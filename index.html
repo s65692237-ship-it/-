@@ -185,13 +185,57 @@
 </body>
 </html>
 <button onclick="navigator.share({title: 'Мемы', url: location.href})">Поделиться</button>
-body {
-    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-    background-size: 400% 400%;
-    animation: gradient 15s ease infinite;
-}
-@keyframes gradient {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
+<style>
+    body {
+        background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+        background-size: 400% 400%;
+        animation: gradient 15s ease infinite;
+        color: #fff;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 50px;
+        min-height: 100vh;
+        margin: 0;
+    }
+    @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    h1 {
+        color: #ff0;
+        text-shadow: 2px 2px 5px #000;
+    }
+    button {
+        background: #f0f;
+        color: #fff;
+        border: none;
+        padding: 15px 30px;
+        font-size: 20px;
+        cursor: pointer;
+        margin-top: 20px;
+        border-radius: 10px;
+    }
+    #meme {
+        margin-top: 30px;
+        font-size: 24px;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 20px;
+        border-radius: 10px;
+        text-shadow: 1px 1px 3px #000;
+    }
+    #memeImg {
+        max-width: 400px;
+        margin-top: 20px;
+        border-radius: 10px;
+        display: none;
+    }
+    footer {
+        margin-top: 50px;
+        padding: 20px;
+        text-align: center;
+        font-size: 20px;
+        color: #fff;
+        text-shadow: 1px 1px 3px #000;
+    }
+</style>
