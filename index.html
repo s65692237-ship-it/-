@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Приколы и шутки</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #111;
+            color: #fff;
+            text-align: center;
+            padding: 50px;
+        }
+        h1 {
+            color: #ff0;
+        }
+        button {
+            background: #f0f;
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            font-size: 20px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        #joke {
+            margin-top: 30px;
+            font-size: 24px;
+            background: #222;
+            padding: 20px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🤣 Генератор шуток 🤣</h1>
+    <div id="joke">Нажми на кнопку, чтобы получить шутку!</div>
+    <button onclick="newJoke()">Новая шутка</button>
+
+    <script>
+        const jokes = [
+            "Почему программисты не любят природу? Слишком много багов.",
+            "— Как дела? — Как в сказке: чем дальше, тем страшнее.",
+            "Мой пароль — 123456. Не пытайся взломать, я сам не могу.",
+            "В школе учили, что лень — двигатель прогресса. Я решил не учиться, чтобы прогресс шёл быстрее.",
+            "— Ты где? — В интернете. — А конкретнее? — В браузере.",
+            "Скачал приложение для медитации. Теперь я спокойно игнорирую все свои проблемы.",
+            "Учёные доказали, что смех продлевает жизнь. Поэтому я смеюсь над своими оценками.",
+            "— Как пройти в библиотеку? — А ты точно туда хочешь? Там скучно.",
+            "Я не толстый, я просто накапливаю энергию для зимы.",
+            "Мой кот смотрит на меня так, будто я его личный раб. И он прав."
+        ];
+
+        function newJoke() {
+            const random = Math.floor(Math.random() * jokes.length);
+            document.getElementById('joke').innerText = jokes[random];
+        }
+    </script>
+</body>
+</html>
