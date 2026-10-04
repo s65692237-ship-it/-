@@ -69,37 +69,72 @@
     setInterval(updateOnline, 5000); // обновление каждые 5 секунд
     updateOnline();
 </script>
-const memes = [
-    { 
-        text: "Когда мама сказала «убери телефон», а ты уже 3 часа смотришь мемы", 
-        img: "https://i.imgflip.com/7q5k1a.jpg" 
-    },
-    { 
-        text: "Тиммейты в CS: «я на А» *умирает первым*", 
-        img: "https://i.imgflip.com/7q5k2b.jpg" 
-    },
-    { 
-        text: "Учитель: «Следующий урок — контрольная» Весь класс: *паника*", 
-        img: "https://i.imgflip.com/7q5k3c.jpg" 
-    },
-    { 
-        text: "Тиктокер: «Снимаю полезный контент» Контент: *танец под одну и ту же песню*", 
-        img: "https://i.imgflip.com/7q5k4d.jpg" 
-    },
-    { 
-        text: "Когда скачал взлом для игры, а там вирус", 
-        img: "https://i.imgflip.com/7q5k5e.jpg" 
-    },
-    { 
-        text: "Интернет: «Скорость 100 Мбит/с» Реальность: *грузит гифку 5 минут*", 
-        img: "https://i.imgflip.com/7q5k6f.jpg" 
-    },
-    { 
-        text: "Когда друг сказал «я знаю, как взломать» и сломал свой же телефон", 
-        img: "https://i.imgflip.com/7q5k7g.jpg" 
-    },
-    { 
-        text: "Родители: «В наше время не было интернета» Я: *не представляю, как вы выжили*", 
-        img: "https://i.imgflip.com/7q5k8h.jpg" 
-    }
-];
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Мемы для своих</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #111;
+            color: #fff;
+            text-align: center;
+            padding: 50px;
+        }
+        h1 {
+            color: #ff0;
+        }
+        button {
+            background: #f0f;
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            font-size: 20px;
+            cursor: pointer;
+            margin-top: 20px;
+            border-radius: 10px;
+        }
+        #meme {
+            margin-top: 30px;
+            font-size: 24px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        #memeImg {
+            max-width: 400px;
+            margin-top: 20px;
+            border-radius: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>🤣 Мемы для своих 🤣</h1>
+    <div id="meme">Нажми на кнопку, чтобы получить мем!</div>
+    <img id="memeImg" src="" alt="Мем">
+    <br>
+    <button onclick="newMeme()">Новый мем</button>
+
+    <script>
+        const memes = [
+            { text: "Когда мама сказала «убери телефон», а ты уже 3 часа смотришь мемы", img: "https://i.imgflip.com/7q5k1a.jpg" },
+            { text: "Тиммейты в CS: «я на А» *умирает первым*", img: "https://i.imgflip.com/7q5k2b.jpg" },
+            { text: "Учитель: «Следующий урок — контрольная» Весь класс: *паника*", img: "https://i.imgflip.com/7q5k3c.jpg" },
+            { text: "Тиктокер: «Снимаю полезный контент» Контент: *танец под одну и ту же песню*", img: "https://i.imgflip.com/7q5k4d.jpg" },
+            { text: "Когда скачал взлом для игры, а там вирус", img: "https://i.imgflip.com/7q5k5e.jpg" },
+            { text: "Интернет: «Скорость 100 Мбит/с» Реальность: *грузит гифку 5 минут*", img: "https://i.imgflip.com/7q5k6f.jpg" },
+            { text: "Когда друг сказал «я знаю, как взломать» и сломал свой же телефон", img: "https://i.imgflip.com/7q5k7g.jpg" },
+            { text: "Родители: «В наше время не было интернета» Я: *не представляю, как вы выжили*", img: "https://i.imgflip.com/7q5k8h.jpg" }
+        ];
+
+        function newMeme() {
+            const random = Math.floor(Math.random() * memes.length);
+            document.getElementById('meme').innerText = memes[random].text;
+            const img = document.getElementById('memeImg');
+            img.src = memes[random].img;
+            img.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
