@@ -57,3 +57,15 @@
     </script>
 </body>
 </html>
+<div id="online" style="position: fixed; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: #0f0; padding: 8px 15px; border-radius: 10px; font-family: Arial; font-size: 16px; z-index: 999;">
+    🟢 Онлайн: <span id="onlineCount">1</span>
+</div>
+
+<script>
+    function updateOnline() {
+        const random = Math.floor(Math.random() * 50) + 1; // от 1 до 50
+        document.getElementById('onlineCount').innerText = random;
+    }
+    setInterval(updateOnline, 5000); // обновление каждые 5 секунд
+    updateOnline();
+</script>
