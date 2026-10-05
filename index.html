@@ -242,3 +242,32 @@
 <button onclick="alert('Ты чё, читать не умеешь? Написано же — НЕ НАЖИМАТЬ!')" style="background: #f00; color: #fff; border: none; padding: 15px 30px; font-size: 20px; cursor: pointer; margin-top: 30px; border-radius: 10px;">
     НЕ НАЖИМАТЬ
 </button>
+<button onclick="showRandom()" style="background: #ff0; color: #000; border: 3px solid #f00; padding: 20px 40px; font-size: 24px; font-weight: bold; cursor: pointer; margin-top: 30px; border-radius: 15px; box-shadow: 0 0 20px #f0f;">
+    ПИЗДЕЦ СМЕШНО
+</button>
+<p id="randomText" style="margin-top: 20px; font-size: 28px; color: #fff; text-shadow: 2px 2px 5px #000;"></p>
+
+<script>
+    const randomPhrases = [
+        "Ты чё, самый умный? Иди уроки делай!",
+        "Поебота — это стиль жизни, а ты — его жертва.",
+        "Я твой сайт сломаю, если не дашь шаурму.",
+        "Тиммейты — раки, а ты — бог CS2.",
+        "Мама сказала: «Убери телефон», а я сказал: «Ща, мем досмотрю».",
+        "Купи мне шаурму, и я скажу, где майор в толчке.",
+        "Твой сайт работает лучше, чем твои оценки.",
+        "Я не хакер, я просто умею гуглить.",
+        "Пиздец смешно — это когда училка упала на ровном месте.",
+        "Сайт сделал, а домашку — нет. Красавчик!",
+        "Нажми ещё раз, и я расскажу, где майор в толчке.",
+        "Ты не чмо, ты просто поебота. Это разные вещи."
+    ];
+
+    function showRandom() {
+        const random = Math.floor(Math.random() * randomPhrases.length);
+        document.getElementById('randomText').innerText = randomPhrases[random];
+    }
+</script>
+<button onclick="new Audio('https://www.soundjay.com/buttons/beep-07.wav').play()" style="background: #ff0; color: #000; border: none; padding: 15px 30px; font-size: 20px; cursor: pointer; margin-top: 20px; border-radius: 10px;">
+    ЗВУК
+</button>
