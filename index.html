@@ -314,3 +314,10 @@
         }
     }
 </script>
+<p>👀 Посещений: <span id="visits">0</span></p>
+<script>
+    let visits = parseInt(localStorage.getItem('visits') || '0');
+    visits++;
+    localStorage.setItem('visits', visits);
+    document.getElementById('visits').innerText = visits;
+</script>
