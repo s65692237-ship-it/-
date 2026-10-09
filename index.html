@@ -321,3 +321,17 @@
     localStorage.setItem('visits', visits);
     document.getElementById('visits').innerText = visits;
 </script>
+<img id="memeImg" src="" style="max-width: 300px; margin-top: 20px; display: none;">
+<script>
+    const memeImages = [
+        "https://i.imgflip.com/7q5k1a.jpg",
+        "https://i.imgflip.com/7q5k2b.jpg",
+        "https://i.imgflip.com/7q5k3c.jpg"
+    ];
+    function newMeme() {
+        const random = Math.floor(Math.random() * memeImages.length);
+        const img = document.getElementById('memeImg');
+        img.src = memeImages[random];
+        img.style.display = 'block';
+    }
+</script>
