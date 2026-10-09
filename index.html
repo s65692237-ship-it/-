@@ -286,3 +286,31 @@
     <a href="https://youtube.com/@nitro_blade2?si=Z1EqvfIuNxyfpATm" target="_blank" style="display: inline-block; background: #f00; color: #fff; padding: 15px 40px; text-decoration: none; border-radius: 10px; font-size: 20px; font-weight: bold;">СМОТРЕТЬ КАНАЛ</a>
     <p style="font-size: 16px; color: #aaa; margin-top: 10px;">310 подписчиков • 47 видео</p>
 </div>
+<audio id="bgMusic" loop>
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+</audio>
+
+<button onclick="toggleMusic()" id="musicBtn" style="background: #0f0; color: #000; border: none; padding: 15px 30px; font-size: 20px; cursor: pointer; margin-top: 20px; border-radius: 10px;">
+    🎵 ВКЛЮЧИТЬ МУЗЫКУ
+</button>
+
+<script>
+    const music = document.getElementById('bgMusic');
+    const btn = document.getElementById('musicBtn');
+    let isPlaying = false;
+
+    function toggleMusic() {
+        if (isPlaying) {
+            music.pause();
+            btn.innerText = '🎵 ВКЛЮЧИТЬ МУЗЫКУ';
+            btn.style.background = '#0f0';
+            isPlaying = false;
+        } else {
+            music.volume = 0.3; // тихая громкость (30%)
+            music.play();
+            btn.innerText = '🔇 ВЫКЛЮЧИТЬ МУЗЫКУ';
+            btn.style.background = '#f00';
+            isPlaying = true;
+        }
+    }
+</script>
