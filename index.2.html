@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мой Мессенджер</title>
+    <style>
+        body { margin: 0; background: #0e1621; color: #fff; font-family: Arial; display: flex; flex-direction: column; height: 100vh; }
+        #шапка { background: #17212b; padding: 15px; text-align: center; font-size: 20px; border-bottom: 1px solid #242f3d; }
+        #чат { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; }
+        .сообщение { max-width: 70%; padding: 10px 15px; border-radius: 15px; margin: 5px 0; word-wrap: break-word; }
+        .моё { background: #2b5278; align-self: flex-end; }
+        .чужое { background: #182533; align-self: flex-start; }
+        .имя { font-size: 12px; color: #7d8b99; margin-bottom: 3px; }
+        #ввод { display: flex; padding: 10px; background: #17212b; border-top: 1px solid #242f3d; }
+        #полеИмени { width: 100px; padding: 10px; border: none; border-radius: 10px; background: #242f3d; color: #fff; margin-right: 5px; }
+        #полеТекста { flex: 1; padding: 10px; border: none; border-radius: 10px; background: #242f3d; color: #fff; margin-right: 5px; }
+        #кнопкаОтправить { padding: 10px 20px; border: none; border-radius: 10px; background: #2b5278; color: #fff; cursor: pointer; }
+        #комната { padding: 10px; background: #17212b; text-align: center; }
+        #полеКомнаты { padding: 10px; border: none; border-radius: 10px; background: #242f3d; color: #fff; }
+        #кнопкаВойти { padding: 10px 20px; border: none; border-radius: 10px; background: #2b5278; color: #fff; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div id="шапка">Мой Мессенджер</div>
+    <div id="комната">
+        <input id="полеКомнаты" placeholder="Название комнаты" value="общий">
+        <button id="кнопкаВойти" onclick="войтиВКомнату()">Войти</button>
+    </div>
+    <div id="чат"></div>
+    <div id="ввод">
+        <input id="полеИмени" placeholder="Имя" value="Гость">
+        <input id="полеТекста" placeholder="Сообщение..." onkeypress="if(event.key==='Enter') отправитьСообщение()">
+        <button id="кнопкаОтправить" onclick="отправитьСообщение()">→</button>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script>
+        // ВСТАВЬ СЮДА СВОЙ КОНФИГ ИЗ FIREBASE
+        const конфиг = {
+            apiKey: "AIzaSyCSNsgJB3pFsmkSGLXCCa0R22nAkmr8gM",
+            authDomain: "my-messenger-c9a1e.firebaseapp.com",
+            databaseURL: "https://my-messenger-c9a1e-default-rtdb.firebaseio.com",
+            projectId: "my-messenger-c9a1e",
+        };
+        firebase.initializeApp(конфиг);
+        const база = firebase.database();
+
+        let текущаяКомната = "общий";
+        let имяПользователя = "Гость";
+
+        function войтиВКомнату() {
+            текущаяКомната = document.getElementById('полеКомнаты').value || "общий";
+            document.getElementById('чат').innerHTML = '';
+            загрузитьСообщения();
+        }
+
+        function отправитьСообщение() {
+            const полеТекста = document.getElementById('полеТекста');
+            const полеИмени = document.getElementById('полеИмени');
+            const текст = полеТекста.value.trim();
+            имяПользователя = полеИмени.value.trim() || "Гость";
+            if (!текст) return;
+
+            база.ref('комнаты/' + текущаяКомната).push({
+                имя: имяПользователя,
+                текст: текст,
+                время: Date.now()
+            });
+            полеТекста.value = '';
+        }
+
+        function загрузитьСообщения() {
+            база.ref('комнаты/' + текущаяКомната).on('child_added', (снимок) => {
+                const сообщение = снимок.val();
+                const чат = document.getElementById('чат');
+                const блок = document.createElement('div');
+                блок.className = 'сообщение ' + (сообщение.имя === имяПользователя ? 'моё' : 'чужое');
+                блок.innerHTML = '<div class="имя">' + сообщение.имя + '</div>' + сообщение.текст;
+                чат.appendChild(блок);
+                чат.scrollTop = чат.scrollHeight;
+            });
+        }
+
+        войтиВКомнату();
+    </script>
+</body>
+</html>
