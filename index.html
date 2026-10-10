@@ -387,3 +387,14 @@
         bot.style.top = botY + 'px';
     }, 3000);
 </script>
+<p>Мемов просмотрено: <span id="totalMemes">0</span></p>
+<script>
+    let total = parseInt(localStorage.getItem('totalMemes') || '0');
+    document.getElementById('totalMemes').innerText = total;
+    function addMeme() {
+        total++;
+        localStorage.setItem('totalMemes', total);
+        document.getElementById('totalMemes').innerText = total;
+    }
+    // Вызывай addMeme() при каждом новом меме
+</script>
