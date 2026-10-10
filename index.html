@@ -370,3 +370,20 @@
     <a href="https://www.wildberries.ru" target="_blank" style="display: inline-block; background: #fff; color: #cb11ab; padding: 10px 20px; border-radius: 10px; text-decoration: none; font-weight: bold; margin-top: 10px;">ПЕРЕЙТИ</a>
     <p style="font-size: 10px; margin-top: 10px; opacity: 0.7;">Реклама. ООО «Вайлдберриз»</p>
 </div>
+<!-- Летающий бот -->
+<div id="bot" style="position: fixed; font-size: 50px; z-index: 9999; pointer-events: none; transition: all 3s ease-in-out;">🤖</div>
+
+<script>
+    const bot = document.getElementById('bot');
+    let botX = Math.random() * window.innerWidth;
+    let botY = Math.random() * window.innerHeight;
+    bot.style.left = botX + 'px';
+    bot.style.top = botY + 'px';
+
+    setInterval(() => {
+        botX = Math.random() * (window.innerWidth - 60);
+        botY = Math.random() * (window.innerHeight - 60);
+        bot.style.left = botX + 'px';
+        bot.style.top = botY + 'px';
+    }, 3000);
+</script>
