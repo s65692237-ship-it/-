@@ -370,3 +370,50 @@
     <a href="https://www.wildberries.ru" target="_blank" style="display: inline-block; background: #fff; color: #cb11ab; padding: 10px 20px; border-radius: 10px; text-decoration: none; font-weight: bold; margin-top: 10px;">ПЕРЕЙТИ</a>
     <p style="font-size: 10px; margin-top: 10px; opacity: 0.7;">Реклама. ООО «Вайлдберриз»</p>
 </div>
+<!-- Бот -->
+<div id="bot" style="position: fixed; bottom: 100px; right: 100px; font-size: 60px; cursor: pointer; z-index: 9999; transition: all 0.5s;">🤖</div>
+<div id="botMessage" style="position: fixed; bottom: 180px; right: 100px; background: rgba(0,0,0,0.8); color: #fff; padding: 10px 20px; border-radius: 15px; font-family: Arial; font-size: 16px; z-index: 9999; display: none;"></div>
+
+<script>
+    const bot = document.getElementById('bot');
+    const botMessage = document.getElementById('botMessage');
+    const phrases = [
+        "О, мем!",
+        "Это база!",
+        "Ахахах, ну ты дал!",
+        "Я бот, я тут живу.",
+        "Нажми на меня ещё раз!",
+        "Тут так весело!",
+        "Поебота!",
+        "Мне нравится этот сайт."
+    ];
+
+    // Бот сам кликает по кнопкам
+    setInterval(() => {
+        // Двигаем бота
+        const randomX = Math.random() * (window.innerWidth - 100);
+        const randomY = Math.random() * (window.innerHeight - 100);
+        bot.style.right = randomX + 'px';
+        bot.style.bottom = randomY + 'px';
+
+        // Показываем сообщение
+        const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+        botMessage.innerText = randomPhrase;
+        botMessage.style.display = 'block';
+        setTimeout(() => { botMessage.style.display = 'none'; }, 2000);
+
+        // Нажимаем на случайную кнопку (если она есть)
+        const buttons = document.querySelectorAll('button');
+        if (buttons.length > 0) {
+            const randomButton = buttons[Math.floor(Math.random() * buttons.length)];
+            randomButton.click();
+        }
+    }, 5000);
+
+    // Бот реагирует на клик
+    bot.addEventListener('click', () => {
+        botMessage.innerText = "Ты меня нашёл! 🩷";
+        botMessage.style.display = 'block';
+        setTimeout(() => { botMessage.style.display = 'none'; }, 2000);
+    });
+</script>
