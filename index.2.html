@@ -34,11 +34,9 @@
         <button id="sendBtn" onclick="sendMessage()">→</button>
     </div>
 
-    <!-- Firebase через другой CDN -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script>
-        // Твой конфиг
         const firebaseConfig = {
             apiKey: "AIzaSyCSNsgJB3pFsmkSGLXCCa0R22nAkmr8gM",
             authDomain: "my-messenger-c9a1e.firebaseapp.com",
@@ -49,6 +47,7 @@
         let currentRoom = "общий";
         let userName = "Гость";
         let db = null;
+        let currentRef = null; // Ссылка на текущую комнату
 
         try {
             firebase.initializeApp(firebaseConfig);
@@ -58,21 +57,29 @@
         }
 
         function joinRoom() {
-            if (!db) { alert("Firebase не загрузился. Проверь интернет."); return; }
+            if (!db) { alert("Firebase не загрузился."); return; }
+            
+            // Отписываемся от старой комнаты, если есть
+            if (currentRef) {
+                currentRef.off();
+            }
+            
             currentRoom = document.getElementById('roomInput').value || "общий";
             document.getElementById('chat').innerHTML = '';
+            
+            currentRef = db.ref('rooms/' + currentRoom);
             loadMessages();
         }
 
         function sendMessage() {
-            if (!db) { alert("Firebase не загрузился."); return; }
+            if (!db || !currentRef) { alert("Сначала войди в комнату."); return; }
             const msgInput = document.getElementById('msgInput');
             const nameInput = document.getElementById('nameInput');
             const text = msgInput.value.trim();
             userName = nameInput.value.trim() || "Гость";
             if (!text) return;
 
-            db.ref('rooms/' + currentRoom).push({
+            currentRef.push({
                 name: userName,
                 text: text,
                 time: Date.now()
@@ -81,8 +88,7 @@
         }
 
         function loadMessages() {
-            if (!db) return;
-            db.ref('rooms/' + currentRoom).on('child_added', (snapshot) => {
+            currentRef.on('child_added', (snapshot) => {
                 const msg = snapshot.val();
                 const chat = document.getElementById('chat');
                 const div = document.createElement('div');
@@ -93,7 +99,6 @@
             });
         }
 
-        // Автозапуск
         window.onload = function() {
             if (db) joinRoom();
         };
