@@ -225,3 +225,13 @@
     #avatarBtn, #emojiBtn { font-size: 18px; padding: 3px 6px; }
     .message { max-width: 85%; }
 }
+// Добавь в Firebase: при входе в комнату
+currentRef.child('users/' + userName).set(true);
+currentRef.child('users/' + userName).onDisconnect().remove();
+
+// Показ списка
+currentRef.child('users').on('value', (snap) => {
+    const users = [];
+    snap.forEach((child) => users.push(child.key));
+    document.getElementById('onlineList').innerText = 'Онлайн: ' + users.join(', ');
+});
