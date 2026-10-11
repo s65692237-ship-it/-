@@ -43,6 +43,7 @@
         .my .delete-btn, .my .edit-btn { display: block; }
         .reaction { position: absolute; bottom: -10px; right: 10px; background: #17212b; border-radius: 10px; padding: 2px 5px; font-size: 14px; }
         .photo-msg { max-width: 100%; border-radius: 10px; margin-top: 5px; }
+        .sticker-msg { width: 120px; height: 120px; margin-top: 5px; }
         
         #inputArea { display: flex; padding: 10px; background: #17212b; border-top: 1px solid #242f3d; align-items: center; }
         #msgInput { flex: 1; padding: 10px; border: none; border-radius: 10px; background: #242f3d; color: #fff; margin-right: 5px; }
@@ -57,9 +58,10 @@
         #avatarPanel span { font-size: 30px; cursor: pointer; margin: 5px; display: inline-block; }
         #emojiPanel { position: fixed; bottom: 70px; right: 10px; background: #17212b; padding: 10px; border-radius: 10px; display: none; z-index: 100; border: 1px solid #242f3d; width: 280px; max-height: 200px; overflow-y: auto; }
         #emojiPanel span { font-size: 24px; cursor: pointer; margin: 3px; display: inline-block; }
-        #stickerPanel { position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); background: #17212b; padding: 10px; border-radius: 10px; display: none; z-index: 100; border: 1px solid #242f3d; width: 300px; max-height: 250px; overflow-y: auto; }
-        #stickerPanel img { width: 60px; height: 60px; cursor: pointer; margin: 5px; display: inline-block; border-radius: 10px; }
-        #stickerPanel span { font-size: 40px; cursor: pointer; margin: 5px; display: inline-block; }
+        #stickerPanel { position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); background: #17212b; padding: 10px; border-radius: 10px; display: none; z-index: 100; border: 1px solid #242f3d; width: 320px; max-height: 300px; overflow-y: auto; }
+        .sticker-item { display: inline-block; width: 90px; height: 90px; border-radius: 50%; background: #2b5278; margin: 5px; cursor: pointer; position: relative; overflow: hidden; text-align: center; line-height: 90px; font-size: 20px; font-weight: bold; color: #fff; border: 3px solid #1a3a5a; }
+        .sticker-item span { display: block; font-size: 40px; line-height: 1; margin-top: 20px; }
+        .sticker-item .label { font-size: 12px; line-height: 1; margin-top: 5px; }
         
         #premiumPanel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #17212b; padding: 20px; border-radius: 15px; display: none; z-index: 200; border: 2px solid #ffd700; text-align: center; width: 90%; max-width: 350px; }
         #premiumPanel button { display: block; width: 100%; margin: 5px 0; padding: 10px; border: none; border-radius: 8px; background: #2b5278; color: #fff; cursor: pointer; }
@@ -127,9 +129,10 @@
             #avatarPanel span { font-size: 26px; }
             #emojiPanel { bottom: 60px; right: 5px; padding: 8px; width: 220px; }
             #emojiPanel span { font-size: 20px; }
-            #stickerPanel { bottom: 60px; left: 50%; transform: translateX(-50%); padding: 8px; width: 260px; }
-            #stickerPanel img { width: 50px; height: 50px; }
-            #stickerPanel span { font-size: 30px; }
+            #stickerPanel { bottom: 60px; left: 50%; transform: translateX(-50%); padding: 8px; width: 280px; }
+            .sticker-item { width: 70px; height: 70px; line-height: 70px; }
+            .sticker-item span { font-size: 30px; margin-top: 15px; }
+            .sticker-item .label { font-size: 10px; }
         }
     </style>
 </head>
@@ -160,7 +163,7 @@
         <div id="inputArea">
             <button id="emojiBtn" onclick="toggleEmojiPanel()">😀</button>
             <button id="giftBtn" onclick="toggleGiftPanel()">🎁</button>
-            <button id="stickerBtn" onclick="toggleStickerPanel()">🐱</button>
+            <button id="stickerBtn" onclick="toggleStickerPanel()">🩷</button>
             <button id="photoBtn" onclick="document.getElementById('photoInput').click()">📷</button>
             <input type="file" id="photoInput" accept="image/*" onchange="sendPhoto()">
             <input id="msgInput" placeholder="Сообщение..." onkeypress="if(event.key==='Enter') sendMessage()">
@@ -215,34 +218,70 @@
     </div>
     
     <div id="stickerPanel">
-        <p style="font-size:12px; color:#7d8b99; margin:0 0 5px 0;">Животные</p>
-        <img src="https://media.tenor.com/On7kvXhzml4AAAAj/kitty-transparent.gif" onclick="addSticker('https://media.tenor.com/On7kvXhzml4AAAAj/kitty-transparent.gif')">
-        <img src="https://media.tenor.com/2nKST5w7e7AAAAAj/dog-puppy.gif" onclick="addSticker('https://media.tenor.com/2nKST5w7e7AAAAAj/dog-puppy.gif')">
-        <img src="https://media.tenor.com/8vX8X8X8X8AAAAj/fox.gif" onclick="addSticker('https://media.tenor.com/8vX8X8X8X8AAAAj/fox.gif')">
-        <img src="https://media.tenor.com/9vX8X8X8X8AAAAj/panda.gif" onclick="addSticker('https://media.tenor.com/9vX8X8X8X8AAAAj/panda.gif')">
-        <img src="https://media.tenor.com/7vX8X8X8X8AAAAj/frog.gif" onclick="addSticker('https://media.tenor.com/7vX8X8X8X8AAAAj/frog.gif')">
-        <img src="https://media.tenor.com/6vX8X8X8X8AAAAj/unicorn.gif" onclick="addSticker('https://media.tenor.com/6vX8X8X8X8AAAAj/unicorn.gif')">
-        
-        <p style="font-size:12px; color:#7d8b99; margin:5px 0;">Смайлы</p>
-        <span onclick="addSticker('😀')">😀</span>
-        <span onclick="addSticker('😂')">😂</span>
-        <span onclick="addSticker('🥰')">🥰</span>
-        <span onclick="addSticker('😎')">😎</span>
-        <span onclick="addSticker('🤔')">🤔</span>
-        <span onclick="addSticker('😴')">😴</span>
-        <span onclick="addSticker('🤯')">🤯</span>
-        <span onclick="addSticker('🥶')">🥶</span>
-        
-        <p style="font-size:12px; color:#7d8b99; margin:5px 0;">Сердечки</p>
-        <span onclick="addSticker('❤️')">❤️</span>
-        <span onclick="addSticker('🧡')">🧡</span>
-        <span onclick="addSticker('💛')">💛</span>
-        <span onclick="addSticker('💚')">💚</span>
-        <span onclick="addSticker('💙')">💙</span>
-        <span onclick="addSticker('💜')">💜</span>
-        <span onclick="addSticker('🖤')">🖤</span>
-        <span onclick="addSticker('🤍')">🤍</span>
-        <span onclick="addSticker('🩷')">🩷</span>
+        <div class="sticker-item" onclick="sendSticker('VOX_LOVE')">
+            <span>😍</span>
+            <div class="label">VOX LOVE</div>
+        </div>
+        <div class="sticker-item" onclick="sendSticker('VOX_SCARED')">
+            <span>😱</span>
+            <div class="label">VOX SCARED</div>
+        </div>
+        <div class="sticker-item" onclick="sendSticker('VOX_SURPRISED')">
+            <span>😲</span>
+            <div class="label">VOX SURPRISED</div>
+        </div>
+        <div class="sticker-item" onclick="sendSticker('VOX_HAPPY')">
+            <span>😄</span>
+            <div class="label">VOX HAPPY</div>
+        </div>
+        <div class="sticker-item" onclick="sendSticker('VOX_SAD')">
+            <span>😢</span>
+            <div class="label">VOX SAD</div>
+        </div>
+        <div class="sticker-item" onclick="sendSticker('VOX_ANGRY')">
+            <span>😡</span>
+            <div class="label">VOX ANGRY</div>
+        </div>
+        <div class="sticker-item" onclick="sendSticker('VOX_LAUGH')">
+            <span>😂</span>
+            <div class="label">VOX LAUGH</div>
+        </div>
+        <div class="sticker-item" onclick="sendSticker('VOX_COOL')">
+            <span>😎</span>
+            <div class="label">VOX COOL</div>
+        </div>
+        <div class="sticker-item" onclick="sendSticker('VOX_LOVE_EYES')">
+            <span>😍</span>
+            <div class="label">VOX LOVE EYES</div>
+        </div>
+        <div class="sticker-item" onclick="sendSticker('VOX_CRY')">
+            <span>😭</span>
+            <div class="label">VOX CRY</div>
+        </div>
+        <div class="sticker-item" onclick="sendSticker('VOX_SLEEP')">
+            <span>😴</span>
+            <div class="label">VOX SLEEP</div>
+        </div>
+        <div class="sticker-item" onclick="sendSticker('VOX_THINK')">
+            <span>🤔</span>
+            <div class="label">VOX THINK</div>
+        </div>
+        <div class="sticker-item" onclick="sendSticker('VOX_KISS')">
+            <span>😘</span>
+            <div class="label">VOX KISS</div>
+        </div>
+        <div class="sticker-item" onclick="sendSticker('VOX_HEART')">
+            <span>🩷</span>
+            <div class="label">VOX HEART</div>
+        </div>
+        <div class="sticker-item" onclick="sendSticker('VOX_FIRE')">
+            <span>🔥</span>
+            <div class="label">VOX FIRE</div>
+        </div>
+        <div class="sticker-item" onclick="sendSticker('VOX_SKULL')">
+            <span>💀</span>
+            <div class="label">VOX SKULL</div>
+        </div>
     </div>
     
     <div id="reactionPanel">
@@ -364,6 +403,17 @@
             }
             
             document.getElementById('myIDValue').innerText = userID;
+            
+            db.ref('users/' + userID).once('value', (snap) => {
+                if (!snap.exists()) {
+                    db.ref('users/' + userID).set({
+                        name: "Гость",
+                        rank: "🩷 VOX",
+                        coins: 0,
+                        id: userID
+                    });
+                }
+            });
             
             if (isOwnerSaved === 'true') {
                 isAdmin = true;
@@ -508,30 +558,23 @@
                     
                     alert("Друг " + data.name + " добавлен!");
                 } else {
-                    alert("Пользователь с таким ID не найден!");
+                    db.ref('users/' + friendID).set({
+                        name: "Пользователь",
+                        rank: "🩷 VOX",
+                        coins: 0,
+                        id: friendID
+                    });
+                    
+                    const container = document.getElementById('chats');
+                    const div = document.createElement('div');
+                    div.className = 'chat-item';
+                    div.innerHTML = '<span class="avatar">👤</span><span class="name">Пользователь</span>';
+                    div.onclick = () => openChat('friend_' + friendID, "Пользователь");
+                    container.appendChild(div);
+                    
+                    alert("Друг добавлен!");
                 }
             });
-        }
-
-        // ===== РЕДАКТИРОВАНИЕ СООБЩЕНИЙ =====
-        function showEditPanel(key, text) {
-            editingMessageKey = key;
-            document.getElementById('editInput').value = text;
-            document.getElementById('editPanel').style.display = 'block';
-        }
-
-        function closeEditPanel() {
-            document.getElementById('editPanel').style.display = 'none';
-            editingMessageKey = null;
-        }
-
-        function saveEdit() {
-            const newText = document.getElementById('editInput').value.trim();
-            if (!newText || !editingMessageKey || !currentRef) return;
-            
-            currentRef.child(editingMessageKey).update({ text: newText });
-            closeEditPanel();
-            alert("Сообщение отредактировано!");
         }
 
         // ===== ОТПРАВКА ФОТО =====
@@ -556,6 +599,44 @@
                 document.getElementById('photoInput').value = '';
             };
             reader.readAsDataURL(file);
+        }
+
+        // ===== ОТПРАВКА СТИКЕРА =====
+        function sendSticker(stickerName) {
+            if (!db || !currentRef) return;
+            
+            currentRef.push({
+                name: userName,
+                avatar: userAvatar,
+                rank: userRank,
+                id: userID,
+                text: '',
+                sticker: stickerName,
+                time: Date.now()
+            });
+            
+            document.getElementById('stickerPanel').style.display = 'none';
+        }
+
+        // ===== РЕДАКТИРОВАНИЕ СООБЩЕНИЙ =====
+        function showEditPanel(key, text) {
+            editingMessageKey = key;
+            document.getElementById('editInput').value = text;
+            document.getElementById('editPanel').style.display = 'block';
+        }
+
+        function closeEditPanel() {
+            document.getElementById('editPanel').style.display = 'none';
+            editingMessageKey = null;
+        }
+
+        function saveEdit() {
+            const newText = document.getElementById('editInput').value.trim();
+            if (!newText || !editingMessageKey || !currentRef) return;
+            
+            currentRef.child(editingMessageKey).update({ text: newText });
+            closeEditPanel();
+            alert("Сообщение отредактировано!");
         }
 
         // ===== ДЕЙСТВИЯ НАД СООБЩЕНИЕМ =====
@@ -806,12 +887,6 @@
             document.getElementById('emojiPanel').style.display = 'none';
         }
 
-        function addSticker(sticker) {
-            const msgInput = document.getElementById('msgInput');
-            msgInput.value += sticker;
-            document.getElementById('stickerPanel').style.display = 'none';
-        }
-
         function sendGift(emoji, price) {
             if (coins < price) {
                 alert("Недостаточно коинов! Нужно " + price + ", у тебя " + coins);
@@ -980,6 +1055,9 @@
             if (msg.photo) {
                 contentHtml += '<img src="' + msg.photo + '" class="photo-msg">';
             }
+            if (msg.sticker) {
+                contentHtml += '<div class="sticker-msg" style="background:#2b5278;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-weight:bold;"><span style="font-size:40px;">' + getStickerEmoji(msg.sticker) + '</span><span style="font-size:12px;">' + msg.sticker + '</span></div>';
+            }
             
             bubble.innerHTML = '<div class="name">' + msg.name + ' ' + rankHtml + ' <span class="id">' + (msg.id || '') + '</span></div>' + contentHtml;
             
@@ -1015,6 +1093,28 @@
             
             chat.appendChild(div);
             chat.scrollTop = chat.scrollHeight;
+        }
+
+        function getStickerEmoji(name) {
+            const map = {
+                'VOX_LOVE': '😍',
+                'VOX_SCARED': '😱',
+                'VOX_SURPRISED': '😲',
+                'VOX_HAPPY': '😄',
+                'VOX_SAD': '😢',
+                'VOX_ANGRY': '😡',
+                'VOX_LAUGH': '😂',
+                'VOX_COOL': '😎',
+                'VOX_LOVE_EYES': '😍',
+                'VOX_CRY': '😭',
+                'VOX_SLEEP': '😴',
+                'VOX_THINK': '🤔',
+                'VOX_KISS': '😘',
+                'VOX_HEART': '🩷',
+                'VOX_FIRE': '🔥',
+                'VOX_SKULL': '💀'
+            };
+            return map[name] || '🩷';
         }
 
         function loadChats() {
