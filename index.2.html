@@ -459,13 +459,9 @@
             // ===== ЗАГРУЗКА ДРУЗЕЙ ИЗ БАЗЫ =====
             db.ref('friends/' + userID).on('value', (snap) => {
                 const container = document.getElementById('chats');
-                // Очищаем только добавленных друзей (не трогаем базовые чаты)
-                const baseChats = ['general', 'support', 'chat1', 'chat2'];
-                const friends = snap.val();
-                
-                // Удаляем старые элементы друзей
                 document.querySelectorAll('.friend-chat').forEach(el => el.remove());
                 
+                const friends = snap.val();
                 if (friends) {
                     Object.keys(friends).forEach(friendID => {
                         const friendName = friends[friendID];
@@ -558,7 +554,7 @@
             checkOwner();
         });
 
-        // ===== ДОБАВЛЕНИЕ В ДРУЗЬЯ ПО ID (ИСПРАВЛЕНО) =====
+        // ===== ДОБАВЛЕНИЕ В ДРУЗЬЯ ПО ID =====
         function addFriend() {
             const friendID = prompt("Введи ID друга (VOX-XXXXXX):");
             if (!friendID) return;
@@ -571,11 +567,8 @@
             db.ref('users/' + friendID).once('value', (snap) => {
                 const data = snap.val();
                 if (data && data.name) {
-                    // Добавляем друга себе
                     db.ref('friends/' + userID + '/' + friendID).set(data.name);
-                    // Добавляем себя другу
                     db.ref('friends/' + friendID + '/' + userID).set(userName);
-                    
                     alert("Друг " + data.name + " добавлен!");
                 } else {
                     alert("Пользователь с таким ID не найден!");
@@ -591,7 +584,6 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 const photoData = e.target.result;
-                
                 currentRef.push({
                     name: userName,
                     avatar: userAvatar,
@@ -601,7 +593,6 @@
                     photo: photoData,
                     time: Date.now()
                 });
-                
                 document.getElementById('photoInput').value = '';
             };
             reader.readAsDataURL(file);
@@ -610,7 +601,6 @@
         // ===== ОТПРАВКА СТИКЕРА =====
         function sendSticker(stickerName) {
             if (!db || !currentRef) return;
-            
             currentRef.push({
                 name: userName,
                 avatar: userAvatar,
@@ -620,7 +610,6 @@
                 sticker: stickerName,
                 time: Date.now()
             });
-            
             document.getElementById('stickerPanel').style.display = 'none';
         }
 
@@ -639,7 +628,6 @@
         function saveEdit() {
             const newText = document.getElementById('editInput').value.trim();
             if (!newText || !editingMessageKey || !currentRef) return;
-            
             currentRef.child(editingMessageKey).update({ text: newText });
             closeEditPanel();
             alert("Сообщение отредактировано!");
@@ -689,11 +677,7 @@
                 alert("Назначать админов может только Владелец! Напиши ему в Telegram: @V0XPRM");
                 return;
             }
-            
-            db.ref('users/' + selectedUserID).update({
-                rank: "🛡️ Админ"
-            });
-            
+            db.ref('users/' + selectedUserID).update({ rank: "🛡️ Админ" });
             db.ref('admin/actions').push({ type: 'admin', target: selectedUserName, id: selectedUserID, time: Date.now() });
             alert("Пользователь " + selectedUserName + " (ID: " + selectedUserID + ") назначен админом!");
             closeActionPanel();
@@ -716,16 +700,11 @@
             }
             const amount = prompt("Сколько коинов выдать?");
             if (!amount) return;
-            
             db.ref('users/' + selectedUserID).transaction((user) => {
-                if (user) {
-                    user.coins = (user.coins || 0) + parseInt(amount);
-                } else {
-                    user = { coins: parseInt(amount) };
-                }
+                if (user) { user.coins = (user.coins || 0) + parseInt(amount); }
+                else { user = { coins: parseInt(amount) }; }
                 return user;
             });
-            
             alert("Пользователю " + selectedUserName + " (ID: " + selectedUserID + ") выдано " + amount + " коинов!");
             closeActionPanel();
         }
@@ -768,10 +747,7 @@
         }
 
         function adminGiveRank() {
-            if (!isAdmin || userName !== "Владелец") {
-                alert("Только Владелец может выдавать звания!");
-                return;
-            }
+            if (!isAdmin || userName !== "Владелец") { alert("Только Владелец!"); return; }
             const targetID = document.getElementById('adminTarget').value;
             if (!targetID) return;
             db.ref('users/' + targetID).update({ rank: '👑 VOX Легенда' });
@@ -779,32 +755,21 @@
         }
 
         function adminGiveCoins() {
-            if (!isAdmin || userName !== "Владелец") {
-                alert("Только Владелец может выдавать коины!");
-                return;
-            }
+            if (!isAdmin || userName !== "Владелец") { alert("Только Владелец!"); return; }
             const targetID = document.getElementById('adminTarget').value;
             if (!targetID) return;
             const amount = prompt("Сколько коинов выдать?");
             if (!amount) return;
-            
             db.ref('users/' + targetID).transaction((user) => {
-                if (user) {
-                    user.coins = (user.coins || 0) + parseInt(amount);
-                } else {
-                    user = { coins: parseInt(amount) };
-                }
+                if (user) { user.coins = (user.coins || 0) + parseInt(amount); }
+                else { user = { coins: parseInt(amount) }; }
                 return user;
             });
-            
             alert("Пользователю с ID " + targetID + " выдано " + amount + " коинов!");
         }
 
         function adminWarn() {
-            if (!isAdmin || userName !== "Владелец") {
-                alert("Только Владелец может выдавать предупреждения!");
-                return;
-            }
+            if (!isAdmin || userName !== "Владелец") { alert("Только Владелец!"); return; }
             const targetID = document.getElementById('adminTarget').value;
             if (!targetID) return;
             db.ref('admin/actions').push({ type: 'warn', target: targetID, time: Date.now() });
@@ -812,10 +777,7 @@
         }
 
         function adminMute() {
-            if (!isAdmin || userName !== "Владелец") {
-                alert("Только Владелец может выдавать мут!");
-                return;
-            }
+            if (!isAdmin || userName !== "Владелец") { alert("Только Владелец!"); return; }
             const targetID = document.getElementById('adminTarget').value;
             if (!targetID) return;
             db.ref('admin/actions').push({ type: 'mute', target: targetID, time: Date.now() });
@@ -823,10 +785,7 @@
         }
 
         function adminBan() {
-            if (!isAdmin || userName !== "Владелец") {
-                alert("Только Владелец может банить!");
-                return;
-            }
+            if (!isAdmin || userName !== "Владелец") { alert("Только Владелец!"); return; }
             const targetID = document.getElementById('adminTarget').value;
             if (!targetID) return;
             db.ref('admin/actions').push({ type: 'ban', target: targetID, time: Date.now() });
@@ -901,7 +860,6 @@
             coins -= price;
             document.getElementById('coinCount').innerText = coins;
             db.ref('users/' + userID).update({ coins: coins });
-            
             if (!db || !currentRef) return;
             currentRef.push({
                 name: userName,
@@ -979,7 +937,6 @@
                 const msg = snapshot.val();
                 const key = snapshot.key;
                 if (key === 'users') return;
-                
                 if (msg.name !== userName) {
                     new Audio('https://www.soundjay.com/buttons/beep-07.wav').play();
                 }
@@ -1103,22 +1060,11 @@
 
         function getStickerEmoji(name) {
             const map = {
-                'VOX_LOVE': '😍',
-                'VOX_SCARED': '😱',
-                'VOX_SURPRISED': '😲',
-                'VOX_HAPPY': '😄',
-                'VOX_SAD': '😢',
-                'VOX_ANGRY': '😡',
-                'VOX_LAUGH': '😂',
-                'VOX_COOL': '😎',
-                'VOX_LOVE_EYES': '😍',
-                'VOX_CRY': '😭',
-                'VOX_SLEEP': '😴',
-                'VOX_THINK': '🤔',
-                'VOX_KISS': '😘',
-                'VOX_HEART': '🩷',
-                'VOX_FIRE': '🔥',
-                'VOX_SKULL': '💀'
+                'VOX_LOVE': '😍', 'VOX_SCARED': '😱', 'VOX_SURPRISED': '😲',
+                'VOX_HAPPY': '😄', 'VOX_SAD': '😢', 'VOX_ANGRY': '😡',
+                'VOX_LAUGH': '😂', 'VOX_COOL': '😎', 'VOX_LOVE_EYES': '😍',
+                'VOX_CRY': '😭', 'VOX_SLEEP': '😴', 'VOX_THINK': '🤔',
+                'VOX_KISS': '😘', 'VOX_HEART': '🩷', 'VOX_FIRE': '🔥', 'VOX_SKULL': '💀'
             };
             return map[name] || '🩷';
         }
