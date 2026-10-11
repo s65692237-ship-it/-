@@ -289,17 +289,67 @@
             console.log("Firebase ошибка: " + e.message);
         }
 
-        // ===== ГЕНЕРАЦИЯ ID (один раз при загрузке) =====
-        userID = "VOX-" + Math.floor(Math.random() * 900000 + 100000);
-        document.getElementById('myIDValue').innerText = userID;
+        // ===== ID и ВЛАДЕЛЕЦ ХРАНЯТСЯ В FIREBASE =====
+        // Генерируем ID один раз и сохраняем в Firebase
+        function getOrCreateUser() {
+            // Проверяем, есть ли сохранённый ID в cookie
+            let savedID = getCookie('vox_id');
+            let isOwnerSaved = getCookie('vox_owner');
+            
+            if (savedID) {
+                userID = savedID;
+            } else {
+                userID = "VOX-" + Math.floor(Math.random() * 900000 + 100000);
+                setCookie('vox_id', userID, 365);
+            }
+            
+            document.getElementById('myIDValue').innerText = userID;
+            
+            // Если владелец сохранён — восстанавливаем
+            if (isOwnerSaved === 'true') {
+                isAdmin = true;
+                isPrime = true;
+                coins = 999999;
+                userAvatar = "👑";
+                userRank = "👑 Владелец";
+                userName = "Владелец";
+                document.getElementById('nameInput').value = "Владелец";
+                document.getElementById('nameInput').disabled = true;
+                document.getElementById('adminBtn').style.display = "block";
+                document.getElementById('coinCount').innerText = coins;
+                document.getElementById('avatarBtn').innerText = "👑";
+            }
+        }
+
+        // ===== COOKIE =====
+        function setCookie(name, value, days) {
+            let expires = "";
+            if (days) {
+                let date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                expires = "; expires=" + date.toUTCString();
+            }
+            document.cookie = name + "=" + (value || "") + expires + "; path=/";
+        }
+
+        function getCookie(name) {
+            let nameEQ = name + "=";
+            let ca = document.cookie.split(';');
+            for(let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+            }
+            return null;
+        }
 
         // ===== ПРОВЕРКА НА ВЛАДЕЛЬЦА (ПО ИМЕНИ + КОДУ) =====
         function checkOwner() {
             userName = document.getElementById('nameInput').value.trim() || "Гость";
             
-            if (userName === "Владелец") {
+            if (userName === "Владелец" && !isAdmin) {
                 document.getElementById('ownerPanel').style.display = 'block';
-            } else {
+            } else if (userName !== "Владелец") {
                 isAdmin = false;
                 isPrime = false;
                 coins = 0;
@@ -325,6 +375,10 @@
                 document.getElementById('coinCount').innerText = coins;
                 document.getElementById('avatarBtn').innerText = "👑";
                 document.getElementById('ownerPanel').style.display = 'none';
+                
+                // Сохраняем владельца в cookie навсегда
+                setCookie('vox_owner', 'true', 365);
+                
                 alert("Добро пожаловать, Владелец!");
             } else {
                 alert("Неверный код!");
@@ -706,6 +760,7 @@
 
         window.onload = function() {
             if (db) {
+                getOrCreateUser();
                 checkOwner();
                 loadChats();
                 openChat('general', 'Общий чат');
