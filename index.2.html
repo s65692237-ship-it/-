@@ -289,21 +289,14 @@
             console.log("Firebase ошибка: " + e.message);
         }
 
-        // ===== ГЕНЕРАЦИЯ ID =====
-        function generateID() {
-            return "VOX-" + Math.floor(Math.random() * 900000 + 100000);
-        }
+        // ===== ГЕНЕРАЦИЯ ID (один раз при загрузке) =====
+        userID = "VOX-" + Math.floor(Math.random() * 900000 + 100000);
+        document.getElementById('myIDValue').innerText = userID;
 
         // ===== ПРОВЕРКА НА ВЛАДЕЛЬЦА (ПО ИМЕНИ + КОДУ) =====
         function checkOwner() {
             userName = document.getElementById('nameInput').value.trim() || "Гость";
             
-            if (!userID) {
-                userID = generateID();
-            }
-            document.getElementById('myIDValue').innerText = userID;
-            
-            // Если имя "Владелец" — показываем панель для кода
             if (userName === "Владелец") {
                 document.getElementById('ownerPanel').style.display = 'block';
             } else {
@@ -342,6 +335,12 @@
             document.getElementById('ownerPanel').style.display = 'none';
             document.getElementById('nameInput').value = "Гость";
         }
+
+        // ===== ПРИМЕНЕНИЕ ИМЕНИ СРАЗУ =====
+        document.getElementById('nameInput').addEventListener('input', function() {
+            userName = this.value.trim() || "Гость";
+            checkOwner();
+        });
 
         // ===== ДЕЙСТВИЯ НАД СООБЩЕНИЕМ =====
         function showActionPanel(name, id) {
