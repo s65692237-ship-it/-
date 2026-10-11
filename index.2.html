@@ -291,6 +291,7 @@
             }
             document.getElementById('myIDValue').innerText = userID;
             
+            // ===== ТОЛЬКО У ТЕБЯ ИМЯ "ВЛАДЕЛЕЦ" И НЕЛЬЗЯ ИЗМЕНИТЬ =====
             if (userName === "Владелец") {
                 isAdmin = true;
                 isPrime = true;
@@ -587,7 +588,6 @@
             div.className = 'message ' + (msg.name === userName ? 'my' : 'other');
             if (msg.gift) div.style.background = '#ffd700';
             
-            // Долгое нажатие для действий (только для админа)
             if (isAdmin && msg.name !== userName) {
                 let pressTimer;
                 div.addEventListener('mousedown', () => {
@@ -601,7 +601,6 @@
                 div.addEventListener('touchend', () => clearTimeout(pressTimer));
             }
             
-            // Долгое нажатие для реакции (для всех)
             let pressTimer2;
             div.addEventListener('mousedown', () => {
                 pressTimer2 = setTimeout(() => showReactionPanel(key), 800);
