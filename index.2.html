@@ -242,7 +242,7 @@
         <button onclick="adminGiveRank()">Выдать звание</button>
         <button onclick="adminGiveCoins()">Выдать коины</button>
         <button onclick="adminWarn()">Предупреждение</button>
-        <button onclick="adminBan()">Бан</button>
+        <button onclick="adminBan()">Забанить</button>
         <button onclick="toggleAdminPanel()">Закрыть</button>
     </div>
 
@@ -277,21 +277,23 @@
             console.log("Firebase ошибка: " + e.message);
         }
 
-        // ===== ГЕНЕРАЦИЯ ID =====
-        function generateID() {
-            return "VOX-" + Math.floor(Math.random() * 900000 + 100000);
+        // ===== ГЕНЕРАЦИЯ ID С СОХРАНЕНИЕМ =====
+        function getSavedID() {
+            let id = localStorage.getItem('vox_id');
+            if (!id) {
+                id = "VOX-" + Math.floor(Math.random() * 900000 + 100000);
+                localStorage.setItem('vox_id', id);
+            }
+            return id;
         }
 
         // ===== ПРОВЕРКА НА ВЛАДЕЛЬЦА =====
         function checkOwner() {
             userName = document.getElementById('nameInput').value.trim() || "Гость";
             
-            if (!userID) {
-                userID = generateID();
-            }
+            userID = getSavedID();
             document.getElementById('myIDValue').innerText = userID;
             
-            // ===== ТОЛЬКО У ТЕБЯ ИМЯ "ВЛАДЕЛЕЦ" И НЕЛЬЗЯ ИЗМЕНИТЬ =====
             if (userName === "Владелец") {
                 isAdmin = true;
                 isPrime = true;
@@ -659,6 +661,7 @@
         function loadChats() {
             const chats = [
                 { id: 'general', name: 'Общий чат', avatar: '🌍' },
+                { id: 'support', name: 'Поддержка', avatar: '🆘' },
                 { id: 'chat1', name: 'Чат 1', avatar: '💬' },
                 { id: 'chat2', name: 'Чат 2', avatar: '💬' }
             ];
