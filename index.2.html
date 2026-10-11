@@ -49,6 +49,9 @@
         #premiumPanel button { display: block; width: 100%; margin: 5px 0; padding: 10px; border: none; border-radius: 8px; background: #2b5278; color: #fff; cursor: pointer; }
         #giftPanel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #17212b; padding: 20px; border-radius: 15px; display: none; z-index: 200; border: 2px solid #ffd700; text-align: center; }
         #giftPanel button { display: block; width: 100%; margin: 5px 0; padding: 10px; border: none; border-radius: 8px; background: #2b5278; color: #fff; cursor: pointer; }
+        #adminPanel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #17212b; padding: 20px; border-radius: 15px; display: none; z-index: 300; border: 2px solid #f00; text-align: center; width: 300px; }
+        #adminPanel button { display: block; width: 100%; margin: 5px 0; padding: 10px; border: none; border-radius: 8px; background: #2b5278; color: #fff; cursor: pointer; }
+        #adminPanel input { width: 100%; padding: 8px; margin: 5px 0; border: none; border-radius: 8px; background: #242f3d; color: #fff; }
         
         @media (max-width: 700px) {
             #sidebar { width: 100%; }
@@ -62,13 +65,14 @@
     <div id="sidebar">
         <div id="logo">VOX</div>
         <div id="userInfo">
-            <input id="nameInput" placeholder="Имя" value="Гость">
-            <button onclick="toggleAvatarPanel()" id="avatarBtn">🐱</button>
+            <input id="nameInput" placeholder="Имя" value="Владелец">
+            <button onclick="toggleAvatarPanel()" id="avatarBtn">👑</button>
             <button onclick="togglePremiumPanel()">💎</button>
             <button id="addFriend" onclick="addFriend()">+ Добавить друга</button>
             <button onclick="buyCoins()" style="background: #ffd700; color: #000;">💰 Купить коины</button>
+            <button onclick="toggleAdminPanel()" id="adminBtn" style="background: #f00;">⚙️ Админ</button>
         </div>
-        <div id="coins">Коины: <span id="coinCount">0</span></div>
+        <div id="coins">Коины: <span id="coinCount">999999</span></div>
         <div id="chats"></div>
     </div>
     
@@ -116,6 +120,7 @@
     <div id="premiumPanel">
         <h2>💎 VOX Premium</h2>
         <p>Выбери своё звание:</p>
+        <button onclick="buyPrime()" style="background: #ffd700; color: #000; font-weight: bold;">👑 VOX Prime — 100 рублей</button>
         <button onclick="setRank('🩷 VOX')">🩷 VOX (обычный)</button>
         <button onclick="setRank('😎 VOX Крутой')">😎 VOX Крутой</button>
         <button onclick="setRank('💎 VOX Донатер')">💎 VOX Донатер</button>
@@ -130,6 +135,16 @@
         <button onclick="sendGift('👑', 50)">👑 Корона — 50 коинов</button>
         <button onclick="sendGift('💎', 100)">💎 Алмаз — 100 коинов</button>
     </div>
+    
+    <div id="adminPanel">
+        <h2>⚙️ Админ-панель</h2>
+        <input id="adminTarget" placeholder="Имя пользователя">
+        <button onclick="adminGiveRank()">Выдать звание</button>
+        <button onclick="adminGiveCoins()">Выдать коины</button>
+        <button onclick="adminWarn()">Предупреждение</button>
+        <button onclick="adminBan()">Бан</button>
+        <button onclick="toggleAdminPanel()">Закрыть</button>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -142,10 +157,12 @@
         };
 
         let currentChat = "general";
-        let userName = "Гость";
-        let userAvatar = "🐱";
-        let userRank = "🩷 VOX";
-        let coins = 0;
+        let userName = "Владелец";
+        let userAvatar = "👑";
+        let userRank = "👑 Владелец";
+        let coins = 999999;
+        let isPrime = true;
+        let isAdmin = true;
         let db = null;
         let currentRef = null;
 
@@ -156,6 +173,44 @@
             console.log("Firebase ошибка: " + e.message);
         }
 
+        // ===== АДМИН =====
+        document.getElementById('nameInput').disabled = true;
+        document.getElementById('adminBtn').style.display = "block";
+
+        function toggleAdminPanel() {
+            const panel = document.getElementById('adminPanel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function adminGiveRank() {
+            const target = document.getElementById('adminTarget').value;
+            if (!target) return;
+            db.ref('admin/actions').push({ type: 'rank', target: target, value: '👑 VOX Легенда', time: Date.now() });
+            alert("Пользователю " + target + " выдано звание Легенда!");
+        }
+
+        function adminGiveCoins() {
+            const target = document.getElementById('adminTarget').value;
+            if (!target) return;
+            db.ref('admin/actions').push({ type: 'coins', target: target, value: 100, time: Date.now() });
+            alert("Пользователю " + target + " выдано 100 коинов!");
+        }
+
+        function adminWarn() {
+            const target = document.getElementById('adminTarget').value;
+            if (!target) return;
+            db.ref('admin/actions').push({ type: 'warn', target: target, time: Date.now() });
+            alert("Пользователю " + target + " выдано предупреждение!");
+        }
+
+        function adminBan() {
+            const target = document.getElementById('adminTarget').value;
+            if (!target) return;
+            db.ref('admin/actions').push({ type: 'ban', target: target, time: Date.now() });
+            alert("Пользователь " + target + " забанен!");
+        }
+
+        // ===== ОСТАЛЬНОЕ =====
         function toggleAvatarPanel() {
             const panel = document.getElementById('avatarPanel');
             panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
@@ -183,24 +238,27 @@
         }
 
         function setRank(rank) {
+            if (!isPrime && rank !== '🩷 VOX') {
+                alert("Сначала купи VOX Prime за 100 рублей!");
+                return;
+            }
             userRank = rank;
             document.getElementById('premiumPanel').style.display = 'none';
             alert("Ты получил звание: " + rank);
+        }
+
+        function buyPrime() {
+            window.open("https://boosty.to/voxprime/posts/7fa90967-11cf-4d0b-864a-b239ae6fcd5f", "_blank");
+        }
+
+        function buyCoins() {
+            window.open("https://boosty.to/voxprime/posts/7fa90967-11cf-4d0b-864a-b239ae6fcd5f", "_blank");
         }
 
         function addEmoji(emoji) {
             const msgInput = document.getElementById('msgInput');
             msgInput.value += emoji;
             document.getElementById('emojiPanel').style.display = 'none';
-        }
-
-        function buyCoins() {
-            const amount = prompt("Сколько коинов купить?\n15 коинов = 30 рублей");
-            if (!amount) return;
-            const price = (amount / 15) * 30;
-            alert("Ты купил " + amount + " коинов за " + price + " рублей!");
-            coins += parseInt(amount);
-            document.getElementById('coinCount').innerText = coins;
         }
 
         function sendGift(emoji, price) {
@@ -257,7 +315,6 @@
             if (!db || !currentRef) return;
             const msgInput = document.getElementById('msgInput');
             const text = msgInput.value.trim();
-            userName = document.getElementById('nameInput').value.trim() || "Гость";
             if (!text) return;
 
             currentRef.child('users/' + userName).set(true);
