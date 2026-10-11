@@ -42,19 +42,23 @@
         .edit-btn { position: absolute; top: 5px; right: 28px; background: #ff0; color: #000; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-size: 12px; display: none; }
         .my .delete-btn, .my .edit-btn { display: block; }
         .reaction { position: absolute; bottom: -10px; right: 10px; background: #17212b; border-radius: 10px; padding: 2px 5px; font-size: 14px; }
+        .photo-msg { max-width: 100%; border-radius: 10px; margin-top: 5px; }
         
         #inputArea { display: flex; padding: 10px; background: #17212b; border-top: 1px solid #242f3d; align-items: center; }
         #msgInput { flex: 1; padding: 10px; border: none; border-radius: 10px; background: #242f3d; color: #fff; margin-right: 5px; }
         #emojiBtn { font-size: 24px; background: #242f3d; border: none; border-radius: 10px; padding: 5px 10px; cursor: pointer; margin-right: 5px; }
         #giftBtn { font-size: 24px; background: #242f3d; border: none; border-radius: 10px; padding: 5px 10px; cursor: pointer; margin-right: 5px; }
         #stickerBtn { font-size: 24px; background: #242f3d; border: none; border-radius: 10px; padding: 5px 10px; cursor: pointer; margin-right: 5px; }
+        #photoBtn { font-size: 24px; background: #242f3d; border: none; border-radius: 10px; padding: 5px 10px; cursor: pointer; margin-right: 5px; }
         #sendBtn { padding: 10px 20px; border: none; border-radius: 10px; background: #2b5278; color: #fff; cursor: pointer; }
+        #photoInput { display: none; }
         
         #avatarPanel { position: fixed; bottom: 70px; left: 10px; background: #17212b; padding: 10px; border-radius: 10px; display: none; z-index: 100; border: 1px solid #242f3d; }
         #avatarPanel span { font-size: 30px; cursor: pointer; margin: 5px; display: inline-block; }
         #emojiPanel { position: fixed; bottom: 70px; right: 10px; background: #17212b; padding: 10px; border-radius: 10px; display: none; z-index: 100; border: 1px solid #242f3d; width: 280px; max-height: 200px; overflow-y: auto; }
         #emojiPanel span { font-size: 24px; cursor: pointer; margin: 3px; display: inline-block; }
-        #stickerPanel { position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); background: #17212b; padding: 10px; border-radius: 10px; display: none; z-index: 100; border: 1px solid #242f3d; width: 280px; max-height: 200px; overflow-y: auto; }
+        #stickerPanel { position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); background: #17212b; padding: 10px; border-radius: 10px; display: none; z-index: 100; border: 1px solid #242f3d; width: 300px; max-height: 250px; overflow-y: auto; }
+        #stickerPanel img { width: 60px; height: 60px; cursor: pointer; margin: 5px; display: inline-block; border-radius: 10px; }
         #stickerPanel span { font-size: 40px; cursor: pointer; margin: 5px; display: inline-block; }
         
         #premiumPanel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #17212b; padding: 20px; border-radius: 15px; display: none; z-index: 200; border: 2px solid #ffd700; text-align: center; width: 90%; max-width: 350px; }
@@ -114,7 +118,7 @@
                 z-index: 999;
             }
             #msgInput { padding: 8px; font-size: 14px; }
-            #emojiBtn, #giftBtn, #stickerBtn { font-size: 20px; padding: 4px 8px; }
+            #emojiBtn, #giftBtn, #stickerBtn, #photoBtn { font-size: 20px; padding: 4px 8px; }
             #sendBtn { padding: 8px 15px; font-size: 14px; }
             
             #chat { padding-bottom: 70px; }
@@ -123,7 +127,8 @@
             #avatarPanel span { font-size: 26px; }
             #emojiPanel { bottom: 60px; right: 5px; padding: 8px; width: 220px; }
             #emojiPanel span { font-size: 20px; }
-            #stickerPanel { bottom: 60px; left: 50%; transform: translateX(-50%); padding: 8px; width: 220px; }
+            #stickerPanel { bottom: 60px; left: 50%; transform: translateX(-50%); padding: 8px; width: 260px; }
+            #stickerPanel img { width: 50px; height: 50px; }
             #stickerPanel span { font-size: 30px; }
         }
     </style>
@@ -156,6 +161,8 @@
             <button id="emojiBtn" onclick="toggleEmojiPanel()">😀</button>
             <button id="giftBtn" onclick="toggleGiftPanel()">🎁</button>
             <button id="stickerBtn" onclick="toggleStickerPanel()">🐱</button>
+            <button id="photoBtn" onclick="document.getElementById('photoInput').click()">📷</button>
+            <input type="file" id="photoInput" accept="image/*" onchange="sendPhoto()">
             <input id="msgInput" placeholder="Сообщение..." onkeypress="if(event.key==='Enter') sendMessage()">
             <button id="sendBtn" onclick="sendMessage()">→</button>
         </div>
@@ -209,22 +216,12 @@
     
     <div id="stickerPanel">
         <p style="font-size:12px; color:#7d8b99; margin:0 0 5px 0;">Животные</p>
-        <span onclick="addSticker('🐱')">🐱</span>
-        <span onclick="addSticker('🐶')">🐶</span>
-        <span onclick="addSticker('🦊')">🦊</span>
-        <span onclick="addSticker('🐼')">🐼</span>
-        <span onclick="addSticker('🐸')">🐸</span>
-        <span onclick="addSticker('🦄')">🦄</span>
-        <span onclick="addSticker('🐷')">🐷</span>
-        <span onclick="addSticker('🐵')">🐵</span>
-        <span onclick="addSticker('🦁')">🦁</span>
-        <span onclick="addSticker('🐯')">🐯</span>
-        <span onclick="addSticker('🐨')">🐨</span>
-        <span onclick="addSticker('🐰')">🐰</span>
-        <span onclick="addSticker('🐻')">🐻</span>
-        <span onclick="addSticker('🐮')">🐮</span>
-        <span onclick="addSticker('🐔')">🐔</span>
-        <span onclick="addSticker('🐧')">🐧</span>
+        <img src="https://media.tenor.com/On7kvXhzml4AAAAj/kitty-transparent.gif" onclick="addSticker('https://media.tenor.com/On7kvXhzml4AAAAj/kitty-transparent.gif')">
+        <img src="https://media.tenor.com/2nKST5w7e7AAAAAj/dog-puppy.gif" onclick="addSticker('https://media.tenor.com/2nKST5w7e7AAAAAj/dog-puppy.gif')">
+        <img src="https://media.tenor.com/8vX8X8X8X8AAAAj/fox.gif" onclick="addSticker('https://media.tenor.com/8vX8X8X8X8AAAAj/fox.gif')">
+        <img src="https://media.tenor.com/9vX8X8X8X8AAAAj/panda.gif" onclick="addSticker('https://media.tenor.com/9vX8X8X8X8AAAAj/panda.gif')">
+        <img src="https://media.tenor.com/7vX8X8X8X8AAAAj/frog.gif" onclick="addSticker('https://media.tenor.com/7vX8X8X8X8AAAAj/frog.gif')">
+        <img src="https://media.tenor.com/6vX8X8X8X8AAAAj/unicorn.gif" onclick="addSticker('https://media.tenor.com/6vX8X8X8X8AAAAj/unicorn.gif')">
         
         <p style="font-size:12px; color:#7d8b99; margin:5px 0;">Смайлы</p>
         <span onclick="addSticker('😀')">😀</span>
@@ -235,8 +232,6 @@
         <span onclick="addSticker('😴')">😴</span>
         <span onclick="addSticker('🤯')">🤯</span>
         <span onclick="addSticker('🥶')">🥶</span>
-        <span onclick="addSticker('😭')">😭</span>
-        <span onclick="addSticker('😡')">😡</span>
         
         <p style="font-size:12px; color:#7d8b99; margin:5px 0;">Сердечки</p>
         <span onclick="addSticker('❤️')">❤️</span>
@@ -539,6 +534,30 @@
             alert("Сообщение отредактировано!");
         }
 
+        // ===== ОТПРАВКА ФОТО =====
+        function sendPhoto() {
+            const file = document.getElementById('photoInput').files[0];
+            if (!file || !db || !currentRef) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const photoData = e.target.result;
+                
+                currentRef.push({
+                    name: userName,
+                    avatar: userAvatar,
+                    rank: userRank,
+                    id: userID,
+                    text: '',
+                    photo: photoData,
+                    time: Date.now()
+                });
+                
+                document.getElementById('photoInput').value = '';
+            };
+            reader.readAsDataURL(file);
+        }
+
         // ===== ДЕЙСТВИЯ НАД СООБЩЕНИЕМ =====
         function showActionPanel(name, id) {
             selectedUserName = name;
@@ -787,9 +806,9 @@
             document.getElementById('emojiPanel').style.display = 'none';
         }
 
-        function addSticker(emoji) {
+        function addSticker(sticker) {
             const msgInput = document.getElementById('msgInput');
-            msgInput.value += emoji;
+            msgInput.value += sticker;
             document.getElementById('stickerPanel').style.display = 'none';
         }
 
@@ -957,7 +976,12 @@
                 rankHtml = '<span class="rank">' + msg.rank + '</span>';
             }
             
-            bubble.innerHTML = '<div class="name">' + msg.name + ' ' + rankHtml + ' <span class="id">' + (msg.id || '') + '</span></div>' + msg.text;
+            let contentHtml = msg.text || '';
+            if (msg.photo) {
+                contentHtml += '<img src="' + msg.photo + '" class="photo-msg">';
+            }
+            
+            bubble.innerHTML = '<div class="name">' + msg.name + ' ' + rankHtml + ' <span class="id">' + (msg.id || '') + '</span></div>' + contentHtml;
             
             const delBtn = document.createElement('button');
             delBtn.className = 'delete-btn';
