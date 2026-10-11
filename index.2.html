@@ -10,9 +10,11 @@
         
         #sidebar { width: 300px; background: #17212b; border-right: 1px solid #242f3d; display: flex; flex-direction: column; }
         #logo { padding: 15px; font-size: 24px; font-weight: bold; color: #2b5278; border-bottom: 1px solid #242f3d; text-align: center; }
-        #userInfo { padding: 10px; border-bottom: 1px solid #242f3d; display: flex; align-items: center; }
-        #userInfo input { width: 100px; padding: 8px; border: none; border-radius: 8px; background: #242f3d; color: #fff; margin-right: 5px; }
-        #userInfo button { font-size: 20px; background: #242f3d; border: none; border-radius: 8px; padding: 5px 8px; cursor: pointer; margin-right: 3px; }
+        #userInfo { padding: 10px; border-bottom: 1px solid #242f3d; display: flex; align-items: center; flex-wrap: wrap; }
+        #userInfo input { width: 80px; padding: 6px; border: none; border-radius: 8px; background: #242f3d; color: #fff; margin-right: 3px; margin-bottom: 3px; }
+        #userInfo button { font-size: 16px; background: #242f3d; border: none; border-radius: 8px; padding: 4px 6px; cursor: pointer; margin-right: 3px; margin-bottom: 3px; }
+        #addFriend { width: 100%; padding: 6px; border: none; border-radius: 8px; background: #2b5278; color: #fff; cursor: pointer; margin-top: 5px; }
+        #coins { padding: 5px 10px; font-size: 14px; color: #ffd700; text-align: center; }
         #chats { flex: 1; overflow-y: auto; }
         .chat-item { padding: 15px; border-bottom: 1px solid #242f3d; cursor: pointer; display: flex; align-items: center; }
         .chat-item:hover { background: #202b36; }
@@ -30,17 +32,23 @@
         .msg-avatar { font-size: 24px; margin: 0 8px; }
         .bubble { display: flex; flex-direction: column; }
         .name { font-size: 12px; color: #7d8b99; margin-bottom: 3px; }
+        .rank { font-size: 10px; color: #ffd700; margin-left: 5px; }
         .delete-btn { position: absolute; top: 5px; right: 5px; background: #f00; color: #fff; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-size: 12px; display: none; }
         .my .delete-btn { display: block; }
         #inputArea { display: flex; padding: 10px; background: #17212b; border-top: 1px solid #242f3d; align-items: center; }
         #msgInput { flex: 1; padding: 10px; border: none; border-radius: 10px; background: #242f3d; color: #fff; margin-right: 5px; }
         #emojiBtn { font-size: 24px; background: #242f3d; border: none; border-radius: 10px; padding: 5px 10px; cursor: pointer; margin-right: 5px; }
+        #giftBtn { font-size: 24px; background: #242f3d; border: none; border-radius: 10px; padding: 5px 10px; cursor: pointer; margin-right: 5px; }
         #sendBtn { padding: 10px 20px; border: none; border-radius: 10px; background: #2b5278; color: #fff; cursor: pointer; }
         
         #avatarPanel { position: fixed; bottom: 70px; left: 10px; background: #17212b; padding: 10px; border-radius: 10px; display: none; z-index: 100; border: 1px solid #242f3d; }
         #avatarPanel span { font-size: 30px; cursor: pointer; margin: 5px; display: inline-block; }
         #emojiPanel { position: fixed; bottom: 70px; right: 10px; background: #17212b; padding: 10px; border-radius: 10px; display: none; z-index: 100; border: 1px solid #242f3d; width: 250px; }
         #emojiPanel span { font-size: 24px; cursor: pointer; margin: 3px; display: inline-block; }
+        #premiumPanel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #17212b; padding: 20px; border-radius: 15px; display: none; z-index: 200; border: 2px solid #ffd700; text-align: center; }
+        #premiumPanel button { display: block; width: 100%; margin: 5px 0; padding: 10px; border: none; border-radius: 8px; background: #2b5278; color: #fff; cursor: pointer; }
+        #giftPanel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #17212b; padding: 20px; border-radius: 15px; display: none; z-index: 200; border: 2px solid #ffd700; text-align: center; }
+        #giftPanel button { display: block; width: 100%; margin: 5px 0; padding: 10px; border: none; border-radius: 8px; background: #2b5278; color: #fff; cursor: pointer; }
         
         @media (max-width: 700px) {
             #sidebar { width: 100%; }
@@ -56,7 +64,11 @@
         <div id="userInfo">
             <input id="nameInput" placeholder="Имя" value="Гость">
             <button onclick="toggleAvatarPanel()" id="avatarBtn">🐱</button>
+            <button onclick="togglePremiumPanel()">💎</button>
+            <button id="addFriend" onclick="addFriend()">+ Добавить друга</button>
+            <button onclick="buyCoins()" style="background: #ffd700; color: #000;">💰 Купить коины</button>
         </div>
+        <div id="coins">Коины: <span id="coinCount">0</span></div>
         <div id="chats"></div>
     </div>
     
@@ -66,6 +78,7 @@
         <div id="chat"></div>
         <div id="inputArea">
             <button id="emojiBtn" onclick="toggleEmojiPanel()">😀</button>
+            <button id="giftBtn" onclick="toggleGiftPanel()">🎁</button>
             <input id="msgInput" placeholder="Сообщение..." onkeypress="if(event.key==='Enter') sendMessage()">
             <button id="sendBtn" onclick="sendMessage()">→</button>
         </div>
@@ -99,6 +112,24 @@
         <span onclick="addEmoji('⚡')">⚡</span>
         <span onclick="addEmoji('🍕')">🍕</span>
     </div>
+    
+    <div id="premiumPanel">
+        <h2>💎 VOX Premium</h2>
+        <p>Выбери своё звание:</p>
+        <button onclick="setRank('🩷 VOX')">🩷 VOX (обычный)</button>
+        <button onclick="setRank('😎 VOX Крутой')">😎 VOX Крутой</button>
+        <button onclick="setRank('💎 VOX Донатер')">💎 VOX Донатер</button>
+        <button onclick="setRank('👑 VOX Легенда')">👑 VOX Легенда</button>
+    </div>
+    
+    <div id="giftPanel">
+        <h2>🎁 Подарки</h2>
+        <p>Выбери подарок:</p>
+        <button onclick="sendGift('🌹', 15)">🌹 Роза — 15 коинов</button>
+        <button onclick="sendGift('🎁', 25)">🎁 Подарок — 25 коинов</button>
+        <button onclick="sendGift('👑', 50)">👑 Корона — 50 коинов</button>
+        <button onclick="sendGift('💎', 100)">💎 Алмаз — 100 коинов</button>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -113,6 +144,8 @@
         let currentChat = "general";
         let userName = "Гость";
         let userAvatar = "🐱";
+        let userRank = "🩷 VOX";
+        let coins = 0;
         let db = null;
         let currentRef = null;
 
@@ -133,16 +166,61 @@
             panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
         }
 
+        function togglePremiumPanel() {
+            const panel = document.getElementById('premiumPanel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function toggleGiftPanel() {
+            const panel = document.getElementById('giftPanel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        }
+
         function setAvatar(emoji) {
             userAvatar = emoji;
             document.getElementById('avatarBtn').innerText = emoji;
             document.getElementById('avatarPanel').style.display = 'none';
         }
 
+        function setRank(rank) {
+            userRank = rank;
+            document.getElementById('premiumPanel').style.display = 'none';
+            alert("Ты получил звание: " + rank);
+        }
+
         function addEmoji(emoji) {
             const msgInput = document.getElementById('msgInput');
             msgInput.value += emoji;
             document.getElementById('emojiPanel').style.display = 'none';
+        }
+
+        function buyCoins() {
+            const amount = prompt("Сколько коинов купить?\n15 коинов = 30 рублей");
+            if (!amount) return;
+            const price = (amount / 15) * 30;
+            alert("Ты купил " + amount + " коинов за " + price + " рублей!");
+            coins += parseInt(amount);
+            document.getElementById('coinCount').innerText = coins;
+        }
+
+        function sendGift(emoji, price) {
+            if (coins < price) {
+                alert("Недостаточно коинов! Нужно " + price + ", у тебя " + coins);
+                return;
+            }
+            coins -= price;
+            document.getElementById('coinCount').innerText = coins;
+            
+            if (!db || !currentRef) return;
+            currentRef.push({
+                name: userName,
+                avatar: userAvatar,
+                rank: userRank,
+                text: emoji + ' ПОДАРОК! ' + emoji,
+                time: Date.now(),
+                gift: true
+            });
+            document.getElementById('giftPanel').style.display = 'none';
         }
 
         function openChat(chatId, chatName) {
@@ -186,6 +264,7 @@
             currentRef.push({
                 name: userName,
                 avatar: userAvatar,
+                rank: userRank,
                 text: text,
                 time: Date.now()
             });
@@ -228,6 +307,7 @@
             const chat = document.getElementById('chat');
             const div = document.createElement('div');
             div.className = 'message ' + (msg.name === userName ? 'my' : 'other');
+            if (msg.gift) div.style.background = '#ffd700';
             
             const avatarSpan = document.createElement('span');
             avatarSpan.className = 'msg-avatar';
@@ -235,7 +315,7 @@
             
             const bubble = document.createElement('div');
             bubble.className = 'bubble';
-            bubble.innerHTML = '<div class="name">' + msg.name + '</div>' + msg.text;
+            bubble.innerHTML = '<div class="name">' + msg.name + ' <span class="rank">' + (msg.rank || '') + '</span></div>' + msg.text;
             
             const delBtn = document.createElement('button');
             delBtn.className = 'delete-btn';
@@ -247,6 +327,18 @@
             div.appendChild(delBtn);
             chat.appendChild(div);
             chat.scrollTop = chat.scrollHeight;
+        }
+
+        function addFriend() {
+            const friendName = prompt("Введи имя друга:");
+            if (!friendName) return;
+            
+            const container = document.getElementById('chats');
+            const div = document.createElement('div');
+            div.className = 'chat-item';
+            div.innerHTML = '<span class="avatar">👤</span><span class="name">' + friendName + '</span>';
+            div.onclick = () => openChat('friend_' + friendName, friendName);
+            container.appendChild(div);
         }
 
         function loadChats() {
