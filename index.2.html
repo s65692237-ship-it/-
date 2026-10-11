@@ -128,7 +128,7 @@
             <input id="nameInput" placeholder="Имя" value="Гость">
             <button onclick="toggleAvatarPanel()" id="avatarBtn">🐱</button>
             <button onclick="togglePremiumPanel()">💎</button>
-            <button id="addFriend" onclick="addFriend()">+ Добавить друга</button>
+            <button id="addFriend" onclick="addFriend()">+ Добавить по ID</button>
             <button onclick="buyCoins()" style="background: #ffd700; color: #000;">💰 Купить коины</button>
             <button onclick="toggleAdminPanel()" id="adminBtn" style="background: #f00; display: none;">⚙️ Админ</button>
         </div>
@@ -330,7 +330,6 @@
             
             document.getElementById('myIDValue').innerText = userID;
             
-            // ===== ПРОВЕРКА НА ВЛАДЕЛЬЦА =====
             if (isOwnerSaved === 'true') {
                 isAdmin = true;
                 isPrime = true;
@@ -345,7 +344,7 @@
                 document.getElementById('avatarBtn').innerText = "👑";
             }
             
-            // ===== ЗАГРУЗКА КОИНОВ ИЗ БАЗЫ =====
+            // Загрузка коинов из базы
             db.ref('users/' + userID).once('value', (snap) => {
                 const data = snap.val();
                 if (data) {
@@ -359,7 +358,7 @@
                 }
             });
             
-            // ===== СЛУШАЕМ ОБНОВЛЕНИЯ КОИНОВ =====
+            // Слушаем обновления коинов
             db.ref('users/' + userID).on('value', (snap) => {
                 const data = snap.val();
                 if (data && data.coins !== undefined) {
@@ -427,7 +426,6 @@
                 
                 setCookie('vox_owner', 'true', 365);
                 
-                // Сохраняем владельца в базе
                 db.ref('users/' + userID).update({
                     name: "Владелец",
                     rank: "👑 Владелец",
@@ -449,6 +447,35 @@
             userName = this.value.trim() || "Гость";
             checkOwner();
         });
+
+        // ===== ДОБАВЛЕНИЕ В ДРУЗЬЯ ПО ID =====
+        function addFriend() {
+            const friendID = prompt("Введи ID друга (VOX-XXXXXX):");
+            if (!friendID) return;
+            
+            if (friendID === userID) {
+                alert("Это твой ID!");
+                return;
+            }
+            
+            // Проверяем, есть ли такой ID в базе
+            db.ref('users/' + friendID).once('value', (snap) => {
+                const data = snap.val();
+                if (data && data.name) {
+                    // Добавляем в список чатов
+                    const container = document.getElementById('chats');
+                    const div = document.createElement('div');
+                    div.className = 'chat-item';
+                    div.innerHTML = '<span class="avatar">👤</span><span class="name">' + data.name + '</span>';
+                    div.onclick = () => openChat('friend_' + friendID, data.name);
+                    container.appendChild(div);
+                    
+                    alert("Друг " + data.name + " добавлен!");
+                } else {
+                    alert("Пользователь с таким ID не найден!");
+                }
+            });
+        }
 
         // ===== ДЕЙСТВИЯ НАД СООБЩЕНИЕМ =====
         function showActionPanel(name, id) {
@@ -497,7 +524,6 @@
             const amount = prompt("Сколько коинов выдать?");
             if (!amount) return;
             
-            // Начисляем коины в базе
             db.ref('users/' + selectedUserID).transaction((user) => {
                 if (user) {
                     user.coins = (user.coins || 0) + parseInt(amount);
@@ -815,18 +841,6 @@
             
             chat.appendChild(div);
             chat.scrollTop = chat.scrollHeight;
-        }
-
-        function addFriend() {
-            const friendName = prompt("Введи имя друга:");
-            if (!friendName) return;
-            
-            const container = document.getElementById('chats');
-            const div = document.createElement('div');
-            div.className = 'chat-item';
-            div.innerHTML = '<span class="avatar">👤</span><span class="name">' + friendName + '</span>';
-            div.onclick = () => openChat('friend_' + friendName, friendName);
-            container.appendChild(div);
         }
 
         function loadChats() {
