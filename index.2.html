@@ -455,6 +455,28 @@
                     document.getElementById('myRankValue').innerText = userRank;
                 }
             });
+            
+            // ===== ЗАГРУЗКА ДРУЗЕЙ ИЗ БАЗЫ =====
+            db.ref('friends/' + userID).on('value', (snap) => {
+                const container = document.getElementById('chats');
+                // Очищаем только добавленных друзей (не трогаем базовые чаты)
+                const baseChats = ['general', 'support', 'chat1', 'chat2'];
+                const friends = snap.val();
+                
+                // Удаляем старые элементы друзей
+                document.querySelectorAll('.friend-chat').forEach(el => el.remove());
+                
+                if (friends) {
+                    Object.keys(friends).forEach(friendID => {
+                        const friendName = friends[friendID];
+                        const div = document.createElement('div');
+                        div.className = 'chat-item friend-chat';
+                        div.innerHTML = '<span class="avatar">👤</span><span class="name">' + friendName + '</span>';
+                        div.onclick = () => openChat('friend_' + friendID, friendName);
+                        container.appendChild(div);
+                    });
+                }
+            });
         }
 
         function setCookie(name, value, days) {
@@ -536,7 +558,7 @@
             checkOwner();
         });
 
-        // ===== ДОБАВЛЕНИЕ В ДРУЗЬЯ ПО ID =====
+        // ===== ДОБАВЛЕНИЕ В ДРУЗЬЯ ПО ID (ИСПРАВЛЕНО) =====
         function addFriend() {
             const friendID = prompt("Введи ID друга (VOX-XXXXXX):");
             if (!friendID) return;
@@ -549,30 +571,14 @@
             db.ref('users/' + friendID).once('value', (snap) => {
                 const data = snap.val();
                 if (data && data.name) {
-                    const container = document.getElementById('chats');
-                    const div = document.createElement('div');
-                    div.className = 'chat-item';
-                    div.innerHTML = '<span class="avatar">👤</span><span class="name">' + data.name + '</span>';
-                    div.onclick = () => openChat('friend_' + friendID, data.name);
-                    container.appendChild(div);
+                    // Добавляем друга себе
+                    db.ref('friends/' + userID + '/' + friendID).set(data.name);
+                    // Добавляем себя другу
+                    db.ref('friends/' + friendID + '/' + userID).set(userName);
                     
                     alert("Друг " + data.name + " добавлен!");
                 } else {
-                    db.ref('users/' + friendID).set({
-                        name: "Пользователь",
-                        rank: "🩷 VOX",
-                        coins: 0,
-                        id: friendID
-                    });
-                    
-                    const container = document.getElementById('chats');
-                    const div = document.createElement('div');
-                    div.className = 'chat-item';
-                    div.innerHTML = '<span class="avatar">👤</span><span class="name">Пользователь</span>';
-                    div.onclick = () => openChat('friend_' + friendID, "Пользователь");
-                    container.appendChild(div);
-                    
-                    alert("Друг добавлен!");
+                    alert("Пользователь с таким ID не найден!");
                 }
             });
         }
