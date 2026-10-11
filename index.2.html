@@ -58,6 +58,10 @@
         #adminPanel button { display: block; width: 100%; margin: 5px 0; padding: 10px; border: none; border-radius: 8px; background: #2b5278; color: #fff; cursor: pointer; }
         #adminPanel input { width: 100%; padding: 8px; margin: 5px 0; border: none; border-radius: 8px; background: #242f3d; color: #fff; }
         
+        /* ===== ПАНЕЛЬ ДЕЙСТВИЙ НАД СООБЩЕНИЕМ ===== */
+        #actionPanel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #17212b; padding: 15px; border-radius: 15px; display: none; z-index: 400; border: 2px solid #f00; text-align: center; width: 90%; max-width: 300px; }
+        #actionPanel button { display: block; width: 100%; margin: 5px 0; padding: 10px; border: none; border-radius: 8px; background: #2b5278; color: #fff; cursor: pointer; }
+        
         /* ===== ПАНЕЛЬ РЕАКЦИЙ ===== */
         #reactionPanel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #17212b; padding: 15px; border-radius: 15px; display: none; z-index: 400; border: 2px solid #2b5278; text-align: center; }
         #reactionPanel span { font-size: 30px; cursor: pointer; margin: 5px; display: inline-block; }
@@ -114,14 +118,14 @@
     <div id="sidebar">
         <div id="logo">VOX</div>
         <div id="userInfo">
-            <input id="nameInput" placeholder="Имя" value="Владелец">
-            <button onclick="toggleAvatarPanel()" id="avatarBtn">👑</button>
+            <input id="nameInput" placeholder="Имя" value="Гость">
+            <button onclick="toggleAvatarPanel()" id="avatarBtn">🐱</button>
             <button onclick="togglePremiumPanel()">💎</button>
             <button id="addFriend" onclick="addFriend()">+ Добавить друга</button>
             <button onclick="buyCoins()" style="background: #ffd700; color: #000;">💰 Купить коины</button>
-            <button onclick="toggleAdminPanel()" id="adminBtn" style="background: #f00;">⚙️ Админ</button>
+            <button onclick="toggleAdminPanel()" id="adminBtn" style="background: #f00; display: none;">⚙️ Админ</button>
         </div>
-        <div id="coins">Коины: <span id="coinCount">999999</span></div>
+        <div id="coins">Коины: <span id="coinCount">0</span></div>
         <div id="chats"></div>
     </div>
     
@@ -203,6 +207,17 @@
         <button onclick="closeReactionPanel()" style="margin-top:10px; padding:8px; border:none; border-radius:8px; background:#2b5278; color:#fff; cursor:pointer;">Отмена</button>
     </div>
     
+    <!-- ===== ПАНЕЛЬ ДЕЙСТВИЙ НАД СООБЩЕНИЕМ ===== -->
+    <div id="actionPanel">
+        <p>Действия над <span id="actionTargetName"></span>:</p>
+        <button onclick="actionBan()" style="background: #f00;">🚫 Бан</button>
+        <button onclick="actionWarn()" style="background: #f80;">⚠️ Предупреждение</button>
+        <button onclick="actionMute()" style="background: #ff0; color: #000;">🔇 Мут</button>
+        <button onclick="actionGiveAdmin()" style="background: #0f0; color: #000;">👑 Назначить админом</button>
+        <button onclick="actionGivePrime()" style="background: #0ff; color: #000;">💎 Дать Prime</button>
+        <button onclick="closeActionPanel()" style="background: #555;">Отмена</button>
+    </div>
+    
     <div id="premiumPanel">
         <h2>💎 VOX Premium</h2>
         <p>Выбери своё звание:</p>
@@ -243,21 +258,88 @@
         };
 
         let currentChat = "general";
-        let userName = "Владелец";
-        let userAvatar = "👑";
-        let userRank = "👑 Владелец";
-        let coins = 999999;
-        let isPrime = true;
-        let isAdmin = true;
+        let userName = "Гость";
+        let userAvatar = "🐱";
+        let userRank = "🩷 VOX";
+        let coins = 0;
+        let isPrime = false;
+        let isAdmin = false;
         let db = null;
         let currentRef = null;
         let selectedMessageKey = null;
+        let selectedUserName = "";
 
         try {
             firebase.initializeApp(firebaseConfig);
             db = firebase.database();
         } catch(e) {
             console.log("Firebase ошибка: " + e.message);
+        }
+
+        // ===== ПРОВЕРКА НА ВЛАДЕЛЬЦА =====
+        function checkOwner() {
+            userName = document.getElementById('nameInput').value.trim() || "Гость";
+            
+            if (userName === "Владелец") {
+                isAdmin = true;
+                isPrime = true;
+                coins = 999999;
+                userAvatar = "👑";
+                userRank = "👑 Владелец";
+                document.getElementById('nameInput').disabled = true;
+                document.getElementById('adminBtn').style.display = "block";
+                document.getElementById('coinCount').innerText = coins;
+                document.getElementById('avatarBtn').innerText = "👑";
+            } else {
+                isAdmin = false;
+                isPrime = false;
+                coins = 0;
+                userAvatar = "🐱";
+                userRank = "🩷 VOX";
+                document.getElementById('adminBtn').style.display = "none";
+                document.getElementById('coinCount').innerText = coins;
+            }
+        }
+
+        // ===== ДЕЙСТВИЯ НАД СООБЩЕНИЕМ =====
+        function showActionPanel(name) {
+            selectedUserName = name;
+            document.getElementById('actionTargetName').innerText = name;
+            document.getElementById('actionPanel').style.display = 'block';
+        }
+
+        function closeActionPanel() {
+            document.getElementById('actionPanel').style.display = 'none';
+        }
+
+        function actionBan() {
+            db.ref('admin/actions').push({ type: 'ban', target: selectedUserName, time: Date.now() });
+            alert("Пользователь " + selectedUserName + " забанен!");
+            closeActionPanel();
+        }
+
+        function actionWarn() {
+            db.ref('admin/actions').push({ type: 'warn', target: selectedUserName, time: Date.now() });
+            alert("Пользователю " + selectedUserName + " выдано предупреждение!");
+            closeActionPanel();
+        }
+
+        function actionMute() {
+            db.ref('admin/actions').push({ type: 'mute', target: selectedUserName, time: Date.now() });
+            alert("Пользователь " + selectedUserName + " замучен!");
+            closeActionPanel();
+        }
+
+        function actionGiveAdmin() {
+            db.ref('admin/actions').push({ type: 'admin', target: selectedUserName, time: Date.now() });
+            alert("Пользователь " + selectedUserName + " назначен админом!");
+            closeActionPanel();
+        }
+
+        function actionGivePrime() {
+            db.ref('admin/actions').push({ type: 'prime', target: selectedUserName, time: Date.now() });
+            alert("Пользователю " + selectedUserName + " выдан Prime!");
+            closeActionPanel();
         }
 
         // ===== РЕАКЦИИ =====
@@ -283,9 +365,6 @@
         }
 
         // ===== АДМИН =====
-        document.getElementById('nameInput').disabled = true;
-        document.getElementById('adminBtn').style.display = "block";
-
         function toggleAdminPanel() {
             const panel = document.getElementById('adminPanel');
             panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
@@ -477,17 +556,31 @@
             div.className = 'message ' + (msg.name === userName ? 'my' : 'other');
             if (msg.gift) div.style.background = '#ffd700';
             
-            // Долгое нажатие для реакции
-            let pressTimer;
+            // Долгое нажатие для действий (только для админа)
+            if (isAdmin && msg.name !== userName) {
+                let pressTimer;
+                div.addEventListener('mousedown', () => {
+                    pressTimer = setTimeout(() => showActionPanel(msg.name), 500);
+                });
+                div.addEventListener('mouseup', () => clearTimeout(pressTimer));
+                div.addEventListener('mouseleave', () => clearTimeout(pressTimer));
+                div.addEventListener('touchstart', () => {
+                    pressTimer = setTimeout(() => showActionPanel(msg.name), 500);
+                });
+                div.addEventListener('touchend', () => clearTimeout(pressTimer));
+            }
+            
+            // Долгое нажатие для реакции (для всех)
+            let pressTimer2;
             div.addEventListener('mousedown', () => {
-                pressTimer = setTimeout(() => showReactionPanel(key), 500);
+                pressTimer2 = setTimeout(() => showReactionPanel(key), 800);
             });
-            div.addEventListener('mouseup', () => clearTimeout(pressTimer));
-            div.addEventListener('mouseleave', () => clearTimeout(pressTimer));
+            div.addEventListener('mouseup', () => clearTimeout(pressTimer2));
+            div.addEventListener('mouseleave', () => clearTimeout(pressTimer2));
             div.addEventListener('touchstart', () => {
-                pressTimer = setTimeout(() => showReactionPanel(key), 500);
+                pressTimer2 = setTimeout(() => showReactionPanel(key), 800);
             });
-            div.addEventListener('touchend', () => clearTimeout(pressTimer));
+            div.addEventListener('touchend', () => clearTimeout(pressTimer2));
             
             const avatarSpan = document.createElement('span');
             avatarSpan.className = 'msg-avatar';
@@ -554,6 +647,7 @@
 
         window.onload = function() {
             if (db) {
+                checkOwner();
                 loadChats();
                 openChat('general', 'Общий чат');
             }
