@@ -8,7 +8,6 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; background: #0e1621; color: #fff; font-family: Arial; display: flex; height: 100vh; overflow: hidden; }
         
-        /* ===== ДЕСКТОП ===== */
         #sidebar { width: 300px; background: #17212b; border-right: 1px solid #242f3d; display: flex; flex-direction: column; }
         #logo { padding: 15px; font-size: 24px; font-weight: bold; color: #2b5278; border-bottom: 1px solid #242f3d; text-align: center; }
         #userInfo { padding: 10px; border-bottom: 1px solid #242f3d; display: flex; align-items: center; flex-wrap: wrap; }
@@ -16,6 +15,7 @@
         #userInfo button { font-size: 16px; background: #242f3d; border: none; border-radius: 8px; padding: 4px 6px; cursor: pointer; margin-right: 3px; margin-bottom: 3px; }
         #addFriend { width: 100%; padding: 6px; border: none; border-radius: 8px; background: #2b5278; color: #fff; cursor: pointer; margin-top: 5px; }
         #coins { padding: 5px 10px; font-size: 14px; color: #ffd700; text-align: center; }
+        #myID { padding: 5px 10px; font-size: 12px; color: #7d8b99; text-align: center; }
         #chats { flex: 1; overflow-y: auto; }
         .chat-item { padding: 15px; border-bottom: 1px solid #242f3d; cursor: pointer; display: flex; align-items: center; }
         .chat-item:hover { background: #202b36; }
@@ -35,11 +35,11 @@
         .bubble { display: flex; flex-direction: column; }
         .name { font-size: 12px; color: #7d8b99; margin-bottom: 3px; }
         .rank { font-size: 10px; color: #ffd700; margin-left: 5px; }
+        .id { font-size: 10px; color: #666; margin-left: 5px; }
         .delete-btn { position: absolute; top: 5px; right: 5px; background: #f00; color: #fff; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-size: 12px; display: none; }
         .my .delete-btn { display: block; }
         .reaction { position: absolute; bottom: -10px; right: 10px; background: #17212b; border-radius: 10px; padding: 2px 5px; font-size: 14px; }
         
-        /* ===== ПОЛЕ ВВОДА ===== */
         #inputArea { display: flex; padding: 10px; background: #17212b; border-top: 1px solid #242f3d; align-items: center; }
         #msgInput { flex: 1; padding: 10px; border: none; border-radius: 10px; background: #242f3d; color: #fff; margin-right: 5px; }
         #emojiBtn { font-size: 24px; background: #242f3d; border: none; border-radius: 10px; padding: 5px 10px; cursor: pointer; margin-right: 5px; }
@@ -58,15 +58,12 @@
         #adminPanel button { display: block; width: 100%; margin: 5px 0; padding: 10px; border: none; border-radius: 8px; background: #2b5278; color: #fff; cursor: pointer; }
         #adminPanel input { width: 100%; padding: 8px; margin: 5px 0; border: none; border-radius: 8px; background: #242f3d; color: #fff; }
         
-        /* ===== ПАНЕЛЬ ДЕЙСТВИЙ НАД СООБЩЕНИЕМ ===== */
         #actionPanel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #17212b; padding: 15px; border-radius: 15px; display: none; z-index: 400; border: 2px solid #f00; text-align: center; width: 90%; max-width: 300px; }
         #actionPanel button { display: block; width: 100%; margin: 5px 0; padding: 10px; border: none; border-radius: 8px; background: #2b5278; color: #fff; cursor: pointer; }
         
-        /* ===== ПАНЕЛЬ РЕАКЦИЙ ===== */
         #reactionPanel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #17212b; padding: 15px; border-radius: 15px; display: none; z-index: 400; border: 2px solid #2b5278; text-align: center; }
         #reactionPanel span { font-size: 30px; cursor: pointer; margin: 5px; display: inline-block; }
         
-        /* ===== МОБИЛЬНАЯ АДАПТАЦИЯ ===== */
         @media (max-width: 700px) {
             body { flex-direction: column; }
             #sidebar { width: 100%; height: 100%; }
@@ -126,6 +123,7 @@
             <button onclick="toggleAdminPanel()" id="adminBtn" style="background: #f00; display: none;">⚙️ Админ</button>
         </div>
         <div id="coins">Коины: <span id="coinCount">0</span></div>
+        <div id="myID">Мой ID: <span id="myIDValue">...</span></div>
         <div id="chats"></div>
     </div>
     
@@ -207,14 +205,15 @@
         <button onclick="closeReactionPanel()" style="margin-top:10px; padding:8px; border:none; border-radius:8px; background:#2b5278; color:#fff; cursor:pointer;">Отмена</button>
     </div>
     
-    <!-- ===== ПАНЕЛЬ ДЕЙСТВИЙ НАД СООБЩЕНИЕМ ===== -->
     <div id="actionPanel">
-        <p>Действия над <span id="actionTargetName"></span>:</p>
+        <p>Действия над <span id="actionTargetName"></span> (ID: <span id="actionTargetID"></span>):</p>
         <button onclick="actionBan()" style="background: #f00;">🚫 Бан</button>
         <button onclick="actionWarn()" style="background: #f80;">⚠️ Предупреждение</button>
         <button onclick="actionMute()" style="background: #ff0; color: #000;">🔇 Мут</button>
         <button onclick="actionGiveAdmin()" style="background: #0f0; color: #000;">👑 Назначить админом</button>
         <button onclick="actionGivePrime()" style="background: #0ff; color: #000;">💎 Дать Prime</button>
+        <button onclick="actionGiveCoins()" style="background: #ffd700; color: #000;">💰 Дать коины</button>
+        <button onclick="actionGiveGift()" style="background: #f0f; color: #fff;">🎁 Дать подарок</button>
         <button onclick="closeActionPanel()" style="background: #555;">Отмена</button>
     </div>
     
@@ -239,7 +238,7 @@
     
     <div id="adminPanel">
         <h2>⚙️ Админ-панель</h2>
-        <input id="adminTarget" placeholder="Имя пользователя">
+        <input id="adminTarget" placeholder="ID пользователя (VOX-XXXXXX)">
         <button onclick="adminGiveRank()">Выдать звание</button>
         <button onclick="adminGiveCoins()">Выдать коины</button>
         <button onclick="adminWarn()">Предупреждение</button>
@@ -261,6 +260,7 @@
         let userName = "Гость";
         let userAvatar = "🐱";
         let userRank = "🩷 VOX";
+        let userID = "";
         let coins = 0;
         let isPrime = false;
         let isAdmin = false;
@@ -268,6 +268,7 @@
         let currentRef = null;
         let selectedMessageKey = null;
         let selectedUserName = "";
+        let selectedUserID = "";
 
         try {
             firebase.initializeApp(firebaseConfig);
@@ -276,9 +277,19 @@
             console.log("Firebase ошибка: " + e.message);
         }
 
+        // ===== ГЕНЕРАЦИЯ ID =====
+        function generateID() {
+            return "VOX-" + Math.floor(Math.random() * 900000 + 100000);
+        }
+
         // ===== ПРОВЕРКА НА ВЛАДЕЛЬЦА =====
         function checkOwner() {
             userName = document.getElementById('nameInput').value.trim() || "Гость";
+            
+            if (!userID) {
+                userID = generateID();
+            }
+            document.getElementById('myIDValue').innerText = userID;
             
             if (userName === "Владелец") {
                 isAdmin = true;
@@ -302,9 +313,11 @@
         }
 
         // ===== ДЕЙСТВИЯ НАД СООБЩЕНИЕМ =====
-        function showActionPanel(name) {
+        function showActionPanel(name, id) {
             selectedUserName = name;
+            selectedUserID = id;
             document.getElementById('actionTargetName').innerText = name;
+            document.getElementById('actionTargetID').innerText = id;
             document.getElementById('actionPanel').style.display = 'block';
         }
 
@@ -313,32 +326,46 @@
         }
 
         function actionBan() {
-            db.ref('admin/actions').push({ type: 'ban', target: selectedUserName, time: Date.now() });
-            alert("Пользователь " + selectedUserName + " забанен!");
+            db.ref('admin/actions').push({ type: 'ban', target: selectedUserName, id: selectedUserID, time: Date.now() });
+            alert("Пользователь " + selectedUserName + " (ID: " + selectedUserID + ") забанен!");
             closeActionPanel();
         }
 
         function actionWarn() {
-            db.ref('admin/actions').push({ type: 'warn', target: selectedUserName, time: Date.now() });
-            alert("Пользователю " + selectedUserName + " выдано предупреждение!");
+            db.ref('admin/actions').push({ type: 'warn', target: selectedUserName, id: selectedUserID, time: Date.now() });
+            alert("Пользователю " + selectedUserName + " (ID: " + selectedUserID + ") выдано предупреждение!");
             closeActionPanel();
         }
 
         function actionMute() {
-            db.ref('admin/actions').push({ type: 'mute', target: selectedUserName, time: Date.now() });
-            alert("Пользователь " + selectedUserName + " замучен!");
+            db.ref('admin/actions').push({ type: 'mute', target: selectedUserName, id: selectedUserID, time: Date.now() });
+            alert("Пользователь " + selectedUserName + " (ID: " + selectedUserID + ") замучен!");
             closeActionPanel();
         }
 
         function actionGiveAdmin() {
-            db.ref('admin/actions').push({ type: 'admin', target: selectedUserName, time: Date.now() });
-            alert("Пользователь " + selectedUserName + " назначен админом!");
+            db.ref('admin/actions').push({ type: 'admin', target: selectedUserName, id: selectedUserID, time: Date.now() });
+            alert("Пользователь " + selectedUserName + " (ID: " + selectedUserID + ") назначен админом!");
             closeActionPanel();
         }
 
         function actionGivePrime() {
-            db.ref('admin/actions').push({ type: 'prime', target: selectedUserName, time: Date.now() });
-            alert("Пользователю " + selectedUserName + " выдан Prime!");
+            db.ref('admin/actions').push({ type: 'prime', target: selectedUserName, id: selectedUserID, time: Date.now() });
+            alert("Пользователю " + selectedUserName + " (ID: " + selectedUserID + ") выдан Prime!");
+            closeActionPanel();
+        }
+
+        function actionGiveCoins() {
+            const amount = prompt("Сколько коинов выдать?");
+            if (!amount) return;
+            db.ref('admin/actions').push({ type: 'coins', target: selectedUserName, id: selectedUserID, value: parseInt(amount), time: Date.now() });
+            alert("Пользователю " + selectedUserName + " (ID: " + selectedUserID + ") выдано " + amount + " коинов!");
+            closeActionPanel();
+        }
+
+        function actionGiveGift() {
+            db.ref('admin/actions').push({ type: 'gift', target: selectedUserName, id: selectedUserID, time: Date.now() });
+            alert("Пользователю " + selectedUserName + " (ID: " + selectedUserID + ") выдан подарок!");
             closeActionPanel();
         }
 
@@ -371,31 +398,33 @@
         }
 
         function adminGiveRank() {
-            const target = document.getElementById('adminTarget').value;
-            if (!target) return;
-            db.ref('admin/actions').push({ type: 'rank', target: target, value: '👑 VOX Легенда', time: Date.now() });
-            alert("Пользователю " + target + " выдано звание Легенда!");
+            const targetID = document.getElementById('adminTarget').value;
+            if (!targetID) return;
+            db.ref('admin/actions').push({ type: 'rank', target: targetID, value: '👑 VOX Легенда', time: Date.now() });
+            alert("Пользователю с ID " + targetID + " выдано звание Легенда!");
         }
 
         function adminGiveCoins() {
-            const target = document.getElementById('adminTarget').value;
-            if (!target) return;
-            db.ref('admin/actions').push({ type: 'coins', target: target, value: 100, time: Date.now() });
-            alert("Пользователю " + target + " выдано 100 коинов!");
+            const targetID = document.getElementById('adminTarget').value;
+            if (!targetID) return;
+            const amount = prompt("Сколько коинов выдать?");
+            if (!amount) return;
+            db.ref('admin/actions').push({ type: 'coins', target: targetID, value: parseInt(amount), time: Date.now() });
+            alert("Пользователю с ID " + targetID + " выдано " + amount + " коинов!");
         }
 
         function adminWarn() {
-            const target = document.getElementById('adminTarget').value;
-            if (!target) return;
-            db.ref('admin/actions').push({ type: 'warn', target: target, time: Date.now() });
-            alert("Пользователю " + target + " выдано предупреждение!");
+            const targetID = document.getElementById('adminTarget').value;
+            if (!targetID) return;
+            db.ref('admin/actions').push({ type: 'warn', target: targetID, time: Date.now() });
+            alert("Пользователю с ID " + targetID + " выдано предупреждение!");
         }
 
         function adminBan() {
-            const target = document.getElementById('adminTarget').value;
-            if (!target) return;
-            db.ref('admin/actions').push({ type: 'ban', target: target, time: Date.now() });
-            alert("Пользователь " + target + " забанен!");
+            const targetID = document.getElementById('adminTarget').value;
+            if (!targetID) return;
+            db.ref('admin/actions').push({ type: 'ban', target: targetID, time: Date.now() });
+            alert("Пользователь с ID " + targetID + " забанен!");
         }
 
         // ===== ОСТАЛЬНОЕ =====
@@ -464,6 +493,7 @@
                 name: userName,
                 avatar: userAvatar,
                 rank: userRank,
+                id: userID,
                 text: emoji + ' ПОДАРОК! ' + emoji,
                 time: Date.now(),
                 gift: true
@@ -512,6 +542,7 @@
                 name: userName,
                 avatar: userAvatar,
                 rank: userRank,
+                id: userID,
                 text: text,
                 time: Date.now()
             });
@@ -560,12 +591,12 @@
             if (isAdmin && msg.name !== userName) {
                 let pressTimer;
                 div.addEventListener('mousedown', () => {
-                    pressTimer = setTimeout(() => showActionPanel(msg.name), 500);
+                    pressTimer = setTimeout(() => showActionPanel(msg.name, msg.id), 500);
                 });
                 div.addEventListener('mouseup', () => clearTimeout(pressTimer));
                 div.addEventListener('mouseleave', () => clearTimeout(pressTimer));
                 div.addEventListener('touchstart', () => {
-                    pressTimer = setTimeout(() => showActionPanel(msg.name), 500);
+                    pressTimer = setTimeout(() => showActionPanel(msg.name, msg.id), 500);
                 });
                 div.addEventListener('touchend', () => clearTimeout(pressTimer));
             }
@@ -588,7 +619,7 @@
             
             const bubble = document.createElement('div');
             bubble.className = 'bubble';
-            bubble.innerHTML = '<div class="name">' + msg.name + ' <span class="rank">' + (msg.rank || '') + '</span></div>' + msg.text;
+            bubble.innerHTML = '<div class="name">' + msg.name + ' <span class="rank">' + (msg.rank || '') + '</span> <span class="id">' + (msg.id || '') + '</span></div>' + msg.text;
             
             const delBtn = document.createElement('button');
             delBtn.className = 'delete-btn';
@@ -603,7 +634,6 @@
             div.appendChild(bubble);
             div.appendChild(delBtn);
             
-            // Реакция
             if (msg.reaction) {
                 const reactionSpan = document.createElement('span');
                 reactionSpan.className = 'reaction';
