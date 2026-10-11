@@ -16,6 +16,7 @@
         #addFriend { width: 100%; padding: 6px; border: none; border-radius: 8px; background: #2b5278; color: #fff; cursor: pointer; margin-top: 5px; }
         #coins { padding: 5px 10px; font-size: 14px; color: #ffd700; text-align: center; }
         #myID { padding: 5px 10px; font-size: 12px; color: #7d8b99; text-align: center; }
+        #myRank { padding: 5px 10px; font-size: 12px; color: #ffd700; text-align: center; }
         #chats { flex: 1; overflow-y: auto; }
         .chat-item { padding: 15px; border-bottom: 1px solid #242f3d; cursor: pointer; display: flex; align-items: center; }
         .chat-item:hover { background: #202b36; }
@@ -35,6 +36,7 @@
         .bubble { display: flex; flex-direction: column; }
         .name { font-size: 12px; color: #7d8b99; margin-bottom: 3px; }
         .rank { font-size: 10px; color: #ffd700; margin-left: 5px; }
+        .admin-rank { font-size: 10px; color: #f00; margin-left: 5px; font-weight: bold; }
         .id { font-size: 10px; color: #666; margin-left: 5px; }
         .delete-btn { position: absolute; top: 5px; right: 5px; background: #f00; color: #fff; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-size: 12px; display: none; }
         .my .delete-btn { display: block; }
@@ -134,6 +136,7 @@
         </div>
         <div id="coins">Коины: <span id="coinCount">0</span></div>
         <div id="myID">Мой ID: <span id="myIDValue">...</span></div>
+        <div id="myRank">Звание: <span id="myRankValue">🩷 VOX</span></div>
         <div id="chats"></div>
     </div>
     
@@ -342,9 +345,10 @@
                 document.getElementById('adminBtn').style.display = "block";
                 document.getElementById('coinCount').innerText = coins;
                 document.getElementById('avatarBtn').innerText = "👑";
+                document.getElementById('myRankValue').innerText = "👑 Владелец";
             }
             
-            // Загрузка коинов из базы
+            // Загрузка коинов и звания из базы
             db.ref('users/' + userID).once('value', (snap) => {
                 const data = snap.val();
                 if (data) {
@@ -354,11 +358,12 @@
                     }
                     if (data.rank) {
                         userRank = data.rank;
+                        document.getElementById('myRankValue').innerText = userRank;
                     }
                 }
             });
             
-            // Слушаем обновления коинов
+            // Слушаем обновления
             db.ref('users/' + userID).on('value', (snap) => {
                 const data = snap.val();
                 if (data && data.coins !== undefined) {
@@ -367,6 +372,7 @@
                 }
                 if (data && data.rank) {
                     userRank = data.rank;
+                    document.getElementById('myRankValue').innerText = userRank;
                 }
             });
         }
@@ -406,6 +412,7 @@
                 userRank = "🩷 VOX";
                 document.getElementById('adminBtn').style.display = "none";
                 document.getElementById('coinCount').innerText = coins;
+                document.getElementById('myRankValue').innerText = userRank;
             }
         }
 
@@ -422,6 +429,7 @@
                 document.getElementById('adminBtn').style.display = "block";
                 document.getElementById('coinCount').innerText = coins;
                 document.getElementById('avatarBtn').innerText = "👑";
+                document.getElementById('myRankValue').innerText = "👑 Владелец";
                 document.getElementById('ownerPanel').style.display = 'none';
                 
                 setCookie('vox_owner', 'true', 365);
@@ -458,11 +466,9 @@
                 return;
             }
             
-            // Проверяем, есть ли такой ID в базе
             db.ref('users/' + friendID).once('value', (snap) => {
                 const data = snap.val();
                 if (data && data.name) {
-                    // Добавляем в список чатов
                     const container = document.getElementById('chats');
                     const div = document.createElement('div');
                     div.className = 'chat-item';
@@ -491,6 +497,11 @@
         }
 
         function actionBan() {
+            // Только Владелец может банить
+            if (!isAdmin || userName !== "Владелец") {
+                alert("Бан может выдавать только Владелец! Напиши ему в Telegram: @V0XPRM");
+                return;
+            }
             db.ref('admin/actions').push({ type: 'ban', target: selectedUserName, id: selectedUserID, time: Date.now() });
             alert("Пользователь " + selectedUserName + " (ID: " + selectedUserID + ") забанен!");
             closeActionPanel();
@@ -503,24 +514,48 @@
         }
 
         function actionMute() {
+            // Только Владелец может мутить
+            if (!isAdmin || userName !== "Владелец") {
+                alert("Мут может выдавать только Владелец! Напиши ему в Telegram: @V0XPRM");
+                return;
+            }
             db.ref('admin/actions').push({ type: 'mute', target: selectedUserName, id: selectedUserID, time: Date.now() });
             alert("Пользователь " + selectedUserName + " (ID: " + selectedUserID + ") замучен!");
             closeActionPanel();
         }
 
         function actionGiveAdmin() {
+            // Только Владелец может назначать админов
+            if (!isAdmin || userName !== "Владелец") {
+                alert("Назначать админов может только Владелец! Напиши ему в Telegram: @V0XPRM");
+                return;
+            }
+            
+            // Меняем звание на "Админ" и сохраняем в базе
+            db.ref('users/' + selectedUserID).update({
+                rank: "🛡️ Админ"
+            });
+            
             db.ref('admin/actions').push({ type: 'admin', target: selectedUserName, id: selectedUserID, time: Date.now() });
             alert("Пользователь " + selectedUserName + " (ID: " + selectedUserID + ") назначен админом!");
             closeActionPanel();
         }
 
         function actionGivePrime() {
-            db.ref('admin/actions').push({ type: 'prime', target: selectedUserName, id: selectedUserID, time: Date.now() });
+            if (!isAdmin || userName !== "Владелец") {
+                alert("Выдавать Prime может только Владелец! Напиши ему в Telegram: @V0XPRM");
+                return;
+            }
+            db.ref('users/' + selectedUserID).update({ rank: "💎 VOX Донатер" });
             alert("Пользователю " + selectedUserName + " (ID: " + selectedUserID + ") выдан Prime!");
             closeActionPanel();
         }
 
         function actionGiveCoins() {
+            if (!isAdmin || userName !== "Владелец") {
+                alert("Выдавать коины может только Владелец! Напиши ему в Telegram: @V0XPRM");
+                return;
+            }
             const amount = prompt("Сколько коинов выдать?");
             if (!amount) return;
             
@@ -538,6 +573,10 @@
         }
 
         function actionGiveGift() {
+            if (!isAdmin || userName !== "Владелец") {
+                alert("Дарить подарки может только Владелец! Напиши ему в Telegram: @V0XPRM");
+                return;
+            }
             db.ref('admin/actions').push({ type: 'gift', target: selectedUserName, id: selectedUserID, time: Date.now() });
             alert("Пользователю " + selectedUserName + " (ID: " + selectedUserID + ") выдан подарок!");
             closeActionPanel();
@@ -571,6 +610,10 @@
         }
 
         function adminGiveRank() {
+            if (!isAdmin || userName !== "Владелец") {
+                alert("Только Владелец может выдавать звания!");
+                return;
+            }
             const targetID = document.getElementById('adminTarget').value;
             if (!targetID) return;
             db.ref('users/' + targetID).update({ rank: '👑 VOX Легенда' });
@@ -578,6 +621,10 @@
         }
 
         function adminGiveCoins() {
+            if (!isAdmin || userName !== "Владелец") {
+                alert("Только Владелец может выдавать коины!");
+                return;
+            }
             const targetID = document.getElementById('adminTarget').value;
             if (!targetID) return;
             const amount = prompt("Сколько коинов выдать?");
@@ -596,6 +643,10 @@
         }
 
         function adminWarn() {
+            if (!isAdmin || userName !== "Владелец") {
+                alert("Только Владелец может выдавать предупреждения!");
+                return;
+            }
             const targetID = document.getElementById('adminTarget').value;
             if (!targetID) return;
             db.ref('admin/actions').push({ type: 'warn', target: targetID, time: Date.now() });
@@ -603,6 +654,10 @@
         }
 
         function adminMute() {
+            if (!isAdmin || userName !== "Владелец") {
+                alert("Только Владелец может выдавать мут!");
+                return;
+            }
             const targetID = document.getElementById('adminTarget').value;
             if (!targetID) return;
             db.ref('admin/actions').push({ type: 'mute', target: targetID, time: Date.now() });
@@ -610,6 +665,10 @@
         }
 
         function adminBan() {
+            if (!isAdmin || userName !== "Владелец") {
+                alert("Только Владелец может банить!");
+                return;
+            }
             const targetID = document.getElementById('adminTarget').value;
             if (!targetID) return;
             db.ref('admin/actions').push({ type: 'ban', target: targetID, time: Date.now() });
@@ -655,6 +714,8 @@
             }
             userRank = rank;
             document.getElementById('premiumPanel').style.display = 'none';
+            document.getElementById('myRankValue').innerText = rank;
+            db.ref('users/' + userID).update({ rank: rank });
             alert("Ты получил звание: " + rank);
         }
 
@@ -687,6 +748,7 @@
             }
             coins -= price;
             document.getElementById('coinCount').innerText = coins;
+            db.ref('users/' + userID).update({ coins: coins });
             
             if (!db || !currentRef) return;
             currentRef.push({
@@ -751,6 +813,11 @@
 
         function deleteMessage(key) {
             if (!db || !currentRef) return;
+            // Удалять сообщения может Владелец и Админ
+            if (!isAdmin && userRank !== "🛡️ Админ" && userName !== "Владелец") {
+                alert("Удалять сообщения может только Владелец и Админ!");
+                return;
+            }
             if (confirm("Удалить сообщение?")) {
                 currentRef.child(key).remove();
             }
@@ -817,14 +884,22 @@
             
             const bubble = document.createElement('div');
             bubble.className = 'bubble';
-            bubble.innerHTML = '<div class="name">' + msg.name + ' <span class="rank">' + (msg.rank || '') + '</span> <span class="id">' + (msg.id || '') + '</span></div>' + msg.text;
+            
+            let rankHtml = '';
+            if (msg.rank === "🛡️ Админ") {
+                rankHtml = '<span class="admin-rank">🛡️ Админ</span>';
+            } else if (msg.rank) {
+                rankHtml = '<span class="rank">' + msg.rank + '</span>';
+            }
+            
+            bubble.innerHTML = '<div class="name">' + msg.name + ' ' + rankHtml + ' <span class="id">' + (msg.id || '') + '</span></div>' + msg.text;
             
             const delBtn = document.createElement('button');
             delBtn.className = 'delete-btn';
             delBtn.innerText = '✖';
             delBtn.onclick = (e) => { e.stopPropagation(); deleteMessage(key); };
             
-            if (isAdmin || msg.name === userName) {
+            if (isAdmin || msg.name === userName || userRank === "🛡️ Админ") {
                 delBtn.style.display = 'block';
             }
             
