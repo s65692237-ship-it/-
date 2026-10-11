@@ -238,7 +238,7 @@
     
     <div id="adminPanel">
         <h2>⚙️ Админ-панель</h2>
-        <input id="adminTarget" placeholder="ID пользователя (VOX-XXXXXX)">
+        <input id="adminTarget" placeholder="ID пользователя">
         <button onclick="adminGiveRank()">Выдать звание</button>
         <button onclick="adminGiveCoins()">Выдать коины</button>
         <button onclick="adminWarn()">Предупреждение</button>
@@ -287,19 +287,22 @@
             return id;
         }
 
-        // ===== ПРОВЕРКА НА ВЛАДЕЛЬЦА =====
+        // ===== ПРОВЕРКА НА ВЛАДЕЛЬЦА ПО ID 9999 =====
         function checkOwner() {
             userName = document.getElementById('nameInput').value.trim() || "Гость";
             
             userID = getSavedID();
             document.getElementById('myIDValue').innerText = userID;
             
-            if (userName === "Владелец") {
+            // ===== ЕСЛИ ID VOX-9999 — ВЛАДЕЛЕЦ =====
+            if (userID === "VOX-9999") {
                 isAdmin = true;
                 isPrime = true;
                 coins = 999999;
                 userAvatar = "👑";
                 userRank = "👑 Владелец";
+                userName = "Владелец";
+                document.getElementById('nameInput').value = "Владелец";
                 document.getElementById('nameInput').disabled = true;
                 document.getElementById('adminBtn').style.display = "block";
                 document.getElementById('coinCount').innerText = coins;
