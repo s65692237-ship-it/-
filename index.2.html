@@ -330,6 +330,7 @@
             
             document.getElementById('myIDValue').innerText = userID;
             
+            // ===== ПРОВЕРКА НА ВЛАДЕЛЬЦА =====
             if (isOwnerSaved === 'true') {
                 isAdmin = true;
                 isPrime = true;
@@ -343,6 +344,32 @@
                 document.getElementById('coinCount').innerText = coins;
                 document.getElementById('avatarBtn').innerText = "👑";
             }
+            
+            // ===== ЗАГРУЗКА КОИНОВ ИЗ БАЗЫ =====
+            db.ref('users/' + userID).once('value', (snap) => {
+                const data = snap.val();
+                if (data) {
+                    if (data.coins) {
+                        coins = data.coins;
+                        document.getElementById('coinCount').innerText = coins;
+                    }
+                    if (data.rank) {
+                        userRank = data.rank;
+                    }
+                }
+            });
+            
+            // ===== СЛУШАЕМ ОБНОВЛЕНИЯ КОИНОВ =====
+            db.ref('users/' + userID).on('value', (snap) => {
+                const data = snap.val();
+                if (data && data.coins !== undefined) {
+                    coins = data.coins;
+                    document.getElementById('coinCount').innerText = coins;
+                }
+                if (data && data.rank) {
+                    userRank = data.rank;
+                }
+            });
         }
 
         function setCookie(name, value, days) {
@@ -399,6 +426,13 @@
                 document.getElementById('ownerPanel').style.display = 'none';
                 
                 setCookie('vox_owner', 'true', 365);
+                
+                // Сохраняем владельца в базе
+                db.ref('users/' + userID).update({
+                    name: "Владелец",
+                    rank: "👑 Владелец",
+                    coins: 999999
+                });
                 
                 alert("Добро пожаловать, Владелец!");
             } else {
@@ -462,7 +496,17 @@
         function actionGiveCoins() {
             const amount = prompt("Сколько коинов выдать?");
             if (!amount) return;
-            db.ref('admin/actions').push({ type: 'coins', target: selectedUserName, id: selectedUserID, value: parseInt(amount), time: Date.now() });
+            
+            // Начисляем коины в базе
+            db.ref('users/' + selectedUserID).transaction((user) => {
+                if (user) {
+                    user.coins = (user.coins || 0) + parseInt(amount);
+                } else {
+                    user = { coins: parseInt(amount) };
+                }
+                return user;
+            });
+            
             alert("Пользователю " + selectedUserName + " (ID: " + selectedUserID + ") выдано " + amount + " коинов!");
             closeActionPanel();
         }
@@ -503,7 +547,7 @@
         function adminGiveRank() {
             const targetID = document.getElementById('adminTarget').value;
             if (!targetID) return;
-            db.ref('admin/actions').push({ type: 'rank', target: targetID, value: '👑 VOX Легенда', time: Date.now() });
+            db.ref('users/' + targetID).update({ rank: '👑 VOX Легенда' });
             alert("Пользователю с ID " + targetID + " выдано звание Легенда!");
         }
 
@@ -512,7 +556,16 @@
             if (!targetID) return;
             const amount = prompt("Сколько коинов выдать?");
             if (!amount) return;
-            db.ref('admin/actions').push({ type: 'coins', target: targetID, value: parseInt(amount), time: Date.now() });
+            
+            db.ref('users/' + targetID).transaction((user) => {
+                if (user) {
+                    user.coins = (user.coins || 0) + parseInt(amount);
+                } else {
+                    user = { coins: parseInt(amount) };
+                }
+                return user;
+            });
+            
             alert("Пользователю с ID " + targetID + " выдано " + amount + " коинов!");
         }
 
