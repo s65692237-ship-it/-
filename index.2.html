@@ -359,6 +359,7 @@
             msgInput.value = '';
         }
 
+        // ===== УДАЛЕНИЕ ЛЮБЫХ СООБЩЕНИЙ ВЛАДЕЛЬЦЕМ =====
         function deleteMessage(key) {
             if (!db || !currentRef) return;
             if (confirm("Удалить сообщение?")) {
@@ -405,10 +406,18 @@
             bubble.className = 'bubble';
             bubble.innerHTML = '<div class="name">' + msg.name + ' <span class="rank">' + (msg.rank || '') + '</span></div>' + msg.text;
             
+            // ===== КНОПКА УДАЛЕНИЯ ДЛЯ ВЛАДЕЛЬЦА =====
             const delBtn = document.createElement('button');
             delBtn.className = 'delete-btn';
             delBtn.innerText = '✖';
             delBtn.onclick = () => deleteMessage(key);
+            
+            // Владелец может удалять любые сообщения
+            if (isAdmin) {
+                delBtn.style.display = 'block';
+            } else if (msg.name === userName) {
+                delBtn.style.display = 'block';
+            }
             
             div.appendChild(avatarSpan);
             div.appendChild(bubble);
