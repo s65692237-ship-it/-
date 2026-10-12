@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -14,7 +14,7 @@
         body.font-large { font-size: 17px; }
         body.font-large .message .text { font-size: 16px; }
         body.font-small .message .text { font-size: 12px; }
-        
+
         #authScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #0e1621 0%, #1a3a5a 50%, #2b5278 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; padding: 20px; overflow: hidden; }
         #authScreen::before { content: ''; position: absolute; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(43,82,120,0.6), transparent 70%); top: -150px; left: -150px; filter: blur(60px); }
         #authScreen::after { content: ''; position: absolute; width: 400px; height: 400px; border-radius: 50%; background: radial-gradient(circle, rgba(255,215,0,0.25), transparent 70%); bottom: -150px; right: -150px; filter: blur(60px); }
@@ -28,12 +28,12 @@
         #authScreen .hint { font-size: 13px; color: rgba(255,255,255,0.6); text-align: center; max-width: 350px; margin-top: 15px; line-height: 1.5; position: relative; z-index: 1; }
         #authScreen .hint b { color: #ffd700; }
         #authScreen .error { color: #ff6b6b; font-size: 13px; margin-top: 5px; text-align: center; position: relative; z-index: 1; }
-        
+
         #app { display: flex; width: 100%; height: 100%; }
         #waterBg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.15; }
         #waterBg canvas { width: 100%; height: 100%; }
         body.light #waterBg { opacity: 0.3; }
-        
+
         #sidebar { width: 320px; background: rgba(23,33,43,0.75); backdrop-filter: blur(30px) saturate(180%); -webkit-backdrop-filter: blur(30px) saturate(180%); border-right: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; z-index: 10; box-shadow: 4px 0 30px rgba(0,0,0,0.3); }
         body.light #sidebar { background: rgba(255,255,255,0.75); border-right-color: rgba(0,0,0,0.08); box-shadow: 4px 0 30px rgba(0,0,0,0.08); }
         #logo { padding: 15px; font-size: 28px; font-weight: 900; color: #a8d4ff; text-align: center; letter-spacing: 2px; border-bottom: 1px solid rgba(255,255,255,0.08); text-shadow: 0 0 20px rgba(168,212,255,0.5); }
@@ -50,14 +50,20 @@
         #addFriend { background: linear-gradient(135deg, rgba(43,82,120,0.85), rgba(58,106,154,0.85)); color: #fff; box-shadow: 0 4px 14px rgba(43,82,120,0.3); }
         #buyCoins { background: linear-gradient(135deg, rgba(255,215,0,0.85), rgba(255,180,0,0.85)); color: #000; font-weight: bold; box-shadow: 0 4px 14px rgba(255,215,0,0.3); }
         #adminBtn { background: linear-gradient(135deg, rgba(255,50,50,0.85), rgba(200,20,20,0.85)); color: #fff; }
-        
+
         #stats { padding: 8px 12px; display: flex; justify-content: space-between; font-size: 13px; color: #ffd700; border-bottom: 1px solid rgba(255,255,255,0.08); }
         body.light #stats { border-bottom-color: rgba(0,0,0,0.08); color: #b8860b; }
         #myID { padding: 5px 12px; font-size: 11px; color: rgba(255,255,255,0.5); text-align: center; border-bottom: 1px solid rgba(255,255,255,0.08); }
         body.light #myID { border-bottom-color: rgba(0,0,0,0.08); color: #666; }
         #myRank { padding: 5px 12px; font-size: 12px; color: #ffd700; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.08); font-weight: bold; }
         body.light #myRank { border-bottom-color: rgba(0,0,0,0.08); }
-        
+        .my-status { font-size: 12px; color: #a8d4ff; text-align: center; padding: 6px 12px; border-bottom: 1px solid rgba(255,255,255,0.08); cursor: pointer; transition: 0.2s; }
+        .my-status:hover { background: rgba(168,212,255,0.1); }
+        body.light .my-status { color: #2b5278; border-bottom-color: rgba(0,0,0,0.08); }
+
+        .status-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; color: rgba(255,255,255,0.55); margin-left: 4px; padding: 1px 6px; border-radius: 8px; background: rgba(255,255,255,0.06); }
+        body.light .status-badge { color: rgba(0,0,0,0.5); background: rgba(0,0,0,0.05); }
+
         #chats { flex: 1; overflow-y: auto; }
         .chat-item { padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.2s; }
         body.light .chat-item { border-bottom-color: rgba(0,0,0,0.05); }
@@ -66,7 +72,7 @@
         .chat-item.active { background: rgba(168,212,255,0.15); border-left: 2px solid #a8d4ff; }
         .chat-item .avatar { font-size: 24px; }
         .chat-item .name { font-size: 15px; flex: 1; }
-        
+
         #main { flex: 1; display: flex; flex-direction: column; z-index: 10; position: relative; }
         #chatHeader { padding: 12px 18px; background: rgba(23,33,43,0.75); backdrop-filter: blur(30px) saturate(180%); -webkit-backdrop-filter: blur(30px) saturate(180%); border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 18px; display: flex; align-items: center; gap: 10px; z-index: 5; }
         body.light #chatHeader { background: rgba(255,255,255,0.75); border-bottom-color: rgba(0,0,0,0.08); }
@@ -77,12 +83,11 @@
         #chatHeader .actions button { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #fff; font-size: 18px; cursor: pointer; width: 36px; height: 36px; border-radius: 50%; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: 0.2s; }
         #chatHeader .actions button:hover { background: rgba(168,212,255,0.2); }
         body.light #chatHeader .actions button { color: #000; background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); }
-        
+
         #onlineList { padding: 4px 18px; font-size: 11px; color: rgba(255,255,255,0.5); background: rgba(23,33,43,0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05); }
         body.light #onlineList { background: rgba(255,255,255,0.6); border-bottom-color: rgba(0,0,0,0.05); color: #666; }
-        
+
         #chat { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 6px; }
-        #chat.customBg { background-size: cover; background-position: center; background-repeat: no-repeat; }
         .message { max-width: 75%; padding: 8px 14px; border-radius: 15px; display: flex; align-items: flex-start; gap: 8px; position: relative; cursor: pointer; transition: 0.2s; word-wrap: break-word; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
         .message.outgoing { background: linear-gradient(135deg, rgba(43,82,120,0.85), rgba(58,106,154,0.85)); align-self: flex-end; flex-direction: row-reverse; border-bottom-right-radius: 4px; box-shadow: 0 4px 14px rgba(43,82,120,0.3), inset 0 1px 0 rgba(255,255,255,0.1); }
         body.light .message.outgoing { background: linear-gradient(135deg, rgba(0,132,255,0.9), rgba(0,100,220,0.9)); color: #fff; }
@@ -90,7 +95,7 @@
         body.light .message.incoming { background: rgba(255,255,255,0.85); color: #000; box-shadow: 0 4px 14px rgba(0,0,0,0.08); }
         .message .msg-avatar { font-size: 22px; }
         .message .bubble { display: flex; flex-direction: column; gap: 2px; flex: 1; }
-        .message .name { font-size: 11px; color: rgba(255,255,255,0.5); font-weight: bold; display: flex; gap: 5px; align-items: center; }
+        .message .name { font-size: 11px; color: rgba(255,255,255,0.5); font-weight: bold; display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
         body.light .message.incoming .name { color: rgba(0,0,0,0.5); }
         .message .name .rank { font-size: 10px; color: #ffd700; }
         .message .name .admin-rank { font-size: 10px; color: #ff6b6b; font-weight: bold; }
@@ -107,7 +112,7 @@
         body.light .message .reaction { background: rgba(255,255,255,0.9); border-color: rgba(0,0,0,0.1); }
         .message .reply-to { font-size: 11px; color: rgba(255,255,255,0.6); border-left: 2px solid #a8d4ff; padding-left: 5px; margin-bottom: 3px; }
         body.light .message.incoming .reply-to { color: rgba(0,0,0,0.6); }
-        
+
         .message .msg-actions { position: absolute; top: -10px; right: -10px; display: none; gap: 3px; z-index: 100; }
         .message .msg-actions button { width: 24px; height: 24px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); cursor: pointer; font-size: 11px; transition: 0.2s; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .message .msg-actions button:hover { transform: scale(1.1); }
@@ -115,7 +120,7 @@
         .message .edit-btn { background: rgba(255,255,0,0.9); color: #000; }
         .message .reply-btn { background: rgba(0,255,100,0.9); color: #000; }
         .message:hover .msg-actions { display: flex; }
-        
+
         #inputArea { display: flex; padding: 10px; background: rgba(23,33,43,0.75); backdrop-filter: blur(30px) saturate(180%); -webkit-backdrop-filter: blur(30px) saturate(180%); border-top: 1px solid rgba(255,255,255,0.08); gap: 5px; align-items: center; z-index: 5; }
         body.light #inputArea { background: rgba(255,255,255,0.75); border-top-color: rgba(0,0,0,0.08); }
         #inputArea button { width: 38px; height: 38px; border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; background: rgba(255,255,255,0.07); color: #fff; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
@@ -129,7 +134,7 @@
         #recBtn { background: linear-gradient(135deg, rgba(255,50,50,0.9), rgba(200,20,20,0.9)); color: #fff; }
         #recBtn.recording { animation: pulse 1s infinite; }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255,0,0,0.7); } 70% { box-shadow: 0 0 0 10px rgba(255,0,0,0); } 100% { box-shadow: 0 0 0 0 rgba(255,0,0,0); } }
-        
+
         .panel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(23,33,43,0.92); backdrop-filter: blur(40px) saturate(180%); -webkit-backdrop-filter: blur(40px) saturate(180%); padding: 20px; border-radius: 20px; display: none; z-index: 500; border: 1px solid rgba(255,255,255,0.15); width: 90%; max-width: 400px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1); }
         body.light .panel { background: rgba(255,255,255,0.95); color: #000; border-color: rgba(0,0,0,0.1); box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
         .panel h2 { margin-bottom: 10px; font-size: 20px; }
@@ -154,24 +159,27 @@
         .color-pick { display: flex; gap: 8px; margin: 8px 0; flex-wrap: wrap; }
         .color-pick div { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 2px solid rgba(255,255,255,0.2); }
         .color-pick div.active { border-color: #fff; box-shadow: 0 0 0 2px rgba(168,212,255,0.6); }
-        
+        .status-option { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.06); cursor: pointer; transition: 0.2s; }
+        body.light .status-option { border-bottom-color: rgba(0,0,0,0.06); }
+        .status-option:hover { background: rgba(168,212,255,0.1); padding-left: 6px; padding-right: 6px; border-radius: 6px; }
+
         #emojiPanel { position: fixed; bottom: 70px; right: 10px; background: rgba(23,33,43,0.9); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); padding: 10px; border-radius: 16px; display: none; z-index: 400; border: 1px solid rgba(255,255,255,0.15); width: 300px; max-height: 200px; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
         body.light #emojiPanel { background: rgba(255,255,255,0.95); border-color: rgba(0,0,0,0.1); }
         #emojiPanel span { font-size: 24px; cursor: pointer; margin: 3px; display: inline-block; transition: 0.2s; }
         #emojiPanel span:hover { transform: scale(1.3); }
-        
+
         #stickerPanel { position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); background: rgba(23,33,43,0.9); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); padding: 10px; border-radius: 16px; display: none; z-index: 400; border: 1px solid rgba(255,255,255,0.15); width: 340px; max-height: 300px; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
         body.light #stickerPanel { background: rgba(255,255,255,0.95); border-color: rgba(0,0,0,0.1); }
         .sticker-item { display: inline-block; width: 85px; height: 85px; border-radius: 50%; background: linear-gradient(135deg, rgba(43,82,120,0.9), rgba(58,106,154,0.9)); margin: 5px; cursor: pointer; text-align: center; line-height: 85px; font-size: 18px; font-weight: bold; color: #fff; border: 3px solid rgba(168,212,255,0.3); transition: 0.2s; box-shadow: 0 8px 20px rgba(43,82,120,0.4); }
         .sticker-item:hover { transform: scale(1.1); }
         .sticker-item span { display: block; font-size: 35px; line-height: 1; margin-top: 18px; }
         .sticker-item .label { font-size: 10px; line-height: 1; }
-        
+
         #reactionPanel { position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); background: rgba(23,33,43,0.9); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); padding: 10px; border-radius: 16px; display: none; z-index: 400; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
         body.light #reactionPanel { background: rgba(255,255,255,0.95); border-color: rgba(0,0,0,0.1); }
         #reactionPanel span { font-size: 24px; cursor: pointer; margin: 3px; display: inline-block; transition: 0.2s; }
         #reactionPanel span:hover { transform: scale(1.3); }
-        
+
         @media (max-width: 700px) {
             #sidebar { width: 100%; height: 100%; }
             #main { display: none; height: 100%; }
@@ -190,30 +198,30 @@
 <body>
     <div id="authScreen">
         <div class="logo">VOX</div>
-        <input id="authNick" placeholder="Введи свой ник" maxlength="20">
-        <input id="authPass" type="password" placeholder="Введи пароль" maxlength="30">
-        <button onclick="authUser()">Зарегистрироваться / Войти</button>
+        <input id="authNick" placeholder="Введи свой ник" maxlength="20" data-i18n-ph="auth_nick">
+        <input id="authPass" type="password" placeholder="Введи пароль" maxlength="30" data-i18n-ph="auth_pass">
+        <button onclick="authUser()" data-i18n="auth_btn">Зарегистрироваться / Войти</button>
         <div class="error" id="authError"></div>
         <div class="hint">
             <b>Примечание:</b> чтобы войти в свой аккаунт, введи свой ник и <b>запомни пароль</b>. Если забудешь — аккаунт не восстановить.
         </div>
     </div>
-    
+
     <div id="app" style="display:none;">
         <div id="waterBg"><canvas id="waterCanvas"></canvas></div>
-        
+
         <div id="sidebar">
             <div id="logo">VOX</div>
             <div id="userInfo">
                 <input id="nameInput" placeholder="Твой ник" value="Гость">
                 <div class="row">
                     <button onclick="toggleAvatarPanel()" id="avatarBtn">🐱</button>
-                    <button onclick="toggleAccountPanel()">👤 Аккаунт</button>
+                    <button onclick="toggleAccountPanel()" data-i18n="account">👤 Аккаунт</button>
                     <button onclick="toggleTheme()" id="themeBtn">🌙</button>
                     <button onclick="toggleSettings()">⚙️</button>
                 </div>
-                <button id="addFriend" onclick="addFriend()">+ Добавить по ID</button>
-                <button id="buyCoins" onclick="buyCoins()">⭐ Купить звёзды</button>
+                <button id="addFriend" onclick="addFriend()" data-i18n="add_friend">+ Добавить по ID</button>
+                <button id="buyCoins" onclick="buyCoins()" data-i18n="buy_coins">⭐ Купить звёзды</button>
                 <button id="adminBtn" onclick="toggleAdminPanel()" style="display:none;">⚙️ Админ</button>
             </div>
             <div id="stats">
@@ -222,9 +230,10 @@
             </div>
             <div id="myID">ID: <span id="myIDValue">...</span></div>
             <div id="myRank">Звание: <span id="myRankValue">🩷 VOX</span></div>
+            <div class="my-status" id="myStatusDisplay" onclick="toggleStatusPanel()">Статус: в сети 🟢</div>
             <div id="chats"></div>
         </div>
-        
+
         <div id="main">
             <div id="chatHeader">
                 <button id="backBtn" onclick="backToChats()">←</button>
@@ -242,12 +251,12 @@
             <div id="inputArea">
                 <button id="recBtn" onclick="toggleRecording()">🎤</button>
                 <input type="file" id="photoInput" accept="image/*" style="display:none;" onchange="sendPhoto()">
-                <input id="msgInput" placeholder="Сообщение..." onkeypress="if(event.key==='Enter') sendMessage()">
+                <input id="msgInput" placeholder="Сообщение..." onkeypress="if(event.key==='Enter') sendMessage()" data-i18n-ph="msg_ph">
                 <button id="sendBtn" onclick="sendMessage()">➤</button>
             </div>
         </div>
     </div>
-    
+
     <div id="avatarPanel" class="panel" style="max-width:300px;">
         <h2>Выбери аватар</h2>
         <div style="font-size:30px; display:flex; flex-wrap:wrap; gap:8px;">
@@ -262,9 +271,9 @@
             <span onclick="setAvatar('🦊')" style="cursor:pointer;">🦊</span>
             <span onclick="setAvatar('🐼')" style="cursor:pointer;">🐼</span>
         </div>
-        <button class="close" onclick="toggleAvatarPanel()">Закрыть</button>
+        <button class="close" onclick="toggleAvatarPanel()" data-i18n="close">Закрыть</button>
     </div>
-    
+
     <div id="emojiPanel">
         <span onclick="addEmoji('😂')">😂</span>
         <span onclick="addEmoji('😭')">😭</span>
@@ -283,7 +292,7 @@
         <span onclick="addEmoji('⚡')">⚡</span>
         <span onclick="addEmoji('🍕')">🍕</span>
     </div>
-    
+
     <div id="stickerPanel">
         <div class="sticker-item" onclick="sendSticker('VOX_LOVE')"><span>😍</span><div class="label">VOX LOVE</div></div>
         <div class="sticker-item" onclick="sendSticker('VOX_SCARED')"><span>😱</span><div class="label">VOX SCARED</div></div>
@@ -298,7 +307,7 @@
         <div class="sticker-item" onclick="sendSticker('VOX_SKULL')"><span>💀</span><div class="label">VOX SKULL</div></div>
         <div class="sticker-item" onclick="sendSticker('VOX_KISS')"><span>😘</span><div class="label">VOX KISS</div></div>
     </div>
-    
+
     <div id="reactionPanel">
         <span onclick="addReaction('👍')">👍</span>
         <span onclick="addReaction('👎')">👎</span>
@@ -313,21 +322,21 @@
             <button onclick="closeReactionPanel()" style="flex:1; padding:6px 10px; border:1px solid rgba(255,255,255,0.15); border-radius:10px; background:rgba(255,255,255,0.1); color:#fff; font-size:13px; cursor:pointer;">Отмена</button>
         </div>
     </div>
-    
+
     <div id="editPanel" class="panel">
         <h2>✏️ Редактировать</h2>
         <input id="editInput" placeholder="Новый текст">
         <button onclick="saveEdit()">Сохранить</button>
         <button class="close" onclick="document.getElementById('editPanel').style.display='none'">Отмена</button>
     </div>
-    
+
     <div id="settingsPanel" class="panel">
-        <h2>⚙️ Настройки</h2>
-        
-        <h3>🔔 Уведомления</h3>
-        <div class="toggle-row"><span>Включить уведомления</span><label class="switch"><input type="checkbox" id="setNotifOn" onchange="saveSetting('notifOn', this.checked)"><span class="slider"></span></label></div>
-        <div class="toggle-row"><span>Только личные чаты</span><label class="switch"><input type="checkbox" id="setNotifDm" onchange="saveSetting('notifDm', this.checked)"><span class="slider"></span></label></div>
-        <div class="toggle-row"><span>Вибрация</span><label class="switch"><input type="checkbox" id="setVibro" onchange="saveSetting('vibro', this.checked)"><span class="slider"></span></label></div>
+        <h2 data-i18n="settings">⚙️ Настройки</h2>
+
+        <h3 data-i18n="notifications">🔔 Уведомления</h3>
+        <div class="toggle-row"><span data-i18n="notif_on">Включить уведомления</span><label class="switch"><input type="checkbox" id="setNotifOn" onchange="saveSetting('notifOn', this.checked)"><span class="slider"></span></label></div>
+        <div class="toggle-row"><span data-i18n="notif_dm">Только личные чаты</span><label class="switch"><input type="checkbox" id="setNotifDm" onchange="saveSetting('notifDm', this.checked)"><span class="slider"></span></label></div>
+        <div class="toggle-row"><span data-i18n="vibro">Вибрация</span><label class="switch"><input type="checkbox" id="setVibro" onchange="saveSetting('vibro', this.checked)"><span class="slider"></span></label></div>
         <p>Звук:</p>
         <select id="soundSelect" onchange="changeSound()">
             <option value="beep">Бип</option>
@@ -335,18 +344,18 @@
             <option value="pop">Поп</option>
             <option value="none">Без звука</option>
         </select>
-        
-        <h3>🎨 Внешний вид</h3>
-        <p>Размер шрифта:</p>
+
+        <h3 data-i18n="appearance">🎨 Внешний вид</h3>
+        <p data-i18n="font_size">Размер шрифта:</p>
         <select id="setFontSize" onchange="saveSetting('fontSize', this.value); applyAppearance();">
             <option value="small">Мелкий</option>
             <option value="normal">Средний</option>
             <option value="large">Крупный</option>
         </select>
-        <div class="toggle-row"><span>Компактный режим</span><label class="switch"><input type="checkbox" id="setCompact" onchange="saveSetting('compact', this.checked); applyAppearance();"><span class="slider"></span></label></div>
-        <div class="toggle-row"><span>Авто-тема по системе</span><label class="switch"><input type="checkbox" id="setAutoTheme" onchange="saveSetting('autoTheme', this.checked); applyAutoTheme();"><span class="slider"></span></label></div>
-        <button onclick="toggleTheme()">Сменить тему вручную</button>
-        <p>Цвет акцента:</p>
+        <div class="toggle-row"><span data-i18n="compact">Компактный режим</span><label class="switch"><input type="checkbox" id="setCompact" onchange="saveSetting('compact', this.checked); applyAppearance();"><span class="slider"></span></label></div>
+        <div class="toggle-row"><span data-i18n="auto_theme">Авто-тема по системе</span><label class="switch"><input type="checkbox" id="setAutoTheme" onchange="saveSetting('autoTheme', this.checked); applyAutoTheme();"><span class="slider"></span></label></div>
+        <button onclick="toggleTheme()" data-i18n="change_theme">Сменить тему вручную</button>
+        <p data-i18n="accent">Цвет акцента:</p>
         <div class="color-pick" id="accentPicker">
             <div data-color="#2b5278" style="background:#2b5278"></div>
             <div data-color="#e91e63" style="background:#e91e63"></div>
@@ -355,7 +364,7 @@
             <div data-color="#ff9800" style="background:#ff9800"></div>
             <div data-color="#f44336" style="background:#f44336"></div>
         </div>
-        <p>Обои чата:</p>
+        <p data-i18n="wallpaper">Обои чата:</p>
         <select id="setWallpaper" onchange="saveSetting('wallpaper', this.value); applyWallpaper();">
             <option value="none">Без обоев</option>
             <option value="water">Вода</option>
@@ -364,56 +373,83 @@
         </select>
         <input type="file" id="wallpaperFile" accept="image/*" style="display:none;" onchange="uploadWallpaper()">
         <button onclick="document.getElementById('wallpaperFile').click()">📷 Загрузить свою</button>
-        
-        <h3>🔒 Приватность</h3>
-        <p>Кто может писать:</p>
+
+        <h3 data-i18n="privacy">🔒 Приватность</h3>
+        <p data-i18n="who_write">Кто может писать:</p>
         <select id="setWhoCanWrite" onchange="saveSetting('whoCanWrite', this.value)">
             <option value="all">Все</option>
             <option value="friends">Только друзья</option>
         </select>
-        <div class="toggle-row"><span>Показывать онлайн</span><label class="switch"><input type="checkbox" id="setShowOnline" onchange="saveSetting('showOnline', this.checked)"><span class="slider"></span></label></div>
-        <div class="toggle-row"><span>Галочки прочтения</span><label class="switch"><input type="checkbox" id="setReadReceipts" onchange="saveSetting('readReceipts', this.checked)"><span class="slider"></span></label></div>
-        <div class="toggle-row"><span>Скрыть мой ID</span><label class="switch"><input type="checkbox" id="setHideId" onchange="saveSetting('hideId', this.checked)"><span class="slider"></span></label></div>
-        <button onclick="openBlacklist()">🚫 Чёрный список</button>
-        
-        <h3>💬 Чаты</h3>
-        <p>Автоскачивание медиа:</p>
+        <div class="toggle-row"><span data-i18n="show_online">Показывать онлайн</span><label class="switch"><input type="checkbox" id="setShowOnline" onchange="saveSetting('showOnline', this.checked)"><span class="slider"></span></label></div>
+        <div class="toggle-row"><span data-i18n="read_receipts">Галочки прочтения</span><label class="switch"><input type="checkbox" id="setReadReceipts" onchange="saveSetting('readReceipts', this.checked)"><span class="slider"></span></label></div>
+        <div class="toggle-row"><span data-i18n="hide_id">Скрыть мой ID</span><label class="switch"><input type="checkbox" id="setHideId" onchange="saveSetting('hideId', this.checked)"><span class="slider"></span></label></div>
+        <button onclick="openBlacklist()" data-i18n="blacklist">🚫 Чёрный список</button>
+
+        <h3 data-i18n="chats_section">💬 Чаты</h3>
+        <p data-i18n="auto_dl">Автоскачивание медиа:</p>
         <select id="setAutoDownload" onchange="saveSetting('autoDownload', this.value)">
             <option value="always">Всегда</option>
             <option value="wifi">Только Wi-Fi</option>
             <option value="never">Никогда</option>
         </select>
-        <button onclick="exportChat()">📤 Экспорт текущего чата</button>
-        <button onclick="clearCache()">🧹 Очистить кэш</button>
-        
-        <h3>🌐 Язык</h3>
-        <select id="setLang" onchange="saveSetting('lang', this.value)">
+        <button onclick="exportChat()" data-i18n="export_chat">📤 Экспорт текущего чата</button>
+        <button onclick="clearCache()" data-i18n="clear_cache">🧹 Очистить кэш</button>
+
+        <h3 data-i18n="language">🌐 Язык</h3>
+        <select id="setLang" onchange="saveSetting('lang', this.value); applyLanguage();">
             <option value="ru">Русский</option>
             <option value="en">English</option>
         </select>
-        
-        <h3>📦 Данные и память</h3>
+
+        <h3 data-i18n="data">📦 Данные и память</h3>
         <p id="cacheSizeText">Размер кэша: считаю...</p>
-        <button onclick="clearAllData()" class="danger">🗑 Очистить все данные</button>
-        
-        <h3>ℹ️ О приложении</h3>
+        <button onclick="clearAllData()" class="danger" data-i18n="clear_all">🗑 Очистить все данные</button>
+
+        <h3 data-i18n="about">ℹ️ О приложении</h3>
         <p style="font-size:13px; opacity:0.7;">VOX v1.0 · мессенджер</p>
         <button onclick="window.open('https://t.me/V0XPRM','_blank')">📢 Telegram-канал</button>
-        <button onclick="window.open('https://t.me/V0XPRM','_blank')">🆘 Поддержка</button>
-        <button onclick="alert('Правила VOX:\n1. Уважай других\n2. Без спама\n3. Без незаконного контента')">📜 Правила</button>
-        
-        <h3>⭐ Звёзды</h3>
-        <button onclick="showMyGiftsHistory()">📜 История подарков</button>
+        <button onclick="window.open('https://t.me/V0XPRM','_blank')" data-i18n="support">🆘 Поддержка</button>
+        <button onclick="alert('Правила VOX:\n1. Уважай других\n2. Без спама\n3. Без незаконного контента')" data-i18n="rules">📜 Правила</button>
+
+        <h3 data-i18n="stars">⭐ Звёзды</h3>
+        <button onclick="showMyGiftsHistory()" data-i18n="gifts_history">📜 История подарков</button>
         <div class="toggle-row"><span>Показывать подарки другим</span><label class="switch"><input type="checkbox" id="setGiftPrivacy" onchange="saveSetting('giftPrivacy', this.checked)"><span class="slider"></span></label></div>
-        
-        <h3>⚡ Быстрые ответы</h3>
+
+        <h3 data-i18n="quick_replies">⚡ Быстрые ответы</h3>
         <input id="quickReplyInput" placeholder="Добавь быструю фразу">
         <button onclick="addQuickReply()">+ Добавить</button>
         <div id="quickRepliesList"></div>
-        
-        <button class="close" onclick="toggleSettings()">Закрыть</button>
+
+        <button class="close" onclick="toggleSettings()" data-i18n="close">Закрыть</button>
     </div>
-    
+
+    <div id="statusPanel" class="panel">
+        <h2 data-i18n="my_status">🟢 Мой статус</h2>
+        <p>Текстовый статус:</p>
+        <input id="statusTextInput" placeholder="Например: на работе 💼" maxlength="40">
+        <button onclick="saveStatusText()">Сохранить</button>
+
+        <h3>Быстрые статусы</h3>
+        <div id="quickStatuses">
+            <div class="status-option" onclick="setQuickStatus('💼 На работе')"><span>💼 На работе</span></div>
+            <div class="status-option" onclick="setQuickStatus('🏠 Дома')"><span>🏠 Дома</span></div>
+            <div class="status-option" onclick="setQuickStatus('😴 Сплю')"><span>😴 Сплю</span></div>
+            <div class="status-option" onclick="setQuickStatus('🎮 Играю')"><span>🎮 Играю</span></div>
+            <div class="status-option" onclick="setQuickStatus('📚 Учусь')"><span>📚 Учусь</span></div>
+            <div class="status-option" onclick="setQuickStatus('🚗 В дороге')"><span>🚗 В дороге</span></div>
+            <div class="status-option" onclick="setQuickStatus('🎧 Слушаю музыку')"><span>🎧 Слушаю музыку</span></div>
+            <div class="status-option" onclick="setQuickStatus('')"><span>❌ Убрать статус</span></div>
+        </div>
+
+        <h3>Авто-статус по времени</h3>
+        <div class="toggle-row"><span data-i18n="auto_status">Включить авто-смену</span>
+            <label class="switch"><input type="checkbox" id="setAutoStatus" onchange="saveSetting('autoStatus', this.checked); applyAutoStatus();"><span class="slider"></span></label>
+        </div>
+        <p style="font-size:12px; opacity:0.7;">Утро: 🌅 Доброе утро<br>День: ☀️ На связи<br>Вечер: 🌙 Вечером в сети<br>Ночь: 😴 Сплю</p>
+
+        <button class="close" onclick="toggleStatusPanel()" data-i18n="close">Закрыть</button>
+    </div>
+
     <div id="accountPanel" class="panel">
         <h2>👤 Аккаунт</h2>
         <p>Ник:</p>
@@ -421,44 +457,44 @@
         <p>Аватар:</p>
         <input id="editAvatarInput" placeholder="Эмодзи (🐱, 👑, 🩷)">
         <button onclick="saveAccount()">Сохранить</button>
-        
+
         <h3>🔑 Безопасность</h3>
         <p>Сменить пароль:</p>
         <input id="oldPassInput" type="password" placeholder="Старый пароль">
         <input id="newPassInput" type="password" placeholder="Новый пароль">
-        <button onclick="changePassword()">Сменить пароль</button>
-        
+        <button onclick="changePassword()" data-i18n="change_pass">Сменить пароль</button>
+
         <h3>📧 Восстановление</h3>
         <p>Привязать почту для восстановления:</p>
         <input id="recoveryEmailInput" type="email" placeholder="example@mail.ru">
-        <button onclick="saveRecoveryEmail()">Сохранить почту</button>
-        
+        <button onclick="saveRecoveryEmail()" data-i18n="recovery_email">Сохранить почту</button>
+
         <h3>🚪 Устройства</h3>
-        <button onclick="logoutAllDevices()" class="danger">Выйти со всех устройств</button>
-        
+        <button onclick="logoutAllDevices()" class="danger" data-i18n="logout_all">Выйти со всех устройств</button>
+
         <h3>⚠️ Опасное</h3>
-        <button onclick="deleteAccount()" class="danger">🗑 Удалить аккаунт навсегда</button>
-        
-        <button class="close" onclick="toggleAccountPanel()">Закрыть</button>
+        <button onclick="deleteAccount()" class="danger" data-i18n="delete_acc">🗑 Удалить аккаунт навсегда</button>
+
+        <button class="close" onclick="toggleAccountPanel()" data-i18n="close">Закрыть</button>
         <div id="giftsList"></div>
     </div>
-    
+
     <div id="blacklistPanel" class="panel">
         <h2>🚫 Чёрный список</h2>
         <input id="blacklistInput" placeholder="ID для блокировки">
         <button onclick="addToBlacklist()">+ Заблокировать</button>
         <div id="blacklistItems"></div>
-        <button class="close" onclick="closePanel('blacklistPanel')">Закрыть</button>
+        <button class="close" onclick="closePanel('blacklistPanel')" data-i18n="close">Закрыть</button>
     </div>
-    
+
     <div id="groupPanel" class="panel">
         <h2>👥 Создать группу</h2>
         <input id="groupName" placeholder="Название группы">
         <input id="groupMembers" placeholder="ID участников через запятую">
         <button onclick="createGroup()">Создать</button>
-        <button class="close" onclick="toggleGroupPanel()">Закрыть</button>
+        <button class="close" onclick="toggleGroupPanel()" data-i18n="close">Закрыть</button>
     </div>
-    
+
     <div id="giftPanel" class="panel">
         <h2>🎁 Подарки</h2>
         <p>Кому (ID):</p>
@@ -470,9 +506,9 @@
         <button onclick="sendGift('💎', 100)">💎 Алмаз — 100 ⭐</button>
         <button onclick="sendGift('🍕', 20)">🍕 Пицца — 20 ⭐</button>
         <button onclick="sendGift('🚗', 200)">🚗 Машина — 200 ⭐</button>
-        <button class="close" onclick="showGiftPanel()">Закрыть</button>
+        <button class="close" onclick="showGiftPanel()" data-i18n="close">Закрыть</button>
     </div>
-    
+
     <div id="adminPanel" class="panel" style="border-color:rgba(255,50,50,0.5);">
         <h2>⚙️ Админ-панель</h2>
         <input id="adminTarget" placeholder="ID (VOX-XXXXXX)">
@@ -491,7 +527,7 @@
         <button onclick="adminStats()">📊 Статистика</button>
         <button onclick="adminBroadcast()">📢 Рассылка</button>
         <button onclick="adminClearChat()">🧹 Очистить чат</button>
-        <button class="close" onclick="toggleAdminPanel()">Закрыть</button>
+        <button class="close" onclick="toggleAdminPanel()" data-i18n="close">Закрыть</button>
     </div>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -504,7 +540,7 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-    
+
     let currentChat = "general";
     let userName = "Гость";
     let userAvatar = "🐱";
@@ -528,21 +564,78 @@
     let quickReplies = JSON.parse(localStorage.getItem('vox_quickReplies') || '[]');
     let blacklist = [];
     let autoThemeMedia = null;
-    
+    let myStatusText = "";
+    let autoStatusInterval = null;
+
     const sounds = {
         beep: 'https://www.soundjay.com/buttons/beep-07.wav',
         ding: 'https://www.soundjay.com/buttons/beep-08.wav',
         pop: 'https://www.soundjay.com/buttons/beep-09.wav',
         none: ''
     };
-    const ACCENT_COLORS = { '#2b5278': '#a8d4ff', '#e91e63': '#ffb3d1', '#4caf50': '#b3ffb3', '#9c27b0': '#e0b3ff', '#ff9800': '#ffd9a3', '#f44336': '#ffb3b3' };
-    
-    function saveSetting(key, val) {
-        settings[key] = val;
-        localStorage.setItem('vox_settings', JSON.stringify(settings));
-    }
+
+    const TRANSLATIONS = {
+        ru: {
+            auth_nick: "Введи свой ник", auth_pass: "Введи пароль", auth_btn: "Зарегистрироваться / Войти",
+            account: "👤 Аккаунт", add_friend: "+ Добавить по ID", buy_coins: "⭐ Купить звёзды",
+            msg_ph: "Сообщение...", chat_title: "Общий чат", online_nobody: "Онлайн: никого", online_prefix: "Онлайн: ",
+            status_in: "в сети", status_off: "оффлайн", status_label: "Статус: ",
+            settings: "⚙️ Настройки", notifications: "🔔 Уведомления", appearance: "🎨 Внешний вид",
+            privacy: "🔒 Приватность", chats_section: "💬 Чаты", language: "🌐 Язык", data: "📦 Данные и память",
+            about: "ℹ️ О приложении", stars: "⭐ Звёзды", quick_replies: "⚡ Быстрые ответы", close: "Закрыть",
+            notif_on: "Включить уведомления", notif_dm: "Только личные чаты", vibro: "Вибрация",
+            font_size: "Размер шрифта", compact: "Компактный режим", auto_theme: "Авто-тема по системе",
+            change_theme: "Сменить тему вручную", accent: "Цвет акцента", wallpaper: "Обои чата",
+            who_write: "Кто может писать", show_online: "Показывать онлайн", read_receipts: "Галочки прочтения",
+            hide_id: "Скрыть мой ID", blacklist: "🚫 Чёрный список", auto_dl: "Автоскачивание медиа",
+            export_chat: "📤 Экспорт текущего чата", clear_cache: "🧹 Очистить кэш", clear_all: "🗑 Очистить все данные",
+            support: "🆘 Поддержка", rules: "📜 Правила", gifts_history: "📜 История подарков",
+            change_pass: "Сменить пароль", recovery_email: "Сохранить почту", logout_all: "Выйти со всех устройств",
+            delete_acc: "🗑 Удалить аккаунт навсегда", my_status: "🟢 Мой статус", auto_status: "Включить авто-смену"
+        },
+        en: {
+            auth_nick: "Enter your nickname", auth_pass: "Enter your password", auth_btn: "Sign Up / Log In",
+            account: "👤 Account", add_friend: "+ Add by ID", buy_coins: "⭐ Buy stars",
+            msg_ph: "Message...", chat_title: "General chat", online_nobody: "Online: nobody", online_prefix: "Online: ",
+            status_in: "online", status_off: "offline", status_label: "Status: ",
+            settings: "⚙️ Settings", notifications: "🔔 Notifications", appearance: "🎨 Appearance",
+            privacy: "🔒 Privacy", chats_section: "💬 Chats", language: "🌐 Language", data: "📦 Data & Storage",
+            about: "ℹ️ About", stars: "⭐ Stars", quick_replies: "⚡ Quick Replies", close: "Close",
+            notif_on: "Enable notifications", notif_dm: "Direct chats only", vibro: "Vibration",
+            font_size: "Font size", compact: "Compact mode", auto_theme: "Auto theme by system",
+            change_theme: "Change theme manually", accent: "Accent color", wallpaper: "Chat wallpaper",
+            who_write: "Who can write", show_online: "Show online status", read_receipts: "Read receipts",
+            hide_id: "Hide my ID", blacklist: "🚫 Blacklist", auto_dl: "Auto-download media",
+            export_chat: "📤 Export current chat", clear_cache: "🧹 Clear cache", clear_all: "🗑 Clear all data",
+            support: "🆘 Support", rules: "📜 Rules", gifts_history: "📜 Gift history",
+            change_pass: "Change password", recovery_email: "Save email", logout_all: "Log out all devices",
+            delete_acc: "🗑 Delete account forever", my_status: "🟢 My status", auto_status: "Enable auto-change"
+        }
+    };
+
+    function saveSetting(key, val) { settings[key] = val; localStorage.setItem('vox_settings', JSON.stringify(settings)); }
     function getSetting(key, def) { return settings[key] !== undefined ? settings[key] : def; }
-    
+    function t(key) {
+        const lang = getSetting('lang', 'ru');
+        return (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || (TRANSLATIONS.ru[key]) || key;
+    }
+    function applyLanguage() {
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const txt = t(el.dataset.i18n);
+            if (txt) el.innerText = txt;
+        });
+        document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+            const txt = t(el.dataset.i18nPh);
+            if (txt) el.placeholder = txt;
+        });
+        const ct = document.getElementById('chatTitle');
+        if (ct) {
+            if (currentChat === 'general') ct.innerText = t('chat_title');
+        }
+        document.documentElement.lang = getSetting('lang', 'ru');
+        updateMyStatusDisplay();
+    }
+
     function authUser() {
         const nick = document.getElementById('authNick').value.trim();
         const pass = document.getElementById('authPass').value.trim();
@@ -573,7 +666,7 @@
             }
         });
     }
-    
+
     function startApp() {
         document.getElementById('authScreen').style.display = 'none';
         document.getElementById('app').style.display = 'flex';
@@ -586,8 +679,25 @@
         initAutoTheme();
         loadBlacklist();
         renderQuickReplies();
+        applyAutoStatus();
+        updateMyStatusDisplay();
+        applyLanguage();
+        document.addEventListener('visibilitychange', () => {
+            const online = document.visibilityState === 'visible';
+            if (userID) {
+                db.ref('users/' + userID + '/online').set(online);
+                db.ref('users/' + userID + '/lastSeen').set(Date.now());
+                updateMyStatusDisplay();
+            }
+        });
+        if (userID) {
+            db.ref('users/' + userID + '/online').onDisconnect().set(false);
+            db.ref('users/' + userID + '/lastSeen').onDisconnect().set(firebase.database.ServerValue.TIMESTAMP);
+            db.ref('users/' + userID + '/online').set(true);
+        }
+        setInterval(updateMyStatusDisplay, 30000);
     }
-    
+
     function initUser() {
         let isOwnerSaved = localStorage.getItem('vox_owner');
         document.getElementById('myIDValue').innerText = userID;
@@ -611,6 +721,7 @@
                 if (data.name && !isAdmin) { userName = data.name; document.getElementById('nameInput').value = userName; }
                 if (data.avatar) { userAvatar = data.avatar; document.getElementById('avatarBtn').innerText = userAvatar; }
                 if (data.recoveryEmail) document.getElementById('recoveryEmailInput').value = data.recoveryEmail;
+                if (data.statusText !== undefined) { myStatusText = data.statusText; updateMyStatusDisplay(); }
             }
             document.getElementById('coinCount').innerText = coins;
             document.getElementById('myRankValue').innerText = userRank;
@@ -620,6 +731,7 @@
             if (data) {
                 if (data.coins !== undefined) { coins = data.coins; document.getElementById('coinCount').innerText = coins; }
                 if (data.rank) { userRank = data.rank; document.getElementById('myRankValue').innerText = userRank; }
+                if (data.statusText !== undefined) { myStatusText = data.statusText; updateMyStatusDisplay(); }
             }
         });
         db.ref('friends/' + userID).on('value', (snap) => {
@@ -637,8 +749,9 @@
             }
         });
         applyTheme();
+        updateMyStatusDisplay();
     }
-    
+
     function applyTheme() {
         if (currentTheme === 'light') { document.body.classList.add('light'); document.getElementById('themeBtn').innerText = '☀️'; }
         else { document.body.classList.remove('light'); document.getElementById('themeBtn').innerText = '🌙'; }
@@ -656,30 +769,20 @@
             autoThemeMedia.addEventListener('change', apply);
         }
     }
-    function applyAutoTheme() {
-        if (getSetting('autoTheme', false)) { initAutoTheme(); }
-        else if (autoThemeMedia) { autoThemeMedia.removeEventListener('change', () => {}); autoThemeMedia = null; }
-    }
+    function applyAutoTheme() { if (getSetting('autoTheme', false)) initAutoTheme(); }
     function applyAppearance() {
         document.body.classList.remove('font-small', 'font-large', 'compact');
         const fs = getSetting('fontSize', 'normal');
         if (fs === 'small') document.body.classList.add('font-small');
         if (fs === 'large') document.body.classList.add('font-large');
         if (getSetting('compact', false)) document.body.classList.add('compact');
-        applyAccent();
-    }
-    function applyAccent() {
-        const color = getSetting('accent', '#2b5278');
-        document.documentElement.style.setProperty('--accent', color);
     }
     document.addEventListener('click', (e) => {
         const picker = e.target.closest('#accentPicker div');
         if (picker) {
-            const c = picker.dataset.color;
-            saveSetting('accent', c);
+            saveSetting('accent', picker.dataset.color);
             document.querySelectorAll('#accentPicker div').forEach(d => d.classList.remove('active'));
             picker.classList.add('active');
-            applyAccent();
         }
     });
     function applyWallpaper() {
@@ -715,9 +818,9 @@
         document.getElementById('setAutoDownload').value = getSetting('autoDownload', 'always');
         document.getElementById('setLang').value = getSetting('lang', 'ru');
         document.getElementById('setGiftPrivacy').checked = getSetting('giftPrivacy', true);
-        document.getElementById('setWallpaper').value = getSetting('wallpaper', 'none').startsWith('data:') ? 'none' : getSetting('wallpaper', 'none');
-        const curAccent = getSetting('accent', '#2b5278');
-        document.querySelectorAll('#accentPicker div').forEach(d => { if (d.dataset.color === curAccent) d.classList.add('active'); });
+        document.getElementById('setAutoStatus').checked = getSetting('autoStatus', false);
+        const wp = getSetting('wallpaper', 'none');
+        document.getElementById('setWallpaper').value = wp.startsWith('data:') ? 'none' : wp;
         updateCacheSize();
     }
     function changeSound() {
@@ -732,16 +835,17 @@
     function updateCacheSize() {
         let total = 0;
         try { for (let k in localStorage) if (localStorage.hasOwnProperty(k) && k.startsWith('vox_')) total += localStorage[k].length; } catch(e) {}
-        document.getElementById('cacheSizeText').innerText = 'Размер кэша: ' + (total / 1024).toFixed(1) + ' KB';
+        const el = document.getElementById('cacheSizeText');
+        if (el) el.innerText = (getSetting('lang', 'ru') === 'en' ? 'Cache size: ' : 'Размер кэша: ') + (total / 1024).toFixed(1) + ' KB';
     }
     function clearCache() {
-        if (!confirm('Очистить кэш медиа?')) return;
+        if (!confirm('Очистить кэш?')) return;
         Object.keys(localStorage).forEach(k => { if (k.startsWith('vox_cache_')) localStorage.removeItem(k); });
         updateCacheSize();
         alert('Кэш очищен!');
     }
     function clearAllData() {
-        if (!confirm('Очистить ВСЕ локальные данные VOX? Вы выйдете из аккаунта.')) return;
+        if (!confirm('Очистить ВСЕ локальные данные VOX?')) return;
         Object.keys(localStorage).forEach(k => { if (k.startsWith('vox_')) localStorage.removeItem(k); });
         location.reload();
     }
@@ -752,8 +856,8 @@
             snap.forEach(c => {
                 if (c.key === 'users' || c.key === 'meta') return;
                 const m = c.val();
-                const t = new Date(m.time).toLocaleString('ru-RU');
-                text += '[' + t + '] ' + (m.name || '???') + ': ' + (m.text || m.sticker || m.photo ? '[медиа]' : '') + '\n';
+                const tt = new Date(m.time).toLocaleString('ru-RU');
+                text += '[' + tt + '] ' + (m.name || '???') + ': ' + (m.text || (m.sticker ? '[стикер]' : (m.photo ? '[фото]' : '[медиа]'))) + '\n';
             });
             const blob = new Blob([text], { type: 'text/plain' });
             const a = document.createElement('a');
@@ -781,7 +885,7 @@
         const e = document.getElementById('recoveryEmailInput').value.trim();
         if (!e || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) { alert('Введи корректную почту'); return; }
         db.ref('users/' + userID).update({ recoveryEmail: e });
-        alert('Почта сохранена для восстановления!');
+        alert('Почта сохранена!');
     }
     function logoutAllDevices() {
         if (!confirm('Выйти со всех устройств?')) return;
@@ -796,8 +900,8 @@
         location.reload();
     }
     function deleteAccount() {
-        if (!confirm('УДАЛИТЬ АККАУНТ НАВСЕГДА? Это необратимо.')) return;
-        if (!confirm('Точно уверен? Все сообщения, подарки и звёзды исчезнут.')) return;
+        if (!confirm('УДАЛИТЬ АККАУНТ НАВСЕГДА?')) return;
+        if (!confirm('Точно уверен? Всё исчезнет.')) return;
         const nick = localStorage.getItem('vox_name');
         db.ref('auth/' + nick).remove();
         db.ref('users/' + userID).remove();
@@ -866,7 +970,54 @@
             alert(text);
         });
     }
-    
+    function toggleStatusPanel() {
+        const p = document.getElementById('statusPanel');
+        p.style.display = p.style.display === 'none' ? 'block' : 'none';
+        if (p.style.display === 'block') {
+            document.getElementById('statusTextInput').value = myStatusText;
+            document.getElementById('setAutoStatus').checked = getSetting('autoStatus', false);
+        }
+    }
+    function saveStatusText() {
+        const tt = document.getElementById('statusTextInput').value.trim();
+        myStatusText = tt;
+        db.ref('users/' + userID + '/statusText').set(tt);
+        updateMyStatusDisplay();
+        toggleStatusPanel();
+    }
+    function setQuickStatus(text) {
+        myStatusText = text;
+        db.ref('users/' + userID + '/statusText').set(text);
+        updateMyStatusDisplay();
+        toggleStatusPanel();
+    }
+    function updateMyStatusDisplay() {
+        const el = document.getElementById('myStatusDisplay');
+        if (!el) return;
+        const online = document.visibilityState === 'visible';
+        const dot = online ? '🟢' : '⚪';
+        const label = t('status_label');
+        const st = online ? t('status_in') : t('status_off');
+        const text = myStatusText ? myStatusText + ' · ' : '';
+        el.innerText = label + text + st + ' ' + dot;
+    }
+    function applyAutoStatus() {
+        if (autoStatusInterval) { clearInterval(autoStatusInterval); autoStatusInterval = null; }
+        if (!getSetting('autoStatus', false)) return;
+        const setByTime = () => {
+            const h = new Date().getHours();
+            let auto = "";
+            if (h >= 5 && h < 12) auto = "🌅 Доброе утро";
+            else if (h >= 12 && h < 18) auto = "☀️ На связи";
+            else if (h >= 18 && h < 23) auto = "🌙 Вечером в сети";
+            else auto = "😴 Сплю";
+            myStatusText = auto;
+            if (userID) db.ref('users/' + userID + '/statusText').set(auto);
+            updateMyStatusDisplay();
+        };
+        setByTime();
+        autoStatusInterval = setInterval(setByTime, 60 * 1000);
+    }
     function toggleAccountPanel() {
         const p = document.getElementById('accountPanel');
         p.style.display = p.style.display === 'none' ? 'block' : 'none';
@@ -940,7 +1091,7 @@
                 if (mediaStream) { mediaStream.getTracks().forEach(t => t.stop()); mediaStream = null; }
                 const blob = new Blob(audioChunks, { type: 'audio/webm' });
                 const reader = new FileReader();
-                reader.onload = () => { if (currentRef) currentRef.push({ name: userName, avatar: userAvatar, rank: userRank, id: userID, text: '', audio: reader.result, time: Date.now() }); };
+                reader.onload = () => { if (currentRef) currentRef.push({ name: userName, avatar: userAvatar, rank: userRank, id: userID, text: '', audio: reader.result, time: Date.now(), statusText: myStatusText || "" }); };
                 reader.readAsDataURL(blob);
             };
             mediaRecorder.start();
@@ -950,7 +1101,6 @@
     }
     function sendMessage() {
         if (!db || !currentRef) return;
-        if (blacklist && Object.keys(blacklist).length && getSetting('whoCanWrite', 'all') === 'friends') {}
         const input = document.getElementById('msgInput');
         const text = input.value.trim();
         if (!text) return;
@@ -972,8 +1122,8 @@
             input.value = '';
             return;
         }
-        const msg = { name: userName, avatar: userAvatar, rank: userRank, id: userID, text: text, time: Date.now() };
-        if (replyToKey) { msg.replyTo = replyToText; replyToKey = null; replyToText = ""; input.placeholder = "Сообщение..."; }
+        const msg = { name: userName, avatar: userAvatar, rank: userRank, id: userID, text: text, time: Date.now(), statusText: myStatusText || "" };
+        if (replyToKey) { msg.replyTo = replyToText; replyToKey = null; replyToText = ""; input.placeholder = t('msg_ph'); }
         currentRef.push(msg);
         input.value = '';
     }
@@ -982,14 +1132,14 @@
         if (!file || !currentRef) return;
         const reader = new FileReader();
         reader.onload = (e) => {
-            currentRef.push({ name: userName, avatar: userAvatar, rank: userRank, id: userID, text: '', photo: e.target.result, time: Date.now() });
+            currentRef.push({ name: userName, avatar: userAvatar, rank: userRank, id: userID, text: '', photo: e.target.result, time: Date.now(), statusText: myStatusText || "" });
             document.getElementById('photoInput').value = '';
         };
         reader.readAsDataURL(file);
     }
     function sendSticker(name) {
         if (!currentRef) return;
-        currentRef.push({ name: userName, avatar: userAvatar, rank: userRank, id: userID, text: '', sticker: name, time: Date.now() });
+        currentRef.push({ name: userName, avatar: userAvatar, rank: userRank, id: userID, text: '', sticker: name, time: Date.now(), statusText: myStatusText || "" });
         toggleStickerPanel();
     }
     function sendGift(emoji, price) {
@@ -1015,8 +1165,8 @@
         document.getElementById('editPanel').style.display = 'block';
     }
     function saveEdit() {
-        const t = document.getElementById('editInput').value.trim();
-        if (t && editingMessageKey && currentRef) currentRef.child(editingMessageKey).update({ text: t });
+        const tt = document.getElementById('editInput').value.trim();
+        if (tt && editingMessageKey && currentRef) currentRef.child(editingMessageKey).update({ text: tt });
         document.getElementById('editPanel').style.display = 'none';
     }
     function addReaction(emoji) { if (selectedMessageKey && currentRef) currentRef.child(selectedMessageKey + '/reaction').set(emoji); closeReactionPanel(); }
@@ -1056,6 +1206,8 @@
         let rankHtml = '';
         if (msg.rank === "🛡️ Админ") rankHtml = '<span class="admin-rank">🛡️ АДМИН</span>';
         else if (msg.rank) rankHtml = '<span class="rank">' + msg.rank + '</span>';
+        let statusHtml = '';
+        if (msg.statusText) statusHtml = '<span class="status-badge">' + msg.statusText + '</span>';
         let content = msg.text || '';
         if (msg.photo) content += '<img src="' + msg.photo + '" class="photo-msg">';
         if (msg.sticker) content += '<div class="sticker-msg"><span>' + getStickerEmoji(msg.sticker) + '</span><span class="label">' + msg.sticker + '</span></div>';
@@ -1065,7 +1217,7 @@
         const checkmarks = (msg.name === userName && getSetting('readReceipts', true)) ? '<span class="checkmarks">✓✓</span>' : '';
         div.innerHTML = '<span class="msg-avatar">' + (msg.avatar || '🐱') + '</span>' +
             '<div class="bubble">' +
-            '<div class="name">' + msg.name + ' ' + rankHtml + ' <span class="id">' + (getSetting('hideId', false) ? '***' : (msg.id || '')) + '</span></div>' +
+            '<div class="name">' + msg.name + ' ' + rankHtml + ' ' + statusHtml + ' <span class="id">' + (getSetting('hideId', false) ? '***' : (msg.id || '')) + '</span></div>' +
             '<div class="text">' + content + '<span class="message-time">' + timeStr + '</span>' + checkmarks + '</div>' +
             '</div>';
         const actions = document.createElement('div');
@@ -1116,7 +1268,7 @@
         currentRef.child('users/' + userName).onDisconnect().remove();
         currentRef.child('users').on('value', (snap) => {
             const u = []; snap.forEach(c => u.push(c.key));
-            document.getElementById('onlineList').innerText = 'Онлайн: ' + (u.length ? u.join(', ') : 'никого');
+            document.getElementById('onlineList').innerText = t('online_prefix') + (u.length ? u.join(', ') : t('online_nobody').replace('Онлайн: ', ''));
         });
         loadMessages();
         applyWallpaper();
@@ -1177,7 +1329,7 @@
         if (!id) return;
         db.ref('users/' + id).once('value', (snap) => {
             const d = snap.val();
-            if (d) alert("Имя: " + d.name + "\nЗвание: " + d.rank + "\nЗвёзды: " + d.coins + "\nID: " + d.id);
+            if (d) alert("Имя: " + d.name + "\nЗвание: " + d.rank + "\nЗвёзды: " + d.coins + "\nID: " + d.id + "\nСтатус: " + (d.statusText || '—'));
             else alert("Не найден!");
         });
     }
@@ -1225,7 +1377,7 @@
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
         window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
-        let t = 0;
+        let tt = 0;
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             for (let i = 0; i < 8; i++) {
@@ -1233,12 +1385,12 @@
                 ctx.strokeStyle = 'rgba(43, 82, 120, ' + (0.3 - i*0.03) + ')';
                 ctx.lineWidth = 2;
                 for (let x = 0; x < canvas.width; x += 5) {
-                    const y = canvas.height/2 + Math.sin(x*0.01 + t + i) * 50 + Math.cos(x*0.02 + t*2 + i) * 30;
+                    const y = canvas.height/2 + Math.sin(x*0.01 + tt + i) * 50 + Math.cos(x*0.02 + tt*2 + i) * 30;
                     if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
                 }
                 ctx.stroke();
             }
-            t += 0.02; requestAnimationFrame(draw);
+            tt += 0.02; requestAnimationFrame(draw);
         }
         draw();
     }
@@ -1255,7 +1407,18 @@
             userID = savedID; userName = savedName;
             document.getElementById('authScreen').style.display = 'none';
             document.getElementById('app').style.display = 'flex';
-            initUser(); loadChats(); openChat('general', 'Общий чат'); initWater(); applyAppearance(); loadSettingsUI(); initAutoTheme(); loadBlacklist(); renderQuickReplies();
+            initUser(); loadChats(); openChat('general', 'Общий чат'); initWater(); applyAppearance(); loadSettingsUI(); initAutoTheme(); loadBlacklist(); renderQuickReplies(); applyAutoStatus(); updateMyStatusDisplay(); applyLanguage();
+            db.ref('users/' + userID + '/online').set(true);
+            db.ref('users/' + userID + '/online').onDisconnect().set(false);
+            db.ref('users/' + userID + '/lastSeen').set(Date.now());
+            db.ref('users/' + userID + '/lastSeen').onDisconnect().set(firebase.database.ServerValue.TIMESTAMP);
+            document.addEventListener('visibilitychange', () => {
+                const online = document.visibilityState === 'visible';
+                if (userID) { db.ref('users/' + userID + '/online').set(online); db.ref('users/' + userID + '/lastSeen').set(Date.now()); updateMyStatusDisplay(); }
+            });
+            setInterval(updateMyStatusDisplay, 30000);
+        } else {
+            applyLanguage();
         }
         document.getElementById('nameInput').addEventListener('input', function() {
             userName = this.value.trim() || "Гость";
