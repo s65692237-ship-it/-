@@ -276,6 +276,10 @@
         <span onclick="addReaction('💀')">💀</span>
         <span onclick="addReaction('😮')">😮</span>
         <span onclick="addReaction('😢')">😢</span>
+        <div style="margin-top:6px; border-top:1px solid #242f3d; padding-top:6px; display:flex; gap:6px;">
+            <button onclick="removeReaction()" style="flex:1; padding:6px 10px; border:none; border-radius:8px; background:#f00; color:#fff; font-size:13px; cursor:pointer;">Убрать</button>
+            <button onclick="closeReactionPanel()" style="flex:1; padding:6px 10px; border:none; border-radius:8px; background:#555; color:#fff; font-size:13px; cursor:pointer;">Отмена</button>
+        </div>
     </div>
     
     <div id="editPanel" class="panel" style="display:none;">
@@ -687,14 +691,32 @@
     }
     
     function addReaction(emoji) {
-        if (selectedMessageKey && currentRef) { currentRef.child(selectedMessageKey + '/reaction').set(emoji); }
+        if (selectedMessageKey && currentRef) {
+            currentRef.child(selectedMessageKey + '/reaction').set(emoji);
+        }
+        closeReactionPanel();
+    }
+    
+    function removeReaction() {
+        if (selectedMessageKey && currentRef) {
+            currentRef.child(selectedMessageKey + '/reaction').remove();
+        }
+        closeReactionPanel();
+    }
+    
+    function closeReactionPanel() {
         document.getElementById('reactionPanel').style.display = 'none';
         selectedMessageKey = null;
     }
     
     function showReactionPanel(key) {
+        const p = document.getElementById('reactionPanel');
+        if (selectedMessageKey === key && p.style.display === 'block') {
+            closeReactionPanel();
+            return;
+        }
         selectedMessageKey = key;
-        document.getElementById('reactionPanel').style.display = 'block';
+        p.style.display = 'block';
     }
     
     function loadMessages() {
@@ -770,7 +792,7 @@
             actions.appendChild(delBtn);
         }
         div.appendChild(actions);
-        div.onclick = () => showReactionPanel(key);
+        div.onclick = (ev) => { ev.stopPropagation(); showReactionPanel(key); };
         if (msg.reaction) {
             const r = document.createElement('div');
             r.className = 'reaction';
@@ -944,6 +966,13 @@
         }
         draw();
     }
+    
+    document.addEventListener('click', function(e) {
+        const p = document.getElementById('reactionPanel');
+        if (p.style.display === 'block' && !e.target.closest('#reactionPanel') && !e.target.closest('.message')) {
+            closeReactionPanel();
+        }
+    });
     
     window.onload = function() {
         const savedID = localStorage.getItem('vox_id');
