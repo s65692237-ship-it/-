@@ -9,7 +9,6 @@
         body { background: #0e1621; color: #fff; font-family: 'Segoe UI', Arial, sans-serif; display: flex; height: 100vh; overflow: hidden; transition: background 0.3s, color 0.3s; }
         body.light { background: #f0f2f5; color: #000; }
         
-        /* ===== ЭКРАН РЕГИСТРАЦИИ ===== */
         #authScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #0e1621 0%, #1a3a5a 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
         #authScreen .logo { font-size: 48px; font-weight: 900; color: #2b5278; margin-bottom: 30px; letter-spacing: 4px; text-shadow: 0 0 20px rgba(43, 82, 120, 0.5); }
         #authScreen input { width: 100%; max-width: 350px; padding: 14px 18px; margin: 8px 0; border: none; border-radius: 12px; background: rgba(36, 47, 61, 0.9); color: #fff; font-size: 16px; outline: none; transition: 0.2s; }
@@ -21,13 +20,11 @@
         #authScreen .hint b { color: #ffd700; }
         #authScreen .error { color: #f00; font-size: 13px; margin-top: 5px; text-align: center; }
         
-        /* ===== ОСНОВНОЙ ИНТЕРФЕЙС ===== */
         #app { display: flex; width: 100%; height: 100%; }
         #waterBg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.15; }
         #waterBg canvas { width: 100%; height: 100%; }
         body.light #waterBg { opacity: 0.3; }
         
-        /* ===== САЙДБАР ===== */
         #sidebar { width: 320px; background: #17212b; border-right: 1px solid #242f3d; display: flex; flex-direction: column; z-index: 10; }
         body.light #sidebar { background: #fff; border-right-color: #ddd; }
         #logo { padding: 15px; font-size: 28px; font-weight: 900; color: #2b5278; text-align: center; letter-spacing: 2px; border-bottom: 1px solid #242f3d; }
@@ -60,9 +57,7 @@
         .chat-item.active { background: #2b5278; }
         .chat-item .avatar { font-size: 24px; }
         .chat-item .name { font-size: 15px; flex: 1; }
-        .chat-item .badge { background: #f00; color: #fff; border-radius: 10px; padding: 1px 6px; font-size: 10px; }
         
-        /* ===== ОСНОВНОЙ ЧАТ ===== */
         #main { flex: 1; display: flex; flex-direction: column; z-index: 10; }
         #chatHeader { padding: 12px 18px; background: #17212b; border-bottom: 1px solid #242f3d; font-size: 18px; display: flex; align-items: center; gap: 10px; }
         body.light #chatHeader { background: #fff; border-bottom-color: #ddd; }
@@ -77,8 +72,6 @@
         body.light #onlineList { background: #fff; border-bottom-color: #ddd; color: #666; }
         
         #chat { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 6px; }
-        
-        /* ===== СООБЩЕНИЯ (ИНТЕРФЕЙС КАК В ТЕЛЕГРАМ) ===== */
         .message { max-width: 75%; padding: 8px 14px; border-radius: 15px; display: flex; align-items: flex-start; gap: 8px; position: relative; cursor: pointer; transition: 0.2s; word-wrap: break-word; }
         .message.outgoing { background: #2b5278; align-self: flex-end; flex-direction: row-reverse; border-bottom-right-radius: 4px; }
         body.light .message.outgoing { background: #0084ff; color: #fff; }
@@ -93,6 +86,7 @@
         .message .text { font-size: 14px; line-height: 1.4; }
         .message .message-time { font-size: 10px; color: rgba(255,255,255,0.6); float: right; margin-left: 8px; margin-top: 4px; }
         body.light .message.incoming .message-time { color: rgba(0,0,0,0.5); }
+        .message .checkmarks { font-size: 11px; color: #0f0; margin-left: 4px; float: right; }
         .message .photo-msg { max-width: 100%; border-radius: 10px; margin-top: 4px; }
         .message .sticker-msg { width: 100px; height: 100px; border-radius: 50%; background: #2b5278; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; font-weight: bold; border: 3px solid #1a3a5a; }
         .message .sticker-msg span { font-size: 35px; }
@@ -108,7 +102,6 @@
         .message .reply-btn { background: #0f0; color: #000; }
         .message:hover .msg-actions { display: flex; }
         
-        /* ===== ПОЛЕ ВВОДА ===== */
         #inputArea { display: flex; padding: 10px; background: #17212b; border-top: 1px solid #242f3d; gap: 5px; align-items: center; }
         body.light #inputArea { background: #fff; border-top-color: #ddd; }
         #inputArea button { width: 38px; height: 38px; border: none; border-radius: 50%; background: #242f3d; color: #fff; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
@@ -121,7 +114,6 @@
         #recBtn.recording { animation: pulse 1s infinite; }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255,0,0,0.7); } 70% { box-shadow: 0 0 0 10px rgba(255,0,0,0); } 100% { box-shadow: 0 0 0 0 rgba(255,0,0,0); } }
         
-        /* ===== ПАНЕЛИ ===== */
         .panel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #17212b; padding: 20px; border-radius: 15px; display: none; z-index: 500; border: 2px solid #2b5278; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; }
         body.light .panel { background: #fff; color: #000; }
         .panel h2 { margin-bottom: 10px; font-size: 20px; }
@@ -143,7 +135,6 @@
         .sticker-item span { display: block; font-size: 35px; line-height: 1; margin-top: 18px; }
         .sticker-item .label { font-size: 10px; line-height: 1; }
         
-        /* ===== АДАПТАЦИЯ ПОД ТЕЛЕФОН ===== */
         @media (max-width: 700px) {
             #sidebar { width: 100%; height: 100%; }
             #main { display: none; height: 100%; }
@@ -160,7 +151,6 @@
     </style>
 </head>
 <body>
-    <!-- ===== ЭКРАН РЕГИСТРАЦИИ ===== -->
     <div id="authScreen">
         <div class="logo">VOX</div>
         <input id="authNick" placeholder="Введи свой ник" maxlength="20">
@@ -168,11 +158,10 @@
         <button onclick="authUser()">Зарегистрироваться / Войти</button>
         <div class="error" id="authError"></div>
         <div class="hint">
-            <b>Примечание:</b> чтобы войти в свой аккаунт, введи свой ник и <b>запомни пароль</b>. Если забудешь — аккаунт не восстановить. Придумай пароль, который точно запомнишь.
+            <b>Примечание:</b> чтобы войти в свой аккаунт, введи свой ник и <b>запомни пароль</b>. Если забудешь — аккаунт не восстановить.
         </div>
     </div>
     
-    <!-- ===== ОСНОВНОЙ ИНТЕРФЕЙС ===== -->
     <div id="app" style="display:none;">
         <div id="waterBg"><canvas id="waterCanvas"></canvas></div>
         
@@ -217,12 +206,11 @@
                 <button id="recBtn" onclick="toggleRecording()">🎤</button>
                 <input type="file" id="photoInput" accept="image/*" style="display:none;" onchange="sendPhoto()">
                 <input id="msgInput" placeholder="Сообщение..." onkeypress="if(event.key==='Enter') sendMessage()">
-                <button id="sendBtn" onclick="sendMessage()">→</button>
+                <button id="sendBtn" onclick="sendMessage()">➤</button>
             </div>
         </div>
     </div>
     
-    <!-- ===== ПАНЕЛИ ===== -->
     <div id="avatarPanel" class="panel" style="display:none; max-width:300px;">
         <h2>Выбери аватар</h2>
         <div style="font-size:30px; display:flex; flex-wrap:wrap; gap:8px;">
@@ -257,23 +245,6 @@
         <span onclick="addEmoji('🚀')">🚀</span>
         <span onclick="addEmoji('⚡')">⚡</span>
         <span onclick="addEmoji('🍕')">🍕</span>
-        <span onclick="addEmoji('😡')">😡</span>
-        <span onclick="addEmoji('🥶')">🥶</span>
-        <span onclick="addEmoji('🤯')">🤯</span>
-        <span onclick="addEmoji('😱')">😱</span>
-        <span onclick="addEmoji('🤑')">🤑</span>
-        <span onclick="addEmoji('🤮')">🤮</span>
-        <span onclick="addEmoji('🤠')">🤠</span>
-        <span onclick="addEmoji('💪')">💪</span>
-        <span onclick="addEmoji('👀')">👀</span>
-        <span onclick="addEmoji('❤️')">❤️</span>
-        <span onclick="addEmoji('🧡')">🧡</span>
-        <span onclick="addEmoji('💛')">💛</span>
-        <span onclick="addEmoji('💚')">💚</span>
-        <span onclick="addEmoji('💙')">💙</span>
-        <span onclick="addEmoji('💜')">💜</span>
-        <span onclick="addEmoji('🖤')">🖤</span>
-        <span onclick="addEmoji('🤍')">🤍</span>
     </div>
     
     <div id="stickerPanel">
@@ -289,10 +260,6 @@
         <div class="sticker-item" onclick="sendSticker('VOX_FIRE')"><span>🔥</span><div class="label">VOX FIRE</div></div>
         <div class="sticker-item" onclick="sendSticker('VOX_SKULL')"><span>💀</span><div class="label">VOX SKULL</div></div>
         <div class="sticker-item" onclick="sendSticker('VOX_KISS')"><span>😘</span><div class="label">VOX KISS</div></div>
-        <div class="sticker-item" onclick="sendSticker('VOX_CRY')"><span>😭</span><div class="label">VOX CRY</div></div>
-        <div class="sticker-item" onclick="sendSticker('VOX_SLEEP')"><span>😴</span><div class="label">VOX SLEEP</div></div>
-        <div class="sticker-item" onclick="sendSticker('VOX_THINK')"><span>🤔</span><div class="label">VOX THINK</div></div>
-        <div class="sticker-item" onclick="sendSticker('VOX_LOVE_EYES')"><span>😍</span><div class="label">VOX LOVE EYES</div></div>
     </div>
     
     <div id="settingsPanel" class="panel" style="display:none;">
@@ -330,6 +297,9 @@
     
     <div id="giftPanel" class="panel" style="display:none;">
         <h2>🎁 Подарки</h2>
+        <p>Кому (ID):</p>
+        <input id="giftTarget" placeholder="VOX-XXXXXX">
+        <p>Выбери подарок:</p>
         <button onclick="sendGift('🌹', 15)">🌹 Роза — 15 ⭐</button>
         <button onclick="sendGift('🎁', 25)">🎁 Подарок — 25 ⭐</button>
         <button onclick="sendGift('👑', 50)">👑 Корона — 50 ⭐</button>
@@ -344,10 +314,19 @@
         <input id="adminTarget" placeholder="ID (VOX-XXXXXX)">
         <button onclick="adminGiveRank()">👑 Выдать звание</button>
         <button onclick="adminGiveCoins()">⭐ Выдать звёзды</button>
+        <button onclick="adminTakeCoins()">⭐ Забрать звёзды</button>
         <button onclick="adminWarn()">⚠️ Предупреждение</button>
         <button onclick="adminMute()">🔇 Мут</button>
+        <button onclick="adminUnmute()">🔇 Снять мут</button>
         <button onclick="adminBan()">🚫 Бан</button>
+        <button onclick="adminUnban()">🚫 Снять бан</button>
+        <button onclick="adminMakeAdmin()">👑 Назначить админом</button>
         <button onclick="adminRemove()">❌ Снять админа</button>
+        <button onclick="adminGiveGift()">🎁 Дать подарок</button>
+        <button onclick="adminUserInfo()">👤 Инфо о юзере</button>
+        <button onclick="adminStats()">📊 Статистика</button>
+        <button onclick="adminBroadcast()">📢 Рассылка</button>
+        <button onclick="adminClearChat()">🧹 Очистить чат</button>
         <button class="close" onclick="toggleAdminPanel()">Закрыть</button>
     </div>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -390,7 +369,6 @@
         none: ''
     };
     
-    // ===== РЕГИСТРАЦИЯ / ВХОД =====
     function authUser() {
         const nick = document.getElementById('authNick').value.trim();
         const pass = document.getElementById('authPass').value.trim();
@@ -431,7 +409,6 @@
         initWater();
     }
     
-    // ===== ИНИЦИАЛИЗАЦИЯ =====
     function initUser() {
         let isOwnerSaved = localStorage.getItem('vox_owner');
         document.getElementById('myIDValue').innerText = userID;
@@ -502,7 +479,6 @@
         if (sounds[soundType]) { new Audio(sounds[soundType]).play().catch(() => {}); }
     }
     
-    // ===== АККАУНТ =====
     function toggleAccountPanel() {
         const p = document.getElementById('accountPanel');
         p.style.display = p.style.display === 'none' ? 'block' : 'none';
@@ -555,7 +531,6 @@
         }
     }
     
-    // ===== ГРУППЫ =====
     function toggleGroupPanel() {
         const p = document.getElementById('groupPanel');
         p.style.display = p.style.display === 'none' ? 'block' : 'none';
@@ -577,7 +552,6 @@
         document.getElementById('groupPanel').style.display = 'none';
     }
     
-    // ===== ГОЛОСОВЫЕ =====
     async function toggleRecording() {
         if (isRecording) { mediaRecorder.stop(); isRecording = false; document.getElementById('recBtn').classList.remove('recording'); return; }
         try {
@@ -600,14 +574,13 @@
             document.getElementById('recBtn').classList.add('recording');
         } catch(e) { alert("Нет доступа к микрофону"); }
     }
-        // ===== СООБЩЕНИЯ =====
         function sendMessage() {
             if (!db || !currentRef) return;
             const input = document.getElementById('msgInput');
             const text = input.value.trim();
             if (!text) return;
-            const badWords = ['бля', 'хуй', 'пизд', 'еба', 'сука', 'мраз', 'гандон', 'долбо'];
-            const badParents = ['мать', 'мама', 'отец', 'папа', 'родител', 'мамку'];
+            const badWords = ['бля', 'хуй', 'пизд', 'еба', 'сука', 'мраз'];
+            const badParents = ['мать', 'мама', 'отец', 'папа', 'родител'];
             let badCount = 0, parentCount = 0;
             const lower = text.toLowerCase();
             badWords.forEach(w => { if (lower.includes(w)) badCount++; });
@@ -648,13 +621,15 @@
         }
         
         function sendGift(emoji, price) {
+            const targetID = document.getElementById('giftTarget').value.trim();
+            if (!targetID) { alert("Введи ID получателя!"); return; }
             if (coins < price) { alert("Недостаточно звёзд!"); return; }
             coins -= price;
             db.ref('users/' + userID).update({ coins: coins });
-            db.ref('users/' + userID + '/gifts').push({ emoji: emoji, name: 'Подарок ' + emoji, price: price, time: Date.now() });
-            if (currentRef) currentRef.push({ name: userName, avatar: userAvatar, rank: userRank, id: userID, text: emoji + ' ПОДАРОК! ' + emoji, time: Date.now(), gift: true });
+            db.ref('users/' + targetID + '/gifts').push({ emoji: emoji, name: 'Подарок ' + emoji, price: price, time: Date.now() });
+            db.ref('chats/' + currentChat).push({ name: 'СИСТЕМА', avatar: '🛡️', text: userName + ' подарил ' + emoji + ' пользователю ' + targetID, time: Date.now(), system: true });
             document.getElementById('giftPanel').style.display = 'none';
-            db.ref('chats/' + currentChat).push({ name: 'СИСТЕМА', avatar: '🛡️', text: userName + ' подарил ' + emoji, time: Date.now(), system: true });
+            alert("Подарок отправлен!");
         }
         
         function deleteMessage(key) {
@@ -691,7 +666,6 @@
             document.getElementById('reactionPanel').style.display = 'block';
         }
         
-        // ===== ЗАГРУЗКА СООБЩЕНИЙ =====
         function loadMessages() {
             currentRef.on('child_added', (snap) => {
                 const msg = snap.val();
@@ -730,10 +704,11 @@
             if (msg.audio) content += '<audio controls src="' + msg.audio + '" style="max-width:200px;"></audio>';
             if (msg.replyTo) content = '<div class="reply-to">↩ ' + msg.replyTo + '</div>' + content;
             const timeStr = new Date(msg.time).toLocaleTimeString('ru-RU', {hour: '2-digit', minute:'2-digit'});
+            const checkmarks = (msg.name === userName) ? '<span class="checkmarks">✓✓</span>' : '';
             div.innerHTML = '<span class="msg-avatar">' + (msg.avatar || '🐱') + '</span>' +
                 '<div class="bubble">' +
                 '<div class="name">' + msg.name + ' ' + rankHtml + ' <span class="id">' + (msg.id || '') + '</span></div>' +
-                '<div class="text">' + content + '<span class="message-time">' + timeStr + '</span></div>' +
+                '<div class="text">' + content + '<span class="message-time">' + timeStr + '</span>' + checkmarks + '</div>' +
                 '</div>' +
                 '<div class="msg-actions">' +
                 '<button class="reply-btn" onclick="event.stopPropagation();showReply(\'' + key + '\',\'' + (msg.text || '').replace(/'/g, "\\'") + '\')">↩</button>' +
@@ -749,8 +724,7 @@
             const map = {
                 'VOX_LOVE': '😍', 'VOX_SCARED': '😱', 'VOX_SURPRISED': '😲', 'VOX_HAPPY': '😄',
                 'VOX_SAD': '😢', 'VOX_ANGRY': '😡', 'VOX_LAUGH': '😂', 'VOX_COOL': '😎',
-                'VOX_HEART': '🩷', 'VOX_FIRE': '🔥', 'VOX_SKULL': '💀', 'VOX_KISS': '😘',
-                'VOX_CRY': '😭', 'VOX_SLEEP': '😴', 'VOX_THINK': '🤔', 'VOX_LOVE_EYES': '😍'
+                'VOX_HEART': '🩷', 'VOX_FIRE': '🔥', 'VOX_SKULL': '💀', 'VOX_KISS': '😘'
             };
             return map[name] || '🩷';
         }
@@ -813,12 +787,60 @@
             const p = document.getElementById('adminPanel');
             p.style.display = p.style.display === 'none' ? 'block' : 'none';
         }
-        function adminGiveRank() { const id = document.getElementById('adminTarget').value; if (id) db.ref('users/' + id).update({ rank: '👑 VOX Легенда' }); }
-        function adminGiveCoins() { const id = document.getElementById('adminTarget').value; const a = prompt("Сколько?"); if (id && a) db.ref('users/' + id).transaction(u => { if (u) { u.coins = (u.coins || 0) + parseInt(a); } return u; }); }
-        function adminWarn() { const id = document.getElementById('adminTarget').value; if (id) db.ref('admin/actions').push({ type: 'warn', target: id, time: Date.now() }); }
-        function adminMute() { const id = document.getElementById('adminTarget').value; if (id) db.ref('admin/actions').push({ type: 'mute', target: id, time: Date.now() }); }
-        function adminBan() { const id = document.getElementById('adminTarget').value; if (id) db.ref('admin/actions').push({ type: 'ban', target: id, time: Date.now() }); }
-        function adminRemove() { const id = document.getElementById('adminTarget').value; if (id) db.ref('users/' + id).update({ rank: '🩷 VOX' }); }
+        function adminGiveRank() { const id = document.getElementById('adminTarget').value; if (id) db.ref('users/' + id).update({ rank: '👑 VOX Легенда' }); alert("Звание выдано!"); }
+        function adminGiveCoins() { const id = document.getElementById('adminTarget').value; const a = prompt("Сколько?"); if (id && a) db.ref('users/' + id).transaction(u => { if (u) { u.coins = (u.coins || 0) + parseInt(a); } return u; }); alert("Звёзды выданы!"); }
+        function adminTakeCoins() { const id = document.getElementById('adminTarget').value; const a = prompt("Сколько забрать?"); if (id && a) db.ref('users/' + id).transaction(u => { if (u) { u.coins = Math.max(0, (u.coins || 0) - parseInt(a)); } return u; }); alert("Звёзды забраны!"); }
+        function adminWarn() { const id = document.getElementById('adminTarget').value; if (id) db.ref('admin/actions').push({ type: 'warn', target: id, time: Date.now() }); alert("Предупреждение выдано!"); }
+        function adminMute() { const id = document.getElementById('adminTarget').value; if (id) db.ref('admin/actions').push({ type: 'mute', target: id, time: Date.now() }); alert("Мут выдан!"); }
+        function adminUnmute() { const id = document.getElementById('adminTarget').value; if (id) db.ref('admin/actions').push({ type: 'unmute', target: id, time: Date.now() }); alert("Мут снят!"); }
+        function adminBan() { const id = document.getElementById('adminTarget').value; if (id) db.ref('admin/actions').push({ type: 'ban', target: id, time: Date.now() }); alert("Бан выдан!"); }
+        function adminUnban() { const id = document.getElementById('adminTarget').value; if (id) db.ref('admin/actions').push({ type: 'unban', target: id, time: Date.now() }); alert("Бан снят!"); }
+        function adminMakeAdmin() { const id = document.getElementById('adminTarget').value; if (id) db.ref('users/' + id).update({ rank: '🛡️ Админ' }); alert("Назначен админом!"); }
+        function adminRemove() { const id = document.getElementById('adminTarget').value; if (id) db.ref('users/' + id).update({ rank: '🩷 VOX' }); alert("Админ снят!"); }
+        function adminGiveGift() {
+            const id = document.getElementById('adminTarget').value;
+            if (!id) return;
+            const emoji = prompt("Какой подарок? (🌹, 🎁, 👑, 💎, 🍕, 🚗)");
+            if (!emoji) return;
+            db.ref('users/' + id + '/gifts').push({ emoji: emoji, name: 'Подарок ' + emoji, price: 0, time: Date.now() });
+            db.ref('chats/' + currentChat).push({ name: 'СИСТЕМА', avatar: '🛡️', text: 'Владелец подарил ' + emoji + ' пользователю ' + id, time: Date.now(), system: true });
+            alert("Подарок выдан!");
+        }
+        function adminUserInfo() {
+            const id = document.getElementById('adminTarget').value;
+            if (!id) return;
+            db.ref('users/' + id).once('value', (snap) => {
+                const d = snap.val();
+                if (d) { alert("Имя: " + d.name + "\nЗвание: " + d.rank + "\nЗвёзды: " + d.coins + "\nID: " + d.id); }
+                else { alert("Не найден!"); }
+            });
+        }
+        function adminStats() {
+            db.ref('users').once('value', (s1) => {
+                db.ref('chats').once('value', (s2) => {
+                    let msgCount = 0;
+                    s2.forEach(chat => { chat.forEach(msg => { if (msg.key !== 'users') msgCount++; }); });
+                    alert("Пользователей: " + s1.numChildren() + "\nСообщений: " + msgCount + "\nЧатов: " + s2.numChildren());
+                });
+            });
+        }
+        function adminBroadcast() {
+            const text = prompt("Что отправить всем?");
+            if (!text) return;
+            db.ref('chats').once('value', (snap) => {
+                snap.forEach(chat => {
+                    db.ref('chats/' + chat.key).push({ name: 'СИСТЕМА', avatar: '🛡️', id: 'system', text: text, time: Date.now(), system: true });
+                });
+            });
+            alert("Рассылка отправлена!");
+        }
+        function adminClearChat() {
+            if (!confirm("Очистить весь чат?")) return;
+            db.ref('chats/' + currentChat).once('value', (snap) => {
+                snap.forEach(child => { if (child.key !== 'users') child.ref.remove(); });
+            });
+            alert("Чат очищен!");
+        }
         
         // ===== ОСТАЛЬНОЕ =====
         function toggleAvatarPanel() { const p = document.getElementById('avatarPanel'); p.style.display = p.style.display === 'none' ? 'block' : 'none'; }
@@ -830,7 +852,6 @@
         function addEmoji(e) { document.getElementById('msgInput').value += e; toggleEmojiPanel(); }
         function buyCoins() { alert("Купить звёзды: @V0XPRM\n15 ⭐ = 30 рублей"); window.open("https://t.me/V0XPRM", "_blank"); }
         
-        // ===== ЖИДКАЯ ВОДА =====
         function initWater() {
             const canvas = document.getElementById('waterCanvas');
             if (!canvas) return;
@@ -856,7 +877,6 @@
             draw();
         }
         
-        // ===== ЗАГРУЗКА =====
         window.onload = function() {
             const savedID = localStorage.getItem('vox_id');
             const savedName = localStorage.getItem('vox_name');
