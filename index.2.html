@@ -58,6 +58,7 @@ body.light .row button{background:rgba(0,0,0,.05);color:#000}
 .my-status{font-size:12px;color:#a8d4ff;text-align:center;padding:6px 12px;border-bottom:1px solid rgba(255,255,255,.08);cursor:pointer}
 .premium-badge{display:inline-block;font-size:11px;padding:1px 6px;border-radius:8px;background:linear-gradient(135deg,#ffd700,#ff8c00);color:#000;font-weight:bold;margin-left:4px;animation:premiumGlow 2s infinite}
 .status-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:rgba(255,255,255,.55);margin-left:4px;padding:1px 6px;border-radius:8px;background:rgba(255,255,255,.06)}
+.priority-badge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:8px;background:linear-gradient(135deg,#ff6b6b,#c92a2a);color:#fff;font-weight:bold;margin-left:4px}
 #folders{display:flex;gap:4px;padding:6px 8px;overflow-x:auto;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(23,33,43,.4)}
 #folders .folder{padding:5px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.06);font-size:12px;cursor:pointer;white-space:nowrap}
 #folders .folder.active{background:rgba(168,212,255,.2);border-color:rgba(168,212,255,.5);color:#a8d4ff}
@@ -95,6 +96,7 @@ body.light .message.outgoing{background:linear-gradient(135deg,rgba(0,132,255,.9
 .message.incoming{background:rgba(24,37,51,.75);align-self:flex-start;border-bottom-left-radius:4px}
 body.light .message.incoming{background:rgba(255,255,255,.85);color:#000}
 .message.premium-outgoing{border:1px solid rgba(255,215,0,.4);box-shadow:0 0 12px rgba(255,215,0,.2)}
+.message.priority-msg{border-left:3px solid #ff3b3b}
 .message .msg-avatar{font-size:20px;cursor:pointer}
 .message .bubble{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
 .message .name{font-size:11px;color:rgba(255,255,255,.5);font-weight:bold;display:flex;gap:5px;align-items:center;flex-wrap:wrap}
@@ -105,9 +107,12 @@ body.light .message.incoming{background:rgba(255,255,255,.85);color:#000}
 .message .message-time{font-size:10px;color:rgba(255,255,255,.6);float:right;margin-left:8px}
 .message .checkmarks{font-size:11px;color:#7effa0;margin-left:4px;float:right}
 .message .photo-msg{max-width:100%;border-radius:10px;margin-top:4px}
+.message .photo-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:4px}
+.message .photo-grid img{width:100%;border-radius:8px}
 .message .sticker-msg{width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,rgba(43,82,120,.9),rgba(58,106,154,.9));display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-weight:bold;border:3px solid rgba(168,212,255,.3)}
 .message .sticker-msg span{font-size:35px}
 .message .sticker-msg .label{font-size:10px}
+.message .sticker-msg.premium-sticker-msg{background:linear-gradient(135deg,rgba(255,215,0,.9),rgba(255,140,0,.9));border-color:#ffd700;box-shadow:0 0 20px rgba(255,215,0,.6)}
 .message .reaction{position:absolute;bottom:-8px;right:8px;background:rgba(23,33,43,.9);border-radius:10px;padding:1px 6px;font-size:12px;border:1px solid rgba(255,255,255,.15)}
 .message .star-reaction{position:absolute;bottom:-8px;left:8px;background:rgba(255,215,0,.9);color:#000;font-weight:bold;border-radius:10px;padding:1px 6px;font-size:11px}
 .message .reply-to{font-size:11px;color:rgba(255,255,255,.6);border-left:2px solid #a8d4ff;padding-left:5px;margin-bottom:3px}
@@ -168,10 +173,15 @@ input:checked+.slider:before{transform:translateX(20px)}
 #emojiPanel,#stickerPanel,#reactionPanel,#starReactionPanel{position:fixed;bottom:70px;background:rgba(23,33,43,.95);backdrop-filter:blur(40px);padding:10px;border-radius:16px;display:none;z-index:400;border:1px solid rgba(255,255,255,.15)}
 #emojiPanel.show,#stickerPanel.show,#reactionPanel.show,#starReactionPanel.show{display:block;animation:fadeIn .25s ease}
 #emojiPanel{right:10px;width:300px;max-height:200px;overflow-y:auto}
-#stickerPanel{left:50%;transform:translateX(-50%);width:340px;max-height:300px;overflow-y:auto}
+#stickerPanel{left:50%;transform:translateX(-50%);width:360px;max-height:340px;overflow-y:auto}
 #reactionPanel,#starReactionPanel{left:50%;transform:translateX(-50%)}
 #emojiPanel span,#reactionPanel span{font-size:24px;cursor:pointer;margin:3px;display:inline-block}
+.sticker-tabs{display:flex;gap:6px;margin-bottom:8px;justify-content:center}
+.sticker-tabs button{padding:6px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#fff;font-size:12px;cursor:pointer}
+.sticker-tabs button.active{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#000;font-weight:bold;border-color:#ffd700}
+.sticker-tabs button.locked{opacity:.5}
 .sticker-item{display:inline-block;width:85px;height:85px;border-radius:50%;background:linear-gradient(135deg,rgba(43,82,120,.9),rgba(58,106,154,.9));margin:5px;cursor:pointer;text-align:center;color:#fff;font-weight:bold;border:3px solid rgba(168,212,255,.3)}
+.sticker-item.premium-sticker{border-color:#ffd700;background:linear-gradient(135deg,rgba(255,215,0,.9),rgba(255,140,0,.9));box-shadow:0 0 16px rgba(255,215,0,.5)}
 .sticker-item span{display:block;font-size:32px;line-height:1;margin-top:18px}
 .sticker-item .label{font-size:10px}
 #starReactionPanel button{padding:8px 14px;border-radius:10px;background:linear-gradient(135deg,#ffd700,#ffb400);color:#000;font-weight:bold;cursor:pointer;margin:2px;border:none}
@@ -272,7 +282,7 @@ body.show-chat #main{display:flex}
 <button id="scrollDown" onclick="scrollToBottom()">↓</button>
 <div id="inputArea">
 <button id="recBtn" onclick="toggleRecording()">🎤</button>
-<input type="file" id="photoInput" accept="image/*" style="display:none" onchange="sendPhoto()">
+<input type="file" id="photoInput" accept="image/*" multiple style="display:none" onchange="sendPhoto()">
 <input id="msgInput" placeholder="Сообщение..." onkeypress="if(event.key==='Enter')sendMessage()">
 <button id="sendBtn" onclick="sendMessage()">➤</button>
 </div>
@@ -292,6 +302,11 @@ body.show-chat #main{display:flex}
 </div>
 
 <div id="stickerPanel">
+<div class="sticker-tabs">
+<button id="tabNormal" class="active" onclick="switchStickerTab('normal')">Обычные</button>
+<button id="tabPremium" onclick="switchStickerTab('premium')">👑 Premium</button>
+</div>
+<div id="stickersNormal">
 <div class="sticker-item" onclick="sendSticker('VOX_LOVE')"><span>😍</span><div class="label">LOVE</div></div>
 <div class="sticker-item" onclick="sendSticker('VOX_SCARED')"><span>😱</span><div class="label">SCARED</div></div>
 <div class="sticker-item" onclick="sendSticker('VOX_HAPPY')"><span>😄</span><div class="label">HAPPY</div></div>
@@ -303,6 +318,17 @@ body.show-chat #main{display:flex}
 <div class="sticker-item" onclick="sendSticker('VOX_FIRE')"><span>🔥</span><div class="label">FIRE</div></div>
 <div class="sticker-item" onclick="sendSticker('VOX_SKULL')"><span>💀</span><div class="label">SKULL</div></div>
 <div class="sticker-item" onclick="sendSticker('VOX_KISS')"><span>😘</span><div class="label">KISS</div></div>
+</div>
+<div id="stickersPremium" style="display:none">
+<div class="sticker-item premium-sticker" onclick="sendSticker('PREM_CROWN')"><span>👑</span><div class="label">CROWN</div></div>
+<div class="sticker-item premium-sticker" onclick="sendSticker('PREM_DIAMOND')"><span>💎</span><div class="label">DIAMOND</div></div>
+<div class="sticker-item premium-sticker" onclick="sendSticker('PREM_STAR')"><span>⭐</span><div class="label">STAR</div></div>
+<div class="sticker-item premium-sticker" onclick="sendSticker('PREM_ROCKET')"><span>🚀</span><div class="label">ROCKET</div></div>
+<div class="sticker-item premium-sticker" onclick="sendSticker('PREM_MONEY')"><span>💰</span><div class="label">MONEY</div></div>
+<div class="sticker-item premium-sticker" onclick="sendSticker('PREM_TROPHY')"><span>🏆</span><div class="label">TROPHY</div></div>
+<div class="sticker-item premium-sticker" onclick="sendSticker('PREM_FIRE')"><span>🔥</span><div class="label">BLAZE</div></div>
+<div class="sticker-item premium-sticker" onclick="sendSticker('PREM_UNICORN')"><span>🦄</span><div class="label">UNICORN</div></div>
+</div>
 </div>
 
 <div id="reactionPanel">
@@ -349,10 +375,10 @@ body.show-chat #main{display:flex}
 <ul class="premium-features">
 <li>👑 Значок PREMIUM рядом с ником</li>
 <li>🌟 Золотая рамка сообщений</li>
-<li>🎨 Эксклюзивные стикеры</li>
-<li>💬 Больше медиа в сообщениях</li>
-<li>🚀 Приоритетная поддержка</li>
-<li>🎁 Подарок от VOX: 50 ⭐ сразу</li>
+<li>🎨 8 эксклюзивных золотых стикеров</li>
+<li>📷 До 3 фото в одном сообщении</li>
+<li>🚀 Приоритет в чате поддержки</li>
+<li>🎁 Подарок 50 ⭐ сразу при покупке</li>
 </ul>
 <div class="premium-price">1000 ⭐ навсегда</div>
 <div class="premium-status" id="premiumStatus">Статус: Нет</div>
@@ -363,7 +389,7 @@ body.show-chat #main{display:flex}
 
 <div id="backupPanel" class="panel">
 <h2>💾 Сохранение и бэкап</h2>
-<p style="font-size:13px;opacity:.8;margin-bottom:10px">Все данные сохраняются в Firebase + localStorage. Здесь — резервная копия твоего профиля.</p>
+<p style="font-size:13px;opacity:.8;margin-bottom:10px">Все данные сохраняются в Firebase + localStorage.</p>
 <div class="toggle-row"><span>Авто-сохранение в localStorage</span><label class="switch"><input type="checkbox" id="setAutoBackup" onchange="saveSetting('autoBackup',this.checked);applyAutoBackup()"><span class="slider"></span></label></div>
 <button class="save-cta" onclick="exportBackup()">📤 Экспорт моего профиля</button>
 <input type="file" id="importBackupFile" accept=".json" style="display:none" onchange="importBackup()">
@@ -448,7 +474,7 @@ body.show-chat #main{display:flex}
 <p id="cacheSizeText">Размер кэша: считаю...</p>
 <button onclick="clearAllData()" class="danger">🗑 Очистить все данные</button>
 <h3>ℹ️ О приложении</h3>
-<p style="font-size:13px;opacity:.7">VOX v1.4 · мессенджер</p>
+<p style="font-size:13px;opacity:.7">VOX v1.5 · мессенджер</p>
 <button onclick="window.open('https://t.me/V0XPRM','_blank')">📢 Telegram-канал</button>
 <h3>⭐ Звёзды</h3>
 <div class="toggle-row"><span>Платные сообщения</span><label class="switch"><input type="checkbox" id="setPaidMessages" onchange="saveSetting('paidMessages',this.checked);db.ref('users/'+userID+'/paidMessages').set(this.checked)"><span class="slider"></span></label></div>
@@ -561,8 +587,9 @@ let currentChat="general",currentChatType="chat",userName="Гость",userAvata
 let currentRef=null,selectedMessageKey=null,editingMessageKey=null,replyToKey=null,replyToText="",mediaRecorder=null,mediaStream=null,audioChunks=[],isRecording=false;
 let currentTheme=localStorage.getItem('vox_theme')||'dark',soundType=localStorage.getItem('vox_sound')||'beep';
 let settings=JSON.parse(localStorage.getItem('vox_settings')||'{}'),quickReplies=JSON.parse(localStorage.getItem('vox_quickReplies')||'[]');
-let blacklist={},myStatusText="",currentFolder='all',myChats={},lastTapTime=0,lastTapKey=null,currentPinned=null,profileUserID=null,currentChannel=null,isChannelOwner=false,autoStatusInterval=null;
+let blacklist={},myStatusText="",currentFolder='all',myChats={},lastTapTime=0,lastTapKey=null,currentPinned=null,profileUserID=null,currentChannel=null,isChannelOwner=false,autoStatusInterval=null,currentStickerTab='normal';
 const OWNER_IDS=["VOX-369335"];
+const PREMIUM_STICKERS=['PREM_CROWN','PREM_DIAMOND','PREM_STAR','PREM_ROCKET','PREM_MONEY','PREM_TROPHY','PREM_FIRE','PREM_UNICORN'];
 const sounds={beep:'https://www.soundjay.com/buttons/beep-07.wav',ding:'https://www.soundjay.com/buttons/beep-08.wav',pop:'https://www.soundjay.com/buttons/beep-09.wav',none:''};
 const TRANSLATIONS={ru:{status_in:"в сети",status_off:"оффлайн",status_label:"Статус: "},en:{status_in:"online",status_off:"offline",status_label:"Status: "}};
 function saveSetting(k,v){settings[k]=v;localStorage.setItem('vox_settings',JSON.stringify(settings))}
@@ -575,7 +602,7 @@ function applyPremiumUI(){const side=document.getElementById('premiumBadgeSide')
 
 function saveUserLocal(){try{const data={userID,userName,userAvatar,userRank,coins,isPremium,isAdmin,isPrime,myStatusText,savedAt:Date.now()};localStorage.setItem('vox_profile_backup',JSON.stringify(data))}catch(e){}}
 function applyAutoBackup(){if(getSetting('autoBackup',true))saveUserLocal()}
-function exportBackup(){const data={userID,userName,userAvatar,userRank,coins,isPremium,isAdmin,isPrime,myStatusText,quickReplies,settings,exportedAt:new Date().toISOString(),voxVersion:'1.4'};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='vox_backup_'+userID+'_'+Date.now()+'.json';a.click();alert('Бэкап сохранён!')}
+function exportBackup(){const data={userID,userName,userAvatar,userRank,coins,isPremium,isAdmin,isPrime,myStatusText,quickReplies,settings,exportedAt:new Date().toISOString(),voxVersion:'1.5'};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='vox_backup_'+userID+'_'+Date.now()+'.json';a.click();alert('Бэкап сохранён!')}
 function importBackup(){const f=document.getElementById('importBackupFile').files[0];if(!f)return;const r=new FileReader();r.onload=(e)=>{try{const d=JSON.parse(e.target.result);if(d.userName)userName=d.userName;if(d.userAvatar)userAvatar=d.userAvatar;if(d.coins!==undefined)coins=d.coins;if(d.myStatusText!==undefined)myStatusText=d.myStatusText;if(d.quickReplies)quickReplies=d.quickReplies;if(d.settings)settings=d.settings;if(userID){db.ref('users/'+userID).update({name:userName,avatar:userAvatar,coins:coins,statusText:myStatusText})}localStorage.setItem('vox_settings',JSON.stringify(settings));localStorage.setItem('vox_quickReplies',JSON.stringify(quickReplies));initUser();updateMyStatusDisplay();renderChatList();alert('Импорт завершён!')}catch(err){alert('Ошибка файла: '+err.message)}};r.readAsText(f)}
 function syncFromCloud(){if(!userID)return;db.ref('users/'+userID).once('value',(s)=>{const d=s.val();if(!d){alert('Облако пусто');return}if(d.name)userName=d.name;if(d.avatar)userAvatar=d.avatar;if(d.coins!==undefined)coins=d.coins;if(d.rank)userRank=d.rank;if(d.statusText!==undefined)myStatusText=d.statusText;isPremium=d.premium===true;isAdmin=d.isAdmin===true;initUser();applyPremiumUI();applyAdminUI();updateMyStatusDisplay();saveUserLocal();alert('Синхронизация завершена!')})}
 function showFullBackupInfo(){alert('СОХРАНЯЕТСЯ В FIREBASE:\n• Ник, пароль, ID\n• Аватар, звание, звёзды\n• Premium, статус админа\n• Друзья, чаты, группы, каналы\n• Сообщения, реакции\n• Подарки, статусы\n\nСОХРАНЯЕТСЯ В LOCALSTORAGE:\n• Авто-вход (сессия)\n• Настройки интерфейса\n• Тема, шрифт, обои\n• Быстрые ответы\n• Резервная копия профиля\n\nБЭКАП JSON:\n• Экспорт/импорт профиля\n• Синхронизация с облаком')}
@@ -637,8 +664,11 @@ function uploadWallpaper(){const f=document.getElementById('wallpaperFile').file
 
 document.addEventListener('click',(e)=>{const picker=e.target.closest('#accentPicker div');if(picker){saveSetting('accent',picker.dataset.color);document.querySelectorAll('#accentPicker div').forEach(d=>d.classList.remove('active'));picker.classList.add('active');applyAppearance()}})
 
+function switchStickerTab(tab){currentStickerTab=tab;document.getElementById('tabNormal').classList.toggle('active',tab==='normal');document.getElementById('tabPremium').classList.toggle('active',tab==='premium');document.getElementById('stickersNormal').style.display=tab==='normal'?'block':'none';document.getElementById('stickersPremium').style.display=tab==='premium'?'block':'none';if(tab==='premium'&&!isPremium){document.getElementById('stickersPremium').innerHTML='<p style="text-align:center;padding:20px;opacity:.7">🔒 Premium-стикеры доступны только подписчикам VOX Premium.<br><br><button class="premium-cta" onclick="hidePanel(\'stickerPanel\');openPremiumPanel()" style="padding:10px 20px;border-radius:10px;border:none;background:linear-gradient(135deg,#ffd700,#ff8c00);color:#000;font-weight:bold;cursor:pointer">👑 Купить Premium</button></p>'}}
+function toggleStickerPanel(){const p=document.getElementById('stickerPanel');if(p.style.display==='block')hidePanel('stickerPanel');else{showPanel('stickerPanel');switchStickerTab(currentStickerTab)}}
+
 function openPremiumPanel(){showPanel('premiumPanel');const ps=document.getElementById('premiumStatus');ps.innerText='Статус: '+(isPremium?'Активен 👑':'Нет')}
-function buyPremium(){if(isPremium){alert('Premium уже активен');return}if(coins<1000){alert('Недостаточно звёзд: '+coins+', нужно 1000');return}if(!confirm('Купить VOX Premium за 1000 ⭐?'))return;coins-=1000;const u={};u['users/'+userID+'/coins']=coins;u['users/'+userID+'/premium']=true;u['users/'+userID+'/premiumSince']=Date.now();u['users/'+userID+'/premiumVia']='buy';db.ref().update(u).then(()=>{isPremium=true;applyPremiumUI();hidePanel('premiumPanel');alert('👑 Premium активирован!');saveUserLocal();db.ref('chats/general').push({name:'СИСТЕМА',avatar:'👑',id:'system',text:userName+' купил VOX Premium!',time:Date.now(),system:true})})}
+function buyPremium(){if(isPremium){alert('Premium уже активен');return}if(coins<1000){alert('Недостаточно звёзд: '+coins+', нужно 1000');return}if(!confirm('Купить VOX Premium за 1000 ⭐? Бонус: +50 ⭐ сразу.'))return;coins-=1000;coins+=50;const u={};u['users/'+userID+'/coins']=coins;u['users/'+userID+'/premium']=true;u['users/'+userID+'/premiumSince']=Date.now();u['users/'+userID+'/premiumVia']='buy';db.ref().update(u).then(()=>{isPremium=true;applyPremiumUI();hidePanel('premiumPanel');alert('👑 Premium активирован!\n+50 ⭐ бонус зачислен.\nТеперь доступны: золотые стикеры, до 3 фото, приоритет в поддержке.');saveUserLocal();db.ref('chats/general').push({name:'СИСТЕМА',avatar:'👑',id:'system',text:userName+' купил VOX Premium!',time:Date.now(),system:true})})}
 function requestPremiumViaTelegram(){const reqId='req_'+Date.now();db.ref('premiumRequests/'+reqId).set({userID,userName,userAvatar,time:Date.now(),status:'pending',via:'telegram'});alert('Заявка отправлена!');window.open('https://t.me/V0XPRM','_blank')}
 
 function toggleAdminPanel(){if(!isAdmin&&!isPrime&&!OWNER_IDS.includes(userID)){alert('Нет доступа');return}const p=document.getElementById('adminPanel');if(p.style.display==='block')hidePanel('adminPanel');else showPanel('adminPanel')}
@@ -684,20 +714,22 @@ document.getElementById('chat').addEventListener('scroll',function(){const el=th
 
 function renderLinkified(text){return text.replace(/(https?:\/\/[^\s]+)/g,'<a class="link" href="$1" target="_blank" onclick="event.stopPropagation();">$1</a>').replace(/@([A-Za-z0-9А-Яа-яЁё_\-]{2,20})/g,function(m){const nick=m.slice(1).toLowerCase(),isMe=nick===userName.toLowerCase();return '<span class="mention'+(isMe?' mention-me':'')+'">'+m+'</span>'})}
 
-function buildMessageEl(msg,key){const div=document.createElement('div');div.className='message '+(msg.name===userName?'outgoing':'incoming');div.dataset.key=key;if(msg.premium)div.classList.add('premium-outgoing');if(msg.system)div.style.background='rgba(60,60,60,.8)';
+function buildMessageEl(msg,key){const div=document.createElement('div');div.className='message '+(msg.name===userName?'outgoing':'incoming');div.dataset.key=key;if(msg.premium)div.classList.add('premium-outgoing');if(msg.priority)div.classList.add('priority-msg');if(msg.system)div.style.background='rgba(60,60,60,.8)';
 let rankHtml='';if(msg.rank==="🛡️ Админ")rankHtml='<span class="admin-rank">🛡️ АДМИН</span>';else if(msg.rank)rankHtml='<span class="rank">'+msg.rank+'</span>';
 let premiumHtml=msg.premium?'<span class="premium-badge">👑 PREMIUM</span>':'';
+let priorityHtml=msg.priority?'<span class="priority-badge">🚀 ПРИОРИТЕТ</span>':'';
 let statusHtml=msg.statusText?'<span class="status-badge">'+msg.statusText+'</span>':'';
 let content=renderLinkified(msg.text||'');
 if(msg.pinned)content='<span class="pinned-mark">📌</span>'+content;
 if(msg.photo)content+='<img src="'+msg.photo+'" class="photo-msg">';
-if(msg.sticker)content+='<div class="sticker-msg"><span>'+getStickerEmoji(msg.sticker)+'</span><span class="label">'+msg.sticker+'</span></div>';
+if(msg.photos&&msg.photos.length){content+='<div class="photo-grid">'+msg.photos.map(p=>'<img src="'+p+'">').join('')+'</div>'}
+if(msg.sticker)content+='<div class="sticker-msg'+(PREMIUM_STICKERS.includes(msg.sticker)?' premium-sticker-msg':'')+'"><span>'+getStickerEmoji(msg.sticker)+'</span><span class="label">'+msg.sticker+'</span></div>';
 if(msg.audio)content+='<audio controls src="'+msg.audio+'" style="max-width:200px"></audio>';
 if(msg.lockedText){const unlocked=msg.unlockedBy&&msg.unlockedBy[userID];if(unlocked||msg.id===userID)content+='<div style="background:rgba(255,215,0,.1);padding:8px;border-radius:10px;margin-top:4px">'+msg.lockedText+'</div>';else content+='<div class="paid-lock">🔒 Платный контент — '+(msg.lockedPrice||25)+' ⭐<br><button onclick="event.stopPropagation();unlockPaidContent(\''+key+'\')">Разблокировать</button></div>'}
 if(msg.replyTo)content='<div class="reply-to">↩ '+msg.replyTo+'</div>'+content;
 const timeStr=new Date(msg.time).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
 const checkmarks=(msg.name===userName&&getSetting('readReceipts',true))?'<span class="checkmarks">✓✓</span>':'';
-div.innerHTML='<span class="msg-avatar" onclick="event.stopPropagation();showProfile(\''+(msg.id||'')+'\')">'+(msg.avatar||'🐱')+'</span><div class="bubble"><div class="name">'+msg.name+' '+premiumHtml+' '+rankHtml+' '+statusHtml+' <span class="id">'+(getSetting('hideId',false)?'***':(msg.id||''))+'</span></div><div class="text">'+content+'<span class="message-time">'+timeStr+'</span>'+checkmarks+'</div></div>';
+div.innerHTML='<span class="msg-avatar" onclick="event.stopPropagation();showProfile(\''+(msg.id||'')+'\')">'+(msg.avatar||'🐱')+'</span><div class="bubble"><div class="name">'+msg.name+' '+premiumHtml+' '+priorityHtml+' '+rankHtml+' '+statusHtml+' <span class="id">'+(getSetting('hideId',false)?'***':(msg.id||''))+'</span></div><div class="text">'+content+'<span class="message-time">'+timeStr+'</span>'+checkmarks+'</div></div>';
 const actions=document.createElement('div');actions.className='msg-actions';
 if(currentChatType!=='channel'||isChannelOwner){
 const starBtn=document.createElement('button');starBtn.className='star-btn';starBtn.textContent='⭐';starBtn.onclick=(ev)=>{ev.stopPropagation();openStarReactionPanel(key)};actions.appendChild(starBtn);
@@ -713,7 +745,7 @@ if(msg.starReaction){const sr=document.createElement('div');sr.className='star-r
 return div}
 function showHeartPop(x,y){const el=document.createElement('div');el.className='heart-pop';el.textContent='❤️';el.style.left=(x-30)+'px';el.style.top=(y-30)+'px';document.body.appendChild(el);setTimeout(()=>el.remove(),900)}
 function addMessageToChat(msg,key){const chat=document.getElementById('chat');const existing=chat.querySelector('[data-key="'+key+'"]');if(existing)existing.remove();chat.appendChild(buildMessageEl(msg,key));chat.scrollTop=chat.scrollHeight}
-function getStickerEmoji(n){const m={VOX_LOVE:'😍',VOX_SCARED:'😱',VOX_HAPPY:'😄',VOX_SAD:'😢',VOX_ANGRY:'😡',VOX_LAUGH:'😂',VOX_COOL:'😎',VOX_HEART:'🩷',VOX_FIRE:'🔥',VOX_SKULL:'💀',VOX_KISS:'😘'};return m[n]||'🩷'}
+function getStickerEmoji(n){const m={VOX_LOVE:'😍',VOX_SCARED:'😱',VOX_HAPPY:'😄',VOX_SAD:'😢',VOX_ANGRY:'😡',VOX_LAUGH:'😂',VOX_COOL:'😎',VOX_HEART:'🩷',VOX_FIRE:'🔥',VOX_SKULL:'💀',VOX_KISS:'😘',PREM_CROWN:'👑',PREM_DIAMOND:'💎',PREM_STAR:'⭐',PREM_ROCKET:'🚀',PREM_MONEY:'💰',PREM_TROPHY:'🏆',PREM_FIRE:'🔥',PREM_UNICORN:'🦄'};return m[n]||'🩷'}
 
 function showProfile(uid){if(!uid)return;profileUserID=uid;db.ref('users/'+uid).once('value',(snap)=>{const d=snap.val();if(!d){alert('Не найден');return}document.getElementById('profileAvatar').innerText=d.avatar||'🐱';document.getElementById('profileName').innerText=d.name||'Без имени';document.getElementById('profileId').innerText=d.id||uid;document.getElementById('profileStatus').innerText=(d.premium?'👑 Premium · ':'')+(d.statusText||(d.online?'в сети':'оффлайн'));document.getElementById('profileCoins').innerText=d.coins||0;document.getElementById('profileStars').innerText=d.starsReceived||0;db.ref('users/'+uid+'/gifts').once('value',(g)=>{document.getElementById('profileGifts').innerText=g.numChildren()||0});showPanel('profilePanel')})}
 function startDMWithProfile(){if(!profileUserID||profileUserID===userID)return;hidePanel('profilePanel');const chatId='friend_'+profileUserID,name=document.getElementById('profileName').innerText;if(!myChats[chatId]){db.ref('friends/'+userID+'/'+profileUserID).set(name);myChats[chatId]={type:'friend',name,avatar:'👤',other:profileUserID};renderChatList()}openChat(chatId,name,'friend')}
@@ -721,12 +753,17 @@ function donateToProfile(){if(!profileUserID)return;const amount=parseInt(prompt
 
 function sendMessage(){if(!currentRef)return;if(currentChatType==='channel'&&!isChannelOwner){alert('Только владелец канала');return}const input=document.getElementById('msgInput'),text=input.value.trim();if(!text)return;
 const msg={name:userName,avatar:userAvatar,rank:userRank,id:userID,text:text,time:Date.now(),statusText:myStatusText||"",premium:isPremium};
+if(isPremium&&currentChatType==='chat'&&currentChat==='support')msg.priority=true;
 if(replyToKey){msg.replyTo=replyToText;replyToKey=null;replyToText="";input.placeholder="Сообщение..."}
 const mentions=text.match(/@([A-Za-z0-9А-Яа-яЁё_\-]{2,20})/g);if(mentions)msg.mentions=mentions.map(x=>x.slice(1).toLowerCase());
 msg.text=msg.text.replace(/:\)/g,'🙂').replace(/:\(/g,'🙁');
 currentRef.push(msg);input.value=''}
-function sendPhoto(){const file=document.getElementById('photoInput').files[0];if(!file||!currentRef)return;const reader=new FileReader();reader.onload=(e)=>{currentRef.push({name:userName,avatar:userAvatar,rank:userRank,id:userID,text:'',photo:e.target.result,time:Date.now(),premium:isPremium});document.getElementById('photoInput').value=''};reader.readAsDataURL(file)}
-function sendSticker(name){if(!currentRef)return;if(currentChatType==='channel'&&!isChannelOwner){alert('Только владелец');return}currentRef.push({name:userName,avatar:userAvatar,rank:userRank,id:userID,text:'',sticker:name,time:Date.now(),premium:isPremium});toggleStickerPanel()}
+function sendPhoto(){const files=document.getElementById('photoInput').files;if(!files.length||!currentRef)return;const max=isPremium?3:1;const selected=Array.from(files).slice(0,max);if(files.length>max&&!isPremium){alert('Premium-подписчики могут загружать до 3 фото сразу.\nУ тебя загрузится только 1.\nХочешь больше — оформи VOX Premium 👑')}
+const readers=selected.map(f=>new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(f)}));
+Promise.all(readers).then(images=>{const msg={name:userName,avatar:userAvatar,rank:userRank,id:userID,text:'',time:Date.now(),premium:isPremium};if(images.length===1)msg.photo=images[0];else msg.photos=images;currentRef.push(msg);document.getElementById('photoInput').value=''})}
+function sendSticker(name){if(!currentRef)return;if(currentChatType==='channel'&&!isChannelOwner){alert('Только владелец');return}
+if(PREMIUM_STICKERS.includes(name)&&!isPremium){alert('Эти стикеры доступны только с VOX Premium 👑');return}
+currentRef.push({name:userName,avatar:userAvatar,rank:userRank,id:userID,text:'',sticker:name,time:Date.now(),premium:isPremium});toggleStickerPanel()}
 async function toggleRecording(){if(isRecording){try{mediaRecorder.stop()}catch(e){}isRecording=false;document.getElementById('recBtn').classList.remove('recording');return}try{mediaStream=await navigator.mediaDevices.getUserMedia({audio:true});mediaRecorder=new MediaRecorder(mediaStream);audioChunks=[];mediaRecorder.ondataavailable=(e)=>{if(e.data.size)audioChunks.push(e.data)};mediaRecorder.onstop=()=>{if(mediaStream){mediaStream.getTracks().forEach(t=>t.stop());mediaStream=null}const blob=new Blob(audioChunks,{type:'audio/webm'});const reader=new FileReader();reader.onload=()=>{if(currentRef)currentRef.push({name:userName,avatar:userAvatar,rank:userRank,id:userID,text:'',audio:reader.result,time:Date.now(),premium:isPremium})};reader.readAsDataURL(blob)};mediaRecorder.start();isRecording=true;document.getElementById('recBtn').classList.add('recording')}catch(e){alert('Нет доступа к микрофону')}}
 
 function deleteMessage(key){if(!currentRef)return;if(confirm('Удалить?'))currentRef.child(key).remove()}
@@ -735,7 +772,7 @@ function showEditPanel(key,text){editingMessageKey=key;document.getElementById('
 function saveEdit(){const t=document.getElementById('editInput').value.trim();if(t&&editingMessageKey&&currentRef)currentRef.child(editingMessageKey).update({text:t});hidePanel('editPanel')}
 function pinMessage(key,msg){if(!currentRef)return;currentRef.child('pinned').set({text:msg.text||'[медиа]',key,by:userName,time:Date.now()});currentRef.child(key+'/pinned').set(true);alert('Закреплено')}
 function unpinMessage(){if(!currentRef)return;currentRef.child('pinned').remove();currentRef.once('value',(snap)=>{snap.forEach(c=>{if(c.val()&&c.val().pinned)currentRef.child(c.key+'/pinned').remove()})})}
-function saveToFavorites(msg){db.ref('chats/saved_'+userID).push({name:userName,avatar:userAvatar,rank:userRank,id:userID,text:msg.text||'',photo:msg.photo||null,sticker:msg.sticker||null,audio:msg.audio||null,fromName:msg.name,fromId:msg.id,savedAt:Date.now(),time:Date.now()});alert('⭐ Сохранено!')}
+function saveToFavorites(msg){db.ref('chats/saved_'+userID).push({name:userName,avatar:userAvatar,rank:userRank,id:userID,text:msg.text||'',photo:msg.photo||null,photos:msg.photos||null,sticker:msg.sticker||null,audio:msg.audio||null,fromName:msg.name,fromId:msg.id,savedAt:Date.now(),time:Date.now()});alert('⭐ Сохранено!')}
 
 function openStarReactionPanel(key){selectedMessageKey=key;showPanel('starReactionPanel')}
 function closeStarReactionPanel(){hidePanel('starReactionPanel')}
@@ -750,7 +787,6 @@ function createPaidContent(){if(currentChatType==='channel'&&!isChannelOwner){al
 function toggleSettings(){const p=document.getElementById('settingsPanel');if(p.style.display==='block')hidePanel('settingsPanel');else{showPanel('settingsPanel');loadSettingsUI()}}
 function toggleAvatarPanel(){const p=document.getElementById('avatarPanel');if(p.style.display==='block')hidePanel('avatarPanel');else showPanel('avatarPanel')}
 function toggleEmojiPanel(){const p=document.getElementById('emojiPanel');if(p.style.display==='block')hidePanel('emojiPanel');else showPanel('emojiPanel')}
-function toggleStickerPanel(){const p=document.getElementById('stickerPanel');if(p.style.display==='block')hidePanel('stickerPanel');else showPanel('stickerPanel')}
 function toggleGroupPanel(){const p=document.getElementById('groupPanel');if(p.style.display==='block')hidePanel('groupPanel');else showPanel('groupPanel')}
 function toggleAccountPanel(){const p=document.getElementById('accountPanel');if(p.style.display==='block')hidePanel('accountPanel');else showPanel('accountPanel')}
 function showGiftPanel(){const p=document.getElementById('giftPanel');if(p.style.display==='block')hidePanel('giftPanel');else showPanel('giftPanel')}
