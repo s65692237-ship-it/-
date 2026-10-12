@@ -9,6 +9,7 @@
         body { background: #0e1621; color: #fff; font-family: 'Segoe UI', Arial, sans-serif; display: flex; height: 100vh; overflow: hidden; transition: background 0.3s, color 0.3s; }
         body.light { background: #f0f2f5; color: #000; }
         
+        /* ЭКРАН РЕГИСТРАЦИИ */
         #authScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #0e1621 0%, #1a3a5a 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
         #authScreen .logo { font-size: 48px; font-weight: 900; color: #2b5278; margin-bottom: 30px; letter-spacing: 4px; text-shadow: 0 0 20px rgba(43, 82, 120, 0.5); }
         #authScreen input { width: 100%; max-width: 350px; padding: 14px 18px; margin: 8px 0; border: none; border-radius: 12px; background: rgba(36, 47, 61, 0.9); color: #fff; font-size: 16px; outline: none; }
@@ -18,6 +19,7 @@
         #authScreen .hint b { color: #ffd700; }
         #authScreen .error { color: #f00; font-size: 13px; margin-top: 5px; text-align: center; }
         
+        /* ОСНОВНОЙ ИНТЕРФЕЙС */
         #app { display: flex; width: 100%; height: 100%; }
         #waterBg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.15; }
         #waterBg canvas { width: 100%; height: 100%; }
@@ -68,18 +70,22 @@
         #onlineList { padding: 4px 18px; font-size: 11px; color: #7d8b99; background: #17212b; border-bottom: 1px solid #242f3d; }
         body.light #onlineList { background: #fff; border-bottom-color: #ddd; color: #666; }
         
-        #chat { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 5px; }
+        #chat { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 6px; }
+        
+        /* ИНТЕРФЕЙС КАК В TELEGRAM (из кода Ромы) */
         .message { max-width: 75%; padding: 8px 14px; border-radius: 15px; display: flex; align-items: flex-start; gap: 8px; position: relative; cursor: pointer; transition: 0.2s; word-wrap: break-word; }
-        .message.my { background: #2b5278; align-self: flex-end; flex-direction: row-reverse; }
-        body.light .message.my { background: #0084ff; color: #fff; }
-        .message.other { background: #182533; align-self: flex-start; }
-        body.light .message.other { background: #e4e6eb; color: #000; }
+        .message.outgoing { background: #2b5278; align-self: flex-end; flex-direction: row-reverse; border-bottom-right-radius: 4px; }
+        body.light .message.outgoing { background: #0084ff; color: #fff; }
+        .message.incoming { background: #182533; align-self: flex-start; border-bottom-left-radius: 4px; }
+        body.light .message.incoming { background: #e4e6eb; color: #000; }
         .message .msg-avatar { font-size: 22px; }
         .message .bubble { display: flex; flex-direction: column; gap: 2px; flex: 1; }
         .message .name { font-size: 11px; color: #7d8b99; font-weight: bold; display: flex; gap: 5px; align-items: center; }
         .message .name .rank { font-size: 10px; color: #ffd700; }
         .message .name .admin-rank { font-size: 10px; color: #f00; font-weight: bold; }
         .message .text { font-size: 14px; line-height: 1.4; }
+        .message .message-time { font-size: 10px; color: rgba(255,255,255,0.6); float: right; margin-left: 8px; margin-top: 4px; }
+        body.light .message.incoming .message-time { color: rgba(0,0,0,0.5); }
         .message .photo-msg { max-width: 100%; border-radius: 10px; margin-top: 4px; }
         .message .sticker-msg { width: 100px; height: 100px; border-radius: 50%; background: #2b5278; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; font-weight: bold; border: 3px solid #1a3a5a; }
         .message .sticker-msg span { font-size: 35px; }
@@ -87,7 +93,7 @@
         .message .reaction { position: absolute; bottom: -8px; right: 8px; background: #17212b; border-radius: 8px; padding: 1px 5px; font-size: 12px; border: 1px solid #242f3d; }
         .message .reply-to { font-size: 11px; color: #7d8b99; border-left: 2px solid #2b5278; padding-left: 5px; margin-bottom: 3px; }
         
-        .message .msg-actions { position: absolute; top: -10px; right: -10px; display: none; gap: 3px; }
+        .message .msg-actions { position: absolute; top: -10px; right: -10px; display: none; gap: 3px; z-index: 100; }
         .message .msg-actions button { width: 22px; height: 22px; border-radius: 50%; border: none; cursor: pointer; font-size: 11px; }
         .message .delete-btn { background: #f00; color: #fff; }
         .message .edit-btn { background: #ff0; color: #000; }
@@ -106,6 +112,7 @@
         #recBtn.recording { animation: pulse 1s infinite; }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255,0,0,0.7); } 70% { box-shadow: 0 0 0 10px rgba(255,0,0,0); } 100% { box-shadow: 0 0 0 0 rgba(255,0,0,0); } }
         
+        /* ПАНЕЛИ */
         .panel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #17212b; padding: 20px; border-radius: 15px; display: none; z-index: 500; border: 2px solid #2b5278; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; }
         body.light .panel { background: #fff; color: #000; }
         .panel h2 { margin-bottom: 10px; font-size: 20px; }
@@ -145,7 +152,7 @@
         <button onclick="authUser()">Зарегистрироваться / Войти</button>
         <div class="error" id="authError"></div>
         <div class="hint">
-            <b>Примечание:</b> чтобы войти в свой аккаунт, введи свой ник и <b>запомни пароль</b>. Если забудешь — аккаунт не восстановить. Придумай пароль, который точно запомнишь.
+            <b>Примечание:</b> чтобы войти в свой аккаунт, введи свой ник и <b>запомни пароль</b>. Если забудешь — аккаунт не восстановить.
         </div>
     </div>
     
@@ -164,7 +171,7 @@
                     <button onclick="toggleSettings()">⚙️</button>
                 </div>
                 <button id="addFriend" onclick="addFriend()">+ Добавить по ID</button>
-                <button id="buyCoins" onclick="buyCoins()">💰 Купить звёзды</button>
+                <button id="buyCoins" onclick="buyCoins()">⭐ Купить звёзды</button>
                 <button id="adminBtn" onclick="toggleAdminPanel()" style="display:none;">⚙️ Админ</button>
             </div>
             <div id="stats">
@@ -656,7 +663,7 @@
         function addMessageToChat(msg, key) {
             const chat = document.getElementById('chat');
             const div = document.createElement('div');
-            div.className = 'message ' + (msg.name === userName ? 'my' : 'other');
+            div.className = 'message ' + (msg.name === userName ? 'outgoing' : 'incoming');
             if (msg.system) div.style.background = '#333';
             if (msg.gift) div.style.background = '#ffd700';
             if (msg.audio) div.style.background = '#1a3a5a';
@@ -668,10 +675,11 @@
             if (msg.sticker) content += '<div class="sticker-msg"><span>' + getStickerEmoji(msg.sticker) + '</span><span class="label">' + msg.sticker + '</span></div>';
             if (msg.audio) content += '<audio controls src="' + msg.audio + '" style="max-width:200px;"></audio>';
             if (msg.replyTo) content = '<div class="reply-to">↩ ' + msg.replyTo + '</div>' + content;
+            const timeStr = new Date(msg.time).toLocaleTimeString('ru-RU', {hour: '2-digit', minute:'2-digit'});
             div.innerHTML = '<span class="msg-avatar">' + (msg.avatar || '🐱') + '</span>' +
                 '<div class="bubble">' +
                 '<div class="name">' + msg.name + ' ' + rankHtml + '</div>' +
-                '<div class="text">' + content + '</div>' +
+                '<div class="text">' + content + '<span class="message-time">' + timeStr + '</span></div>' +
                 '</div>' +
                 '<div class="msg-actions">' +
                 '<button class="reply-btn" onclick="event.stopPropagation();showReply(\'' + key + '\',\'' + (msg.text || '').replace(/'/g, "\\'") + '\')">↩</button>' +
