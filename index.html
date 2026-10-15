@@ -67,9 +67,7 @@ body.light .notify { background:#fff; color:#0f172a; }
 .btn-prestige { background:linear-gradient(90deg,#8b5cf6,#ec4899); }
 .btn-prestige:hover:not(:disabled) { background:linear-gradient(90deg,#7c3aed,#db2777); }
 .btn-gold { background:linear-gradient(90deg,#f59e0b,#ef4444); }
-.btn-gold:hover:not(:disabled) { background:linear-gradient(90deg,#d97706,#dc2626); }
 .btn-green { background:linear-gradient(90deg,#10b981,#059669); }
-.btn-green:hover:not(:disabled) { background:linear-gradient(90deg,#059669,#047857); }
 .task { background:#0f172a; padding:8px 10px; border-radius:8px; margin-bottom:6px; font-size:13px; border-left:3px solid #10b981; display:flex; justify-content:space-between; }
 body.light .task { background:#f1f5f9; }
 .task.done { opacity:.5; text-decoration:line-through; }
@@ -88,7 +86,7 @@ body.light canvas { background:#f8fafc; }
 .koll-item:hover { transform:scale(1.1); }
 .koll-item.owned { background:rgba(16,185,129,.2); border:1px solid #10b981; }
 .koll-item.locked { opacity:.3; }
-.kollekciya { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+.kollekciya { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; }
 .skill { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #1e293b; font-size:13px; align-items:center; }
 .skill:last-child { border-bottom:none; }
 .crisis-banner { position:fixed; top:0; left:0; width:100%; background:#dc2626; color:#fff; padding:8px; text-align:center; font-weight:600; z-index:150; animation:slideInDown .4s; }
@@ -112,6 +110,12 @@ body.light .rank { background:#f1f5f9; }
 .logo-item:hover { transform:scale(1.1); }
 .logo-item.active { border:2px solid #3b82f6; }
 .logo-item.locked { opacity:.3; }
+.crypto-item { padding:10px 0; border-bottom:1px solid #1e293b; }
+.crypto-item:last-child { border-bottom:none; }
+.crypto-name { font-weight:600; font-size:14px; }
+.crypto-price { font-size:11px; color:#94a3b8; }
+.crypto-buttons { display:flex; gap:6px; margin-top:6px; }
+.crypto-buttons button { padding:5px 10px; font-size:11px; margin:0; flex:1; }
 </style>
 </head>
 <body>
@@ -185,7 +189,6 @@ body.light .rank { background:#f1f5f9; }
     <button onclick="show('screen-tasks')">📅 Задания</button>
     <button onclick="show('screen-events')">📜 События</button>
     <button onclick="show('screen-achieve')">🏆 Достижения</button>
-    <button class="btn-gold" onclick="watchAd()">📺 Реклама (+$500)</button>
     <button class="btn-green" onclick="claimDaily()">🎁 Ежедневная награда</button>
     <button class="btn-prestige" onclick="show('screen-prestige')">🌟 Престиж</button>
     <button class="btn-sec" onclick="toggleTheme()">🌓 Тема</button>
@@ -276,14 +279,8 @@ body.light .rank { background:#f1f5f9; }
 
 <!-- КРИПТА -->
 <div id="screen-crypto" class="screen">
-    <h2>🪙 VoxCoin</h2>
-    <div class="section">
-        <div style="margin-bottom:10px;">Курс: <b id="crypto-price">$1</b></div>
-        <div style="margin-bottom:10px;">У тебя: <b id="crypto-owned">0</b> VOX</div>
-        <button onclick="buyCrypto()">Купить 10 VOX</button>
-        <button class="btn-sec" onclick="sellCrypto()">Продать всё</button>
-        <button class="btn-gold" onclick="mineCrypto()">⛏️ Майнить</button>
-    </div>
+    <h2>🪙 Криптобиржа</h2>
+    <div class="section"><div id="crypto-list"></div></div>
     <button class="btn-sec" onclick="show('screen-main')">Назад</button>
 </div>
 
@@ -376,7 +373,7 @@ body.light .rank { background:#f1f5f9; }
 </div>
 
 <script>
-// ===== БЕЗОПАСНАЯ ЗАГРУЗКА =====
+// ===== БЕЗОПАСНОСТЬ =====
 function safeNumber(n, def){ return (typeof n === "number" && isFinite(n)) ? n : (def || 0); }
 
 // ===== СОСТОЯНИЕ =====
@@ -392,11 +389,21 @@ let S = {
     lastPlaytime:0, light:false,
     prestige:0, prestigeMult:1,
     stocks:{owned:0, price:10, history:[10]},
-    crypto:{owned:0, price:1, history:[1]},
+    cryptos:{
+        VOX: {owned:0, price:1},
+        BTC: {owned:0, price:60000},
+        ETH: {owned:0, price:3000},
+        DOGE: {owned:0, price:0.15},
+        SHIB: {owned:0, price:0.00002}
+    },
     competitors:[
         {name:"Telegram", users:900000000, growth:100},
         {name:"WhatsApp", users:2000000000, growth:200},
-        {name:"MAX", users:50000000, growth:50}
+        {name:"MAX", users:50000000, growth:50},
+        {name:"Signal", users:40000000, growth:30},
+        {name:"Discord", users:150000000, growth:60},
+        {name:"Viber", users:260000000, growth:20},
+        {name:"WeChat", users:1300000000, growth:150}
     ],
     usersHistory:[0],
     crisis:false, crisisTimer:0,
@@ -407,7 +414,6 @@ let S = {
     crystals:0,
     dailyRewardDate:"",
     dailyStreak:0,
-    quests:[],
     questIndex:0
 };
 
@@ -503,39 +509,76 @@ const CRYSTAL_SHOP = [
     {id:"c5", name:"×2 к доходу 5 мин", cost:20, action:()=>{ S.prestigeMult *= 2; setTimeout(()=>{ S.prestigeMult /= 2; }, 300000); }}
 ];
 
-// ===== ДОСТИЖЕНИЯ =====
+// ===== ДОСТИЖЕНИЯ (30) =====
 const ACHIEVEMENTS = [
-    {id:"first100", name:"Первые 100 юзеров", check:()=>S.users>=100},
-    {id:"first1k", name:"1 000 юзеров", check:()=>S.users>=1000},
-    {id:"first10k", name:"10 000 юзеров", check:()=>S.users>=10000},
-    {id:"first100k",name:"100 000 юзеров", check:()=>S.users>=100000},
-    {id:"million", name:"Миллион юзеров", check:()=>S.users>=1000000},
-    {id:"rich", name:"Богач", check:()=>S.money>=10000},
-    {id:"veryrich", name:"Миллионер", check:()=>S.money>=1000000},
-    {id:"allTech", name:"Все технологии", check:()=>S.techs.length===TECHS.length},
-    {id:"fullStaff",name:"Команда мечты", check:()=>S.staff.length===STAFF.length && S.staff.every(id=>S.staffLevels[id] && S.staffLevels[id].level===3)},
-    {id:"survive", name:"10 минут в игре", check:()=>S.playtime>=600},
-    {id:"lvl5", name:"Уровень 5", check:()=>S.level>=5},
-    {id:"lvl10", name:"Уровень 10", check:()=>S.level>=10},
-    {id:"prestige", name:"Первое перерождение",check:()=>S.prestige>=1},
-    {id:"crypto", name:"Криптоинвестор", check:()=>S.crypto.owned>=100},
-    {id:"company", name:"Империя", check:()=>S.company.ipo && S.company.board && S.company.offices>=1},
-    {id:"quest", name:"Квест-мастер", check:()=>S.questIndex>=4},
-    {id:"daily", name:"Постоянный игрок", check:()=>S.dailyStreak>=3}
+    {id:"a1", name:"Первые 100", check:()=>S.users>=100},
+    {id:"a2", name:"1 000 юзеров", check:()=>S.users>=1000},
+    {id:"a3", name:"10 000 юзеров", check:()=>S.users>=10000},
+    {id:"a4", name:"100 000 юзеров", check:()=>S.users>=100000},
+    {id:"a5", name:"Миллион юзеров", check:()=>S.users>=1000000},
+    {id:"a6", name:"10 миллионов", check:()=>S.users>=10000000},
+    {id:"a7", name:"Богач ($10000)", check:()=>S.money>=10000},
+    {id:"a8", name:"Миллионер", check:()=>S.money>=1000000},
+    {id:"a9", name:"Мультимиллионер", check:()=>S.money>=10000000},
+    {id:"a10", name:"Все технологии", check:()=>S.techs.length===TECHS.length},
+    {id:"a11", name:"Полная команда", check:()=>S.staff.length===STAFF.length},
+    {id:"a12", name:"Команда мечты", check:()=>S.staff.length===STAFF.length && S.staff.every(id=>S.staffLevels[id] && S.staffLevels[id].level===3)},
+    {id:"a13", name:"10 минут", check:()=>S.playtime>=600},
+    {id:"a14", name:"30 минут", check:()=>S.playtime>=1800},
+    {id:"a15", name:"Час в игре", check:()=>S.playtime>=3600},
+    {id:"a16", name:"Уровень 5", check:()=>S.level>=5},
+    {id:"a17", name:"Уровень 10", check:()=>S.level>=10},
+    {id:"a18", name:"Уровень 20", check:()=>S.level>=20},
+    {id:"a19", name:"Престиж 1", check:()=>S.prestige>=1},
+    {id:"a20", name:"Престиж 3", check:()=>S.prestige>=3},
+    {id:"a21", name:"Криптоинвестор", check:()=>S.cryptos.BTC.owned>=1},
+    {id:"a22", name:"Все 5 крипт", check:()=>S.cryptos.VOX.owned>0 && S.cryptos.BTC.owned>0 && S.cryptos.ETH.owned>0 && S.cryptos.DOGE.owned>0 && S.cryptos.SHIB.owned>0},
+    {id:"a23", name:"Империя", check:()=>S.company.ipo && S.company.board && S.company.offices>=1},
+    {id:"a24", name:"Квест-мастер", check:()=>S.questIndex>=5},
+    {id:"a25", name:"Постоянный игрок", check:()=>S.dailyStreak>=3},
+    {id:"a26", name:"Неделя подряд", check:()=>S.dailyStreak>=7},
+    {id:"a27", name:"Инвестор-магнат", check:()=>S.prestigeMult>4},
+    {id:"a28", name:"Все отделы", check:()=>Object.keys(S.depts).length===DEPTS.length},
+    {id:"a29", name:"Все навыки MAX", check:()=>SKILLS.every(sk=>(S.skills[sk.id]||0)>=sk.maxLevel)},
+    {id:"a30", name:"Коллекционер", check:()=>S.koll.icons.length>=10}
 ];
 
-// ===== ИНВЕСТОРЫ =====
+// ===== ИНВЕСТОРЫ (8 типов) =====
 const INVESTOR_TYPES = [
     {name:"Частный инвестор", minOffer:5000, share:0.05},
     {name:"Венчурный фонд", minOffer:20000, share:0.10},
     {name:"Крупный холдинг", minOffer:50000, share:0.15},
-    {name:"Иностранный фонд", minOffer:100000, share:0.20}
+    {name:"Иностранный фонд", minOffer:100000, share:0.20},
+    {name:"Ангельский фонд", minOffer:15000, share:0.08},
+    {name:"Хедж-фонд", minOffer:200000, share:0.25},
+    {name:"Государственный", minOffer:300000, share:0.30},
+    {name:"Техно-гигант", minOffer:500000, share:0.35}
 ];
 
-// ===== КОЛЛЕКЦИИ =====
-const KOLL_ICONS = ["💬","📱","⚡","🌐","🚀","🔥","💎","⭐","🎯","🎨"];
-const KOLL_THEMES = ["Синий","Фиолетовый","Зелёный","Красный","Оранжевый","Розовый","Голубой","Золотой"];
-const ALL_LOGOS = ["💬","📱","⚡","🌐","🚀","🔥","💎","⭐","🎯","🎨","🦊","🐉"];
+// ===== КОЛЛЕКЦИИ (20 иконок, 16 тем, 24 логотипа) =====
+const KOLL_ICONS = ["💬","📱","⚡","🌐","🚀","🔥","💎","⭐","🎯","🎨","🦊","🐉","🌈","❄️","🌙","☀️","🍀","🎮","🎧","👑"];
+const KOLL_THEMES = ["Синий","Фиолетовый","Зелёный","Красный","Оранжевый","Розовый","Голубой","Золотой","Красный","Бирюзовый","Лайм","Индиго","Коралловый","Мятный","Лавандовый","Золотой"];
+const ALL_LOGOS = ["💬","📱","⚡","🌐","🚀","🔥","💎","⭐","🎯","🎨","🦊","🐉","🌈","❄️","🌙","☀️","🍀","🎮","🎧","👑","🐺","🦅","🐼","🐧"];
+
+// ===== СЮЖЕТ =====
+const STORY = [
+    "📨 Telegram: Слышал, ты запустил свой мессенджер. Удачи...",
+    "📨 WhatsApp: Мы следим за тобой. Не расслабляйся.",
+    "📨 MAX: Привет! Хочешь сотрудничать?",
+    "📨 Telegram: Твои 1000 юзеров — капля в море.",
+    "📨 Аноним: Ты не сдашься? Хорошо. Продолжай.",
+    "📨 WhatsApp: Инвесторы говорят о тебе.",
+    "📨 Telegram: Мы видим твой рост.",
+    "📨 MAX: Давай объединимся против Telegram?",
+    "📨 Signal: Мы не участвуем в войнах. Но наблюдаем.",
+    "📨 Discord: Хочешь в нашу экосистему?",
+    "📨 Аноним: В следующем сезоне будет война.",
+    "📨 WhatsApp: Готовься. Мы идём за тобой.",
+    "📨 WeChat: Интересный проект. Мы подумаем.",
+    "📨 Аноним: Ты стал слишком большим. Осторожнее.",
+    "📨 Telegram: Ты обогнал нас в одной стране. Хорошо."
+];
+let storyIndex = 0;
 
 // ===== ПОКАЗ ЭКРАНА =====
 function show(id){
@@ -561,7 +604,7 @@ function show(id){
         if(id==="screen-koll") renderKoll();
         if(id==="screen-stats") { drawChart(); renderForecast(); }
         if(id==="screen-prestige") renderPrestige();
-    } catch(e){ console.log("Ошибка show:", e); }
+    } catch(e){ console.log(e); }
 }
 
 // ===== УВЕДОМЛЕНИЕ =====
@@ -632,7 +675,7 @@ function updateUI(){
         document.getElementById("progress-bar").style.width = pct + "%";
         let xpNeed = safeNumber(S.level,1) * 100;
         document.getElementById("xp-bar").style.width = Math.min(100, (safeNumber(S.xp,0) / xpNeed) * 100) + "%";
-    } catch(e){ console.log("Ошибка UI:", e); }
+    } catch(e){}
 }
 
 // ===== ДОХОД =====
@@ -750,8 +793,7 @@ function hireStaff(id){
     S.staffLevels[id] = {level:1, char:ch};
     S.users += s.users;
     addXp(30);
-    const chName = CHARACTERS.find(c=>c.id===ch).name;
-    notify("👥 " + s.name + " [" + chName + "]", "#3b82f6");
+    notify("👥 " + s.name, "#3b82f6");
     beep(500, 0.15);
     saveNow(); updateUI(); renderStaff();
 }
@@ -1022,41 +1064,57 @@ function sellStock(){
     saveNow(); updateUI(); renderStocks();
 }
 
-// ===== КРИПТА =====
+// ===== КРИПТА (5 монет) =====
 function renderCrypto(){
     try {
-        document.getElementById("crypto-price").textContent = "$" + safeNumber(S.crypto?.price,1).toFixed(2);
-        document.getElementById("crypto-owned").textContent = Math.floor(safeNumber(S.crypto?.owned,0));
+        const list = document.getElementById("crypto-list");
+        list.innerHTML = "";
+        Object.keys(S.cryptos).forEach(sym=>{
+            const c = S.cryptos[sym];
+            const div = document.createElement("div");
+            div.className = "crypto-item";
+            div.innerHTML = `
+                <div class="crypto-name">${sym}</div>
+                <div class="crypto-price">Курс: $${c.price.toFixed(6)} | У тебя: ${c.owned}</div>
+                <div class="crypto-buttons">
+                    <button onclick="buyCrypto('${sym}')">Купить 1</button>
+                    <button onclick="sellCrypto('${sym}')">Продать всё</button>
+                    <button onclick="mineCrypto('${sym}')">⛏️ Майнить</button>
+                </div>
+            `;
+            list.appendChild(div);
+        });
     } catch(e){}
 }
-function buyCrypto(){
-    const cost = S.crypto.price * 10;
-    if(S.money < cost) { notify("Не хватает", "#ef4444"); return; }
-    S.money -= cost;
-    S.crypto.owned += 10;
-    notify("🪙 +10 VOX", "#10b981");
+function buyCrypto(sym){
+    const c = S.cryptos[sym];
+    if(S.money < c.price) { notify("Не хватает", "#ef4444"); return; }
+    S.money -= c.price;
+    c.owned += 1;
+    notify("🪙 +1 " + sym, "#10b981");
     saveNow(); updateUI(); renderCrypto();
 }
-function sellCrypto(){
-    if(S.crypto.owned <= 0) { notify("Нет VOX", "#ef4444"); return; }
-    const sum = S.crypto.owned * S.crypto.price;
+function sellCrypto(sym){
+    const c = S.cryptos[sym];
+    if(c.owned <= 0) { notify("Нет " + sym, "#ef4444"); return; }
+    const sum = c.owned * c.price;
     S.money += sum;
-    S.crypto.owned = 0;
+    c.owned = 0;
     notify("🪙 Продано за $" + sum.toFixed(2), "#10b981");
     saveNow(); updateUI(); renderCrypto();
 }
-function mineCrypto(){
-    if(Math.random() < 0.5){
-        const amount = Math.floor(Math.random() * 5) + 1;
-        S.crypto.owned += amount;
-        notify("⛏️ +" + amount + " VOX", "#10b981");
+function mineCrypto(sym){
+    if(Math.random() < 0.4){
+        const amount = Math.floor(Math.random() * 3) + 1;
+        S.cryptos[sym].owned += amount;
+        notify("⛏️ +" + amount + " " + sym, "#10b981");
     } else {
         notify("⛏️ Пусто", "#94a3b8");
     }
     saveNow(); renderCrypto();
 }
 
-// ===== ИНВЕСТОРЫ =====
+// ===== ИНВЕСТОРЫ (8 типов) =====
 function renderInvestors(){
     try {
         const list = document.getElementById("investor-list");
@@ -1261,7 +1319,8 @@ function generateTasks(){
         {id:"t5", text:"Имей 5000$", check:()=>S.money>=5000, done:false, reward:600},
         {id:"t6", text:"Прокачай навык", check:()=>Object.keys(S.skills).length>=1, done:false, reward:500},
         {id:"t7", text:"Купи акцию", check:()=>S.stocks.owned>=1, done:false, reward:300},
-        {id:"t8", text:"Открой отдел", check:()=>Object.keys(S.depts).length>=1, done:false, reward:700}
+        {id:"t8", text:"Открой отдел", check:()=>Object.keys(S.depts).length>=1, done:false, reward:700},
+        {id:"t9", text:"Купи крипту", check:()=>Object.values(S.cryptos).some(c=>c.owned>0), done:false, reward:400}
     ];
     S.dailyTasks = all.sort(()=>Math.random()-0.5).slice(0,3);
 }
@@ -1348,14 +1407,6 @@ function addXp(amount){
     } catch(e){}
 }
 
-// ===== РЕКЛАМА (бесплатная) =====
-function watchAd(){
-    S.money += 500;
-    notify("📺 +$500 (бесплатно)", "#f59e0b");
-    beep(700, 0.2);
-    saveNow(); updateUI();
-}
-
 // ===== ЕЖЕДНЕВНАЯ НАГРАДА =====
 function claimDaily(){
     const today = new Date().toDateString();
@@ -1370,21 +1421,6 @@ function claimDaily(){
     confetti(); beep(900, 0.4);
     saveNow(); updateUI();
 }
-
-// ===== СЮЖЕТ =====
-let storyIndex = 0;
-const STORY = [
-    "📨 Telegram: Слышал, ты запустил свой мессенджер. Удачи...",
-    "📨 WhatsApp: Мы следим за тобой. Не расслабляйся.",
-    "📨 MAX: Привет! Хочешь сотрудничать?",
-    "📨 Telegram: Твои 1000 юзеров — капля в море.",
-    "📨 Аноним: Ты не сдашься? Хорошо. Продолжай.",
-    "📨 WhatsApp: Инвесторы говорят о тебе.",
-    "📨 Telegram: Мы видим твой рост.",
-    "📨 MAX: Давай объединимся против Telegram?",
-    "📨 Аноним: В следующем сезоне будет война.",
-    "📨 WhatsApp: Готовься. Мы идём за тобой."
-];
 
 // ===== ИГРОВОЙ ЦИКЛ =====
 let taxTimer = 0, storyTimer = 0, stockTimer = 0, historyTimer = 0;
@@ -1405,12 +1441,6 @@ function tick(){
             if(s) upkeep += s.cost * 0.001;
         });
         S.money -= upkeep;
-
-        if(S.credit > 0){
-            const pay = S.credit * 0.005;
-            S.money -= pay;
-            S.credit = Math.max(0, S.credit - pay);
-        }
 
         if(taxTimer >= 300){
             taxTimer = 0;
@@ -1439,8 +1469,12 @@ function tick(){
 
         if(cryptoTimer >= 8){
             cryptoTimer = 0;
-            const change = (Math.random() - 0.5) * 0.5;
-            S.crypto.price = Math.max(0.1, S.crypto.price + change);
+            Object.keys(S.cryptos).forEach(sym=>{
+                const c = S.cryptos[sym];
+                const volatility = sym === "SHIB" ? 0.000001 : sym === "DOGE" ? 0.01 : 1;
+                const change = (Math.random() - 0.5) * c.price * 0.05 * volatility;
+                c.price = Math.max(0.000001, c.price + change);
+            });
         }
 
         if(!S.crisis && crisisTimer >= 600 && Math.random() < 0.1){
@@ -1495,7 +1529,7 @@ function tick(){
         if(S.depts.supp) S.rep = Math.min(100, S.rep + 0.05);
 
         addXp(0.5);
-        if(Math.random() < 0.005) randomEvent();
+        if(Math.random() < 0.008) randomEvent();
 
         if(historyTimer >= 5){
             historyTimer = 0;
@@ -1506,7 +1540,7 @@ function tick(){
         checkAchievements();
         checkQuests();
         updateUI();
-    } catch(e){ console.log("Ошибка tick:", e); }
+    } catch(e){ console.log(e); }
 }
 
 function showCrisisBanner(){
@@ -1526,17 +1560,30 @@ function hideCrisisBanner(){
     } catch(e){}
 }
 
+// ===== СЛУЧАЙНОЕ СОБЫТИЕ (20 штук) =====
 function randomEvent(){
     try {
         const events = [
             {text:"⚠️ Сервер упал! -5% юзеров", fn:()=>{ S.users *= 0.95; S.rep -= 5; }, type:"bad"},
             {text:"🎉 Вирусный пост! +500 юзеров", fn:()=>{ S.users += 500; }, type:"good"},
-            {text:"💀 Хакер! -10% денег", fn:()=>{ const dmg=S.money*0.1*(1 - (S.skills.defense||0)*0.1); S.money -= S.depts.sec ? dmg*0.5 : dmg; }, type:"bad"},
+            {text:"💀 Хакер! -10% денег", fn:()=>{ const dmg=S.money*0.1*(1-(S.skills.defense||0)*0.1); S.money -= S.depts.sec?dmg*0.5:dmg; }, type:"bad"},
             {text:"📰 Статья! +10 реп", fn:()=>{ S.rep = Math.min(100, S.rep+10); }, type:"good"},
             {text:"🚨 Утечка! -15 реп", fn:()=>{ S.rep -= 15; }, type:"bad"},
             {text:"⭐ Инвестор! +$1000", fn:()=>{ S.money += 1000; }, type:"good"},
             {text:"🐛 Баг! -200 юзеров", fn:()=>{ S.users = Math.max(0, S.users-200); }, type:"bad"},
-            {text:"🔥 Мем! +2000 юзеров", fn:()=>{ S.users += 2000; }, type:"good"}
+            {text:"🔥 Мем! +2000 юзеров", fn:()=>{ S.users += 2000; }, type:"good"},
+            {text:"📈 Вирусный тренд! +5000 юзеров", fn:()=>{ S.users += 5000; }, type:"good"},
+            {text:"📉 Отток! -10% юзеров", fn:()=>{ S.users *= 0.9; }, type:"bad"},
+            {text:"🎁 Щедрый спонсор! +$5000", fn:()=>{ S.money += 5000; }, type:"good"},
+            {text:"⚡ DDoS-атака! -20% денег", fn:()=>{ const dmg=S.money*0.2*(1-(S.skills.defense||0)*0.1); S.money -= S.depts.sec?dmg*0.5:dmg; }, type:"bad"},
+            {text:"📺 Реклама на ТВ! +3000 юзеров", fn:()=>{ S.users += 3000; }, type:"good"},
+            {text:"🤝 Партнёрство! +5000 юзеров", fn:()=>{ S.users += 5000; }, type:"good"},
+            {text:"⚖️ Иск! -$3000", fn:()=>{ if(!S.company.lawyers) S.money -= 3000; }, type:"bad"},
+            {text:"🏆 Награда! +20 реп", fn:()=>{ S.rep = Math.min(100, S.rep+20); }, type:"good"},
+            {text:"🌐 Заход в новую страну! +10000 юзеров", fn:()=>{ S.users += 10000; }, type:"good"},
+            {text:"🚫 Блокировка в стране! -15% юзеров", fn:()=>{ S.users *= 0.85; }, type:"bad"},
+            {text:"💎 Случайный кристалл!", fn:()=>{ S.crystals += 2; }, type:"good"},
+            {text:"🎯 Крупный заказчик! +$10000", fn:()=>{ S.money += 10000; }, type:"good"}
         ];
         const e = events[Math.floor(Math.random()*events.length)];
         e.fn();
@@ -1564,7 +1611,12 @@ function load(){
         const parsed = JSON.parse(d);
         Object.assign(S, parsed);
         if(!S.stocks) S.stocks = {owned:0, price:10, history:[10]};
-        if(!S.crypto) S.crypto = {owned:0, price:1, history:[1]};
+        if(!S.cryptos){
+            S.cryptos = {
+                VOX:{owned:0,price:1}, BTC:{owned:0,price:60000}, ETH:{owned:0,price:3000},
+                DOGE:{owned:0,price:0.15}, SHIB:{owned:0,price:0.00002}
+            };
+        }
         if(!S.depts) S.depts = {};
         if(!S.skills) S.skills = {};
         if(!S.koll) S.koll = {icons:[], themes:[], unlockedLogos:["💬"]};
@@ -1573,7 +1625,11 @@ function load(){
         if(!S.competitors) S.competitors = [
             {name:"Telegram", users:900000000, growth:100},
             {name:"WhatsApp", users:2000000000, growth:200},
-            {name:"MAX", users:50000000, growth:50}
+            {name:"MAX", users:50000000, growth:50},
+            {name:"Signal", users:40000000, growth:30},
+            {name:"Discord", users:150000000, growth:60},
+            {name:"Viber", users:260000000, growth:20},
+            {name:"WeChat", users:1300000000, growth:150}
         ];
         if(!S.usersHistory) S.usersHistory = [S.users];
         if(S.prestigeMult === undefined) S.prestigeMult = 1;
@@ -1588,7 +1644,6 @@ function load(){
         if(S.dailyRewardDate === undefined) S.dailyRewardDate = "";
         if(S.dailyStreak === undefined) S.dailyStreak = 0;
         if(S.questIndex === undefined) S.questIndex = 0;
-        // Миграция
         for(const id in S.staffLevels){
             if(typeof S.staffLevels[id] === "number"){
                 S.staffLevels[id] = {level: S.staffLevels[id], char:"normal"};
@@ -1637,11 +1692,18 @@ function createMessenger(){
         level:1, xp:0, dailyTasks:[], tasksDate:"", lastPlaytime:0, light:false,
         prestige:0, prestigeMult:1,
         stocks:{owned:0, price:10, history:[10]},
-        crypto:{owned:0, price:1, history:[1]},
+        cryptos:{
+            VOX:{owned:0,price:1}, BTC:{owned:0,price:60000}, ETH:{owned:0,price:3000},
+            DOGE:{owned:0,price:0.15}, SHIB:{owned:0,price:0.00002}
+        },
         competitors:[
             {name:"Telegram", users:900000000, growth:100},
             {name:"WhatsApp", users:2000000000, growth:200},
-            {name:"MAX", users:50000000, growth:50}
+            {name:"MAX", users:50000000, growth:50},
+            {name:"Signal", users:40000000, growth:30},
+            {name:"Discord", users:150000000, growth:60},
+            {name:"Viber", users:260000000, growth:20},
+            {name:"WeChat", users:1300000000, growth:150}
         ],
         usersHistory:[0],
         crisis:false, crisisTimer:0,
@@ -1652,7 +1714,6 @@ function createMessenger(){
         crystals:0,
         dailyRewardDate:"",
         dailyStreak:0,
-        quests:[],
         questIndex:0
     };
     generateTasks();
