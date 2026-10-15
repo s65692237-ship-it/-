@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Симулятор Мессенджера</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:-apple-system,"Segoe UI",Roboto,sans-serif; }
+body { background:#0a0f1e; color:#e2e8f0; min-height:100vh; padding:15px; display:flex; justify-content:center; align-items:flex-start; transition:.3s; }
+body.light { background:#f1f5f9; color:#0f172a; }
+#app { width:100%; max-width:520px; background:#1e293b; border-radius:20px; padding:22px; box-shadow:0 20px 60px rgba(0,0,0,.6); transition:.3s; }
+body.light #app { background:#fff; box-shadow:0 20px 60px rgba(0,0,0,.15); }
+.screen { display:none; }
+.screen.active { display:block; }
+h1 { font-size:24px; margin-bottom:10px; text-align:center; }
+h2 { font-size:19px; margin-bottom:14px; text-align:center; }
+p { text-align:center; color:#94a3b8; margin-bottom:18px; font-size:14px; }
+label { display:block; margin-bottom:12px; font-size:13px; color:#cbd5e1; }
+body.light label { color:#475569; }
+input,select { width:100%; padding:10px; margin-top:5px; background:#0f172a; color:#e2e8f0; border:1px solid #334155; border-radius:8px; font-size:15px; }
+body.light input, body.light select { background:#f8fafc; color:#0f172a; border-color:#cbd5e1; }
+button { width:100%; padding:12px; margin-top:8px; background:#3b82f6; color:#fff; border:none; border-radius:10px; font-size:15px; font-weight:600; cursor:pointer; transition:.2s; }
+button:hover:not(:disabled) { background:#2563eb; }
+button:disabled { background:#334155; color:#64748b; cursor:not-allowed; }
+.header { display:flex; align-items:center; gap:10px; margin-bottom:14px; padding:14px; background:#0f172a; border-radius:12px; font-size:19px; font-weight:700; }
+body.light .header { background:#f1f5f9; }
+#header-logo { font-size:26px; }
+.stats { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px; }
+.stat { background:#0f172a; padding:10px; border-radius:10px; text-align:center; }
+body.light .stat { background:#f1f5f9; }
+.stat-label { font-size:11px; color:#94a3b8; margin-bottom:3px; }
+.stat-value { font-size:17px; font-weight:700; }
+.bar-wrap { background:#0f172a; border-radius:10px; height:12px; overflow:hidden; margin-bottom:14px; }
+body.light .bar-wrap { background:#e2e8f0; }
+.bar { height:100%; background:linear-gradient(90deg,#3b82f6,#8b5cf6); transition:width .3s; }
+.xp-bar { height:8px; margin-bottom:8px; }
+.xp-bar .bar { background:linear-gradient(90deg,#f59e0b,#ef4444); }
+.section { background:#0f172a; border-radius:10px; padding:12px; margin-bottom:10px; }
+body.light .section { background:#f8fafc; }
+.item { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #1e293b; }
+body.light .item { border-bottom-color:#e2e8f0; }
+.item:last-child { border-bottom:none; }
+.item-info { flex:1; }
+.item-name { font-weight:600; font-size:14px; }
+.item-cost { font-size:11px; color:#94a3b8; margin-top:2px; }
+.item button { width:auto; padding:6px 12px; font-size:12px; margin:0; margin-left:8px; }
+.events-list { max-height:300px; overflow-y:auto; }
+.event { background:#0f172a; padding:8px 10px; border-radius:8px; margin-bottom:6px; font-size:13px; border-left:3px solid #f59e0b; }
+body.light .event { background:#f1f5f9; }
+.event.story { border-left-color:#8b5cf6; }
+.event.good { border-left-color:#10b981; }
+.event.bad { border-left-color:#ef4444; }
+.notify { position:fixed; top:20px; right:20px; background:#1e293b; padding:12px 18px; border-radius:10px; border-left:4px solid #10b981; font-size:14px; box-shadow:0 10px 30px rgba(0,0,0,.5); z-index:100; animation:slideIn .3s; max-width:300px; color:#e2e8f0; }
+body.light .notify { background:#fff; color:#0f172a; }
+@keyframes slideIn { from{transform:translateX(400px);opacity:0;} to{transform:translateX(0);opacity:1;} }
+.row { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.btn-sec { background:#334155; }
+.btn-sec:hover:not(:disabled) { background:#475569; }
+.btn-danger { background:#dc2626; }
+.btn-danger:hover:not(:disabled) { background:#b91c1c; }
+.task { background:#0f172a; padding:8px 10px; border-radius:8px; margin-bottom:6px; font-size:13px; border-left:3px solid #10b981; display:flex; justify-content:space-between; }
+body.light .task { background:#f1f5f9; }
+.task.done { opacity:.5; text-decoration:line-through; }
+.badge { background:#3b82f6; padding:2px 8px; border-radius:10px; font-size:11px; }
+.confetti { position:fixed; width:10px; height:10px; pointer-events:none; z-index:200; animation:fall 3s linear forwards; }
+@keyframes fall { 0%{transform:translateY(-20px) rotate(0);opacity:1;} 100%{transform:translateY(100vh) rotate(720deg);opacity:0;} }
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- СТАРТ -->
+<div id="screen-start" class="screen active">
+    <h1>💬 Симулятор Мессенджера</h1>
+    <p>Создай свой мессенджер с нуля и обгони Telegram</p>
+    <button onclick="newGame()">Новая игра</button>
+    <button class="btn-sec" onclick="continueGame()">Продолжить</button>
+    <button class="btn-sec" onclick="toggleTheme()">🌓 Сменить тему</button>
+</div>
+
+<!-- СОЗДАНИЕ -->
+<div id="screen-create" class="screen">
+    <h1>Создай мессенджер</h1>
+    <label>Название<input type="text" id="input-name" maxlength="20" placeholder="Например: Связь"></label>
+    <label>Цвет темы<select id="select-color">
+        <option value="#3b82f6">Синий</option>
+        <option value="#8b5cf6">Фиолетовый</option>
+        <option value="#10b981">Зелёный</option>
+        <option value="#ef4444">Красный</option>
+        <option value="#f59e0b">Оранжевый</option>
+    </select></label>
+    <label>Логотип<select id="select-logo">
+        <option value="💬">💬</option>
+        <option value="📱">📱</option>
+        <option value="⚡">⚡</option>
+        <option value="🌐">🌐</option>
+        <option value="🚀">🚀</option>
+    </select></label>
+    <button onclick="createMessenger()">Создать</button>
+    <button class="btn-sec" onclick="show('screen-start')">Назад</button>
+</div>
+
+<!-- ГЛАВНЫЙ -->
+<div id="screen-main" class="screen">
+    <div class="header">
+        <span id="header-logo">💬</span>
+        <span id="header-name">Мессенджер</span>
+        <span style="margin-left:auto;font-size:14px;background:#3b82f6;padding:3px 10px;border-radius:10px;" id="header-level">Lv.1</span>
+    </div>
+
+    <div class="stats">
+        <div class="stat"><div class="stat-label">Юзеры</div><div class="stat-value" id="stat-users">0</div></div>
+        <div class="stat"><div class="stat-label">Деньги</div><div class="stat-value" id="stat-money">$1000</div></div>
+        <div class="stat"><div class="stat-label">Репутация</div><div class="stat-value" id="stat-rep">50</div></div>
+        <div class="stat"><div class="stat-label">Доход/сек</div><div class="stat-value" id="stat-income">$0</div></div>
+    </div>
+
+    <div class="bar-wrap xp-bar"><div class="bar" id="xp-bar" style="width:0%"></div></div>
+    <div class="bar-wrap"><div class="bar" id="progress-bar" style="width:0%"></div></div>
+
+    <button onclick="show('screen-tech')">🔬 Технологии</button>
+    <button onclick="show('screen-staff')">👥 Сотрудники</button>
+    <button onclick="show('screen-servers')">🖥️ Серверы</button>
+    <button onclick="show('screen-tasks')">📅 Задания</button>
+    <button onclick="show('screen-events')">📜 События</button>
+    <button onclick="show('screen-achieve')">🏆 Достижения</button>
+    <button class="btn-sec" onclick="toggleTheme()">🌓 Тема</button>
+    <button class="btn-danger" onclick="resetGame()">🗑️ Сброс</button>
+</div>
+
+<!-- ТЕХНОЛОГИИ -->
+<div id="screen-tech" class="screen">
+    <h2>🔬 Дерево технологий</h2>
+    <div class="section"><div id="tech-list"></div></div>
+    <button class="btn-sec" onclick="show('screen-main')">Назад</button>
+</div>
+
+<!-- СОТРУДНИКИ -->
+<div id="screen-staff" class="screen">
+    <h2>👥 Сотрудники</h2>
+    <div class="section"><div id="staff-list"></div></div>
+    <button class="btn-sec" onclick="show('screen-main')">Назад</button>
+</div>
+
+<!-- СЕРВЕРЫ -->
+<div id="screen-servers" class="screen">
+    <h2>🖥️ Серверы</h2>
+    <div class="section"><div id="server-list"></div></div>
+    <button class="btn-sec" onclick="show('screen-main')">Назад</button>
+</div>
+
+<!-- ЗАДАНИЯ -->
+<div id="screen-tasks" class="screen">
+    <h2>📅 Ежедневные задания</h2>
+    <div class="section"><div id="tasks-list"></div></div>
+    <button class="btn-sec" onclick="show('screen-main')">Назад</button>
+</div>
+
+<!-- СОБЫТИЯ -->
+<div id="screen-events" class="screen">
+    <h2>📜 События</h2>
+    <div class="events-list" id="events-list"></div>
+    <button class="btn-sec" onclick="show('screen-main')">Назад</button>
+</div>
+
+<!-- ДОСТИЖЕНИЯ -->
+<div id="screen-achieve" class="screen">
+    <h2>🏆 Достижения</h2>
+    <div class="section"><div id="achieve-list"></div></div>
+    <button class="btn-sec" onclick="show('screen-main')">Назад</button>
+</div>
+
+</div>
+
+<script>
+// ===== СОСТОЯНИЕ =====
+let S = {
+    name:"", color:"#3b82f6", logo:"💬",
+    users:0, money:1000, rep:50,
+    techs:[], staff:[], servers:[],
+    staffLevels:{},
+    log:[], achievements:[], playtime:0,
+    level:1, xp:0,
+    dailyTasks:[], tasksDate:"",
+    lastPlaytime:0,
+    light:false
+};
+
+// ===== ТЕХНОЛОГИИ =====
+const TECHS = [
+    {id:"chats", name:"Личные чаты", cost:100, users:50, rep:2},
+    {id:"groups", name:"Группы", cost:300, users:150, rep:3},
+    {id:"photo", name:"Фото", cost:500, users:200, rep:3},
+    {id:"video", name:"Видео", cost:800, users:300, rep:4},
+    {id:"voice", name:"Голосовые", cost:1200, users:400, rep:5},
+    {id:"stickers",name:"Стикеры", cost:1800, users:500, rep:4},
+    {id:"reactions",name:"Реакции", cost:2500, users:700, rep:6},
+    {id:"calls", name:"Звонки", cost:4000, users:1000, rep:7},
+    {id:"crypto", name:"Шифрование", cost:7000, users:1500, rep:10},
+    {id:"bots", name:"Боты", cost:12000,users:2000, rep:8},
+    {id:"stories", name:"Статусы", cost:18000,users:2500, rep:6},
+    {id:"channels",name:"Каналы", cost:25000,users:3000, rep:7},
+    {id:"premium", name:"Подписка", cost:40000,users:5000, rep:12},
+    {id:"apps", name:"Мини-приложения",cost:70000,users:8000,rep:10},
+    {id:"ai", name:"AI-ассистент", cost:120000,users:15000,rep:15}
+];
+
+// ===== СОТРУДНИКИ =====
+const STAFF = [
+    {id:"dev", name:"Разработчик", cost:500, income:2, users:10, desc:"+2$/сек"},
+    {id:"mod", name:"Модератор", cost:800, income:0, users:20, desc:"+репутация"},
+    {id:"design",name:"Дизайнер", cost:1000, income:3, users:15, desc:"+3$/сек"},
+    {id:"market",name:"Маркетолог", cost:1500, income:5, users:50, desc:"+5$/сек"},
+    {id:"sec", name:"Безопасник", cost:2000, income:2, users:5, desc:"Защита"}
+];
+
+// ===== СЕРВЕРЫ =====
+const SERVERS = [
+    {id:"small", name:"Малый сервер", cost:500, maxUsers:1000},
+    {id:"medium", name:"Средний", cost:2000, maxUsers:5000},
+    {id:"large", name:"Большой", cost:8000, maxUsers:20000},
+    {id:"mega", name:"Мега", cost:30000, maxUsers:100000}
+];
+
+// ===== ДОСТИЖЕНИЯ =====
+const ACHIEVEMENTS = [
+    {id:"first100", name:"Первые 100 юзеров", check:()=>S.users>=100},
+    {id:"first1k", name:"1 000 юзеров", check:()=>S.users>=1000},
+    {id:"first10k", name:"10 000 юзеров", check:()=>S.users>=10000},
+    {id:"first100k",name:"100 000 юзеров", check:()=>S.users>=100000},
+    {id:"million", name:"Миллион юзеров", check:()=>S.users>=1000000},
+    {id:"rich", name:"Богач ($10000)", check:()=>S.money>=10000},
+    {id:"veryrich", name:"Миллионер", check:()=>S.money>=1000000},
+    {id:"allTech", name:"Все технологии", check:()=>S.techs.length===TECHS.length},
+    {id:"fullStaff",name:"Полная команда", check:()=>S.staff.length===STAFF.length},
+    {id:"survive", name:"10 минут в игре", check:()=>S.playtime>=600},
+    {id:"lvl5", name:"Уровень 5", check:()=>S.level>=5},
+    {id:"lvl10", name:"Уровень 10", check:()=>S.level>=10}
+];
+
+// ===== ПОКАЗ ЭКРАНА =====
+function show(id){
+    document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+    if(id==="screen-tasks") renderTasks();
+    if(id==="screen-events") renderEvents();
+    if(id==="screen-tech") renderTechs();
+    if(id==="screen-staff") renderStaff();
+    if(id==="screen-servers") renderServers();
+    if(id==="screen-achieve") renderAchievements();
+}
+
+// ===== УВЕДОМЛЕНИЕ =====
+function notify(text,color){
+    const n = document.createElement("div");
+    n.className = "notify";
+    n.style.borderLeftColor = color || "#10b981";
+    n.textContent = text;
+    document.body.appendChild(n);
+    setTimeout(()=>n.remove(), 3500);
+}
+
+// ===== ЗВУК =====
+function beep(freq,dur){
+    try{
+        const ctx = new (window.AudioContext||window.webkitAudioContext)();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.frequency.value = freq;
+        o.type = "sine";
+        g.gain.setValueAtTime(0.05, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+        o.start(); o.stop(ctx.currentTime + dur);
+    }catch(e){}
+}
+
+// ===== КОНФЕТТИ =====
+function confetti(){
+    for(let i=0;i<40;i++){
+        const c = document.createElement("div");
+        c.className = "confetti";
+        c.style.left = Math.random()*100 + "vw";
+        c.style.top = "-20px";
+        c.style.background = ["#3b82f6","#8b5cf6","#10b981","#f59e0b","#ef4444"][Math.floor(Math.random()*5)];
+        c.style.animationDelay = Math.random()*0.5 + "s";
+        document.body.appendChild(c);
+        setTimeout(()=>c.remove(), 3500);
+    }
+}
+
+// ===== ЛОГ =====
+function addLog(text,type){
+    S.log.unshift({text, time:new Date().toLocaleTimeString(), type:type||""});
+    if(S.log.length>50) S.log.pop();
+}
+
+// ===== ОБНОВИТЬ UI =====
+function updateUI(){
+    document.getElementById("header-logo").textContent = S.logo;
+    document.getElementById("header-name").textContent = S.name || "Мессенджер";
+    document.getElementById("header-level").textContent = "Lv." + S.level;
+    document.getElementById("stat-users").textContent = Math.floor(S.users).toLocaleString();
+    document.getElementById("stat-money").textContent = "$" + Math.floor(S.money).toLocaleString();
+    document.getElementById("stat-rep").textContent = Math.floor(S.rep);
+    document.getElementById("stat-income").textContent = "$" + calcIncome().toFixed(1);
+    document.getElementById("app").style.borderTop = "4px solid " + S.color;
+
+    let pct = Math.min(100, (S.users / 1000000) * 100);
+    document.getElementById("progress-bar").style.width = pct + "%";
+
+    let xpNeed = S.level * 100;
+    document.getElementById("xp-bar").style.width = Math.min(100, (S.xp / xpNeed) * 100) + "%";
+}
+
+// ===== ДОХОД =====
+function calcIncome(){
+    let base = S.users * 0.01;
+    let staffBonus = 0;
+    S.staff.forEach(id=>{
+        const s = STAFF.find(x=>x.id===id);
+        if(s){
+            const lvl = S.staffLevels[id] || 1;
+            staffBonus += s.income * lvl;
+        }
+    });
+    return base + staffBonus;
+}
+
+// ===== РЕНДЕР ТЕХНОЛОГИЙ =====
+function renderTechs(){
+    const list = document.getElementById("tech-list");
+    list.innerHTML = "";
+    TECHS.forEach(t=>{
+        const owned = S.techs.includes(t.id);
+        const canBuy = S.money >= t.cost && !owned;
+        const div = document.createElement("div");
+        div.className = "item";
+        div.innerHTML = `
+            <div class="item-info">
+                <div class="item-name">${t.name}</div>
+                <div class="item-cost">$${t.cost.toLocaleString()} • +${t.users} юзеров • +${t.rep} реп</div>
+            </div>
+        `;
+        const btn = document.createElement("button");
+        btn.textContent = owned ? "✓" : "Купить";
+        btn.disabled = owned || !canBuy;
+        if(!owned && canBuy) btn.onclick = ()=>buyTech(t);
+        div.appendChild(btn);
+        list.appendChild(div);
+    });
+}
+
+function buyTech(t){
+    if(S.money < t.cost || S.techs.includes(t.id)) return;
+    S.money -= t.cost;
+    S.users += t.users;
+    S.rep = Math.min(100, S.rep + t.rep);
+    S.techs.push(t.id);
+    addXp(20);
+    addLog("Куплено: " + t.name, "good");
+    notify("✅ Куплено: " + t.name);
+    beep(600, 0.15);
+    saveNow();
+    updateUI(); renderTechs();
+}
+
+// ===== РЕНДЕР СОТРУДНИКОВ =====
+function renderStaff(){
+    const list = document.getElementById("staff-list");
+    list.innerHTML = "";
+    STAFF.forEach(s=>{
+        const hired = S.staff.includes(s.id);
+        const lvl = S.staffLevels[s.id] || 1;
+        const upgradeCost = Math.floor(s.cost * 2 * lvl);
+        const canBuy = S.money >= s.cost && !hired;
+        const canUpgrade = hired && lvl < 3 && S.money >= upgradeCost;
+
+        const div = document.createElement("div");
+        div.className = "item";
+        div.innerHTML = `
+            <div class="item-info">
+                <div class="item-name">${s.name} ${hired?"[Lv."+lvl+"/3]":""}</div>
+                <div class="item-cost">${hired ? "Доход: +" + (s.income*lvl) + "$/сек" : "$" + s.cost + " • " + s.desc}</div>
+            </div>
+        `;
+        const btn = document.createElement("button");
+        if(!hired){
+            btn.textContent = "Нанять";
+            btn.disabled = !canBuy;
+            if(canBuy) btn.onclick = ()=>hireStaff(s);
+        } else if(lvl < 3){
+            btn.textContent = "↑ $" + upgradeCost;
+            btn.disabled = !canUpgrade;
+            if(canUpgrade) btn.onclick = ()=>upgradeStaff(s);
+        } else {
+            btn.textContent = "MAX";
+            btn.disabled = true;
+        }
+        div.appendChild(btn);
+        list.appendChild(div);
+    });
+}
+
+function hireStaff(s){
+    if(S.money < s.cost || S.staff.includes(s.id)) return;
+    S.money -= s.cost;
+    S.staff.push(s.id);
+    S.staffLevels[s.id] = 1;
+    S.users += s.users;
+    addXp(30);
+    addLog("Нанят: " + s.name, "good");
+    notify("👥 Нанят: " + s.name, "#3b82f6");
+    beep(500, 0.15);
+    saveNow();
+    updateUI(); renderStaff();
+}
+
+function upgradeStaff(s){
+    const lvl = S.staffLevels[s.id] || 1;
+    if(lvl >= 3) return;
+    const cost = Math.floor(s.cost * 2 * lvl);
+    if(S.money < cost) return;
+    S.money -= cost;
+    S.staffLevels[s.id] = lvl + 1;
+    addXp(20);
+    addLog(s.name + " → Lv." + (lvl+1), "good");
+    notify("⬆️ " + s.name + " → Lv." + (lvl+1), "#8b5cf6");
+    beep(700, 0.2);
+    saveNow();
+    updateUI(); renderStaff();
+}
+
+// ===== РЕНДЕР СЕРВЕРОВ =====
+function renderServers(){
+    const list = document.getElementById("server-list");
+    list.innerHTML = "";
+    SERVERS.forEach(sv=>{
+        const owned = S.servers.includes(sv.id);
+        const canBuy = S.money >= sv.cost && !owned;
+        const div = document.createElement("div");
+        div.className = "item";
+        div.innerHTML = `
+            <div class="item-info">
+                <div class="item-name">${sv.name}</div>
+                <div class="item-cost">$${sv.cost.toLocaleString()} • до ${sv.maxUsers.toLocaleString()} юзеров</div>
+            </div>
+        `;
+        const btn = document.createElement("button");
+        btn.textContent = owned ? "✓" : "Купить";
+        btn.disabled = owned || !canBuy;
+        if(!owned && canBuy) btn.onclick = ()=>buyServer(sv);
+        div.appendChild(btn);
+        list.appendChild(div);
+    });
+}
+
+function buyServer(sv){
+    if(S.money < sv.cost || S.servers.includes(sv.id)) return;
+    S.money -= sv.cost;
+    S.servers.push(sv.id);
+    addXp(40);
+    addLog("Куплен сервер: " + sv.name, "good");
+    notify("🖥️ Сервер: " + sv.name, "#8b5cf6");
+    beep(700, 0.2);
+    saveNow();
+    updateUI(); renderServers();
+}
+
+// ===== ЗАДАНИЯ =====
+function generateTasks(){
+    const today = new Date().toDateString();
+    if(S.tasksDate === today && S.dailyTasks.length > 0) return;
+    S.tasksDate = today;
+    const all = [
+        {id:"t1", text:"Купи 1 технологию", check:()=>S.techs.length>=1, done:false, reward:200},
+        {id:"t2", text:"Найми 1 сотрудника", check:()=>S.staff.length>=1, done:false, reward:300},
+        {id:"t3", text:"Достигни 100 юзеров", check:()=>S.users>=100, done:false, reward:500},
+        {id:"t4", text:"Купи сервер", check:()=>S.servers.length>=1, done:false, reward:400},
+        {id:"t5", text:"Имей 5000$ на счету", check:()=>S.money>=5000, done:false, reward:600}
+    ];
+    S.dailyTasks = all.sort(()=>Math.random()-0.5).slice(0,3);
+}
+
+function renderTasks(){
+    generateTasks();
+    const list = document.getElementById("tasks-list");
+    list.innerHTML = "";
+    S.dailyTasks.forEach(t=>{
+        const done = t.done || t.check();
+        if(done && !t.done){
+            t.done = true;
+            S.money += t.reward;
+            addXp(50);
+            notify("📅 Задание: " + t.text + " (+$" + t.reward + ")", "#10b981");
+            confetti();
+            saveNow();
+        }
+        const div = document.createElement("div");
+        div.className = "task" + (t.done ? " done" : "");
+        div.innerHTML = `<span>${t.done?"✅":"⬜"} ${t.text}</span><span class="badge">+$${t.reward}</span>`;
+        list.appendChild(div);
+    });
+}
+
+// ===== СОБЫТИЯ =====
+function renderEvents(){
+    const list = document.getElementById("events-list");
+    list.innerHTML = "";
+    if(S.log.length === 0){
+        list.innerHTML = "<div class='event'>Пока событий нет.</div>";
+        return;
+    }
+    S.log.forEach(e=>{
+        const d = document.createElement("div");
+        d.className = "event" + (e.type ? " " + e.type : "");
+        d.textContent = "[" + e.time + "] " + e.text;
+        list.appendChild(d);
+    });
+}
+
+// ===== ДОСТИЖЕНИЯ =====
+function renderAchievements(){
+    const list = document.getElementById("achieve-list");
+    list.innerHTML = "";
+    ACHIEVEMENTS.forEach(a=>{
+        const done = S.achievements.includes(a.id);
+        const div = document.createElement("div");
+        div.className = "item";
+        div.innerHTML = `<div class="item-info"><div class="item-name">${done?"🏆":"🔒"} ${a.name}</div></div>`;
+        list.appendChild(div);
+    });
+}
+
+function checkAchievements(){
+    ACHIEVEMENTS.forEach(a=>{
+        if(!S.achievements.includes(a.id) && a.check()){
+            S.achievements.push(a.id);
+            notify("🏆 Достижение: " + a.name, "#f59e0b");
+            addLog("🏆 Достижение: " + a.name, "good");
+            confetti();
+            beep(900, 0.3);
+            saveNow();
+        }
+    });
+}
+
+// ===== XP =====
+function addXp(amount){
+    S.xp += amount;
+    const need = S.level * 100;
+    if(S.xp >= need){
+        S.xp -= need;
+        S.level++;
+        notify("⬆️ Уровень " + S.level + "!", "#f59e0b");
+        confetti();
+        beep(800, 0.3);
+        saveNow();
+    }
+}
+
+// ===== СЮЖЕТ =====
+let storyIndex = 0;
+const STORY = [
+    "📨 Telegram: Слышал, ты запустил свой мессенджер. Удачи...",
+    "📨 WhatsApp: Мы следим за тобой. Не расслабляйся.",
+    "📨 MAX: Привет от российских разработчиков! Хочешь сотрудничать?",
+    "📨 Telegram: Твои 1000 юзеров — это капля в море. Мы смеёмся.",
+    "📨 Аноним: Ты не сдашься? Хорошо. Продолжай.",
+    "📨 WhatsApp: Инвесторы говорят о тебе. Будь осторожен."
+];
+
+// ===== ИГРОВОЙ ЦИКЛ =====
+let taxTimer = 0;
+let storyTimer = 0;
+
+function tick(){
+    S.playtime++;
+    taxTimer++;
+    storyTimer++;
+
+    S.money += calcIncome();
+
+    let upkeep = 0;
+    S.servers.forEach(id=>{
+        const s = SERVERS.find(x=>x.id===id);
+        if(s) upkeep += s.cost * 0.001;
+    });
+    S.money -= upkeep;
+
+    if(taxTimer >= 300){
+        taxTimer = 0;
+        const tax = Math.max(0, S.money * 0.1);
+        S.money -= tax;
+        addLog("🏦 Налог: -$" + Math.floor(tax), "bad");
+        notify("🏦 Налог: -$" + Math.floor(tax), "#ef4444");
+    }
+
+    if(storyTimer >= 180){
+        storyTimer = 0;
+        if(storyIndex < STORY.length){
+            addLog(STORY[storyIndex], "story");
+            notify(STORY[storyIndex], "#8b5cf6");
+            storyIndex++;
+        }
+    }
+
+    let maxUsers = 1000;
+    S.servers.forEach(id=>{
+        const s = SERVERS.find(x=>x.id===id);
+        if(s) maxUsers += s.maxUsers;
+    });
+
+    if(S.users < maxUsers){
+        let growth = 1 + S.techs.length * 0.5 + S.staff.length * 2;
+        growth *= (S.rep / 50);
+        growth *= (1 + (S.level-1) * 0.1);
+        S.users += growth;
+    }
+
+    S.rep = Math.max(0, S.rep - 0.02);
+    addXp(0.5);
+
+    if(Math.random() < 0.005) randomEvent();
+
+    checkAchievements();
+    updateUI();
+}
+
+function randomEvent(){
+    const events = [
+        {text:"⚠️ Сервер упал! -5% юзеров", fn:()=>{ S.users *= 0.95; S.rep -= 5; }, type:"bad"},
+        {text:"🎉 Вирусный пост! +500 юзеров", fn:()=>{ S.users += 500; }, type:"good"},
+        {text:"💀 Хакерская атака! -10% денег", fn:()=>{ S.money *= 0.9; }, type:"bad"},
+        {text:"📰 Статья в СМИ! +10 репутации", fn:()=>{ S.rep = Math.min(100, S.rep+10); }, type:"good"},
+        {text:"🚨 Утечка данных! -15 репутации", fn:()=>{ S.rep -= 15; }, type:"bad"},
+        {text:"⭐ Инвестор пришёл! +$1000", fn:()=>{ S.money += 1000; }, type:"good"},
+        {text:"🐛 Массовый баг! -200 юзеров", fn:()=>{ S.users = Math.max(0, S.users-200); }, type:"bad"},
+        {text:"🔥 Мем про вас! +2000 юзеров", fn:()=>{ S.users += 2000; }, type:"good"}
+    ];
+    const e = events[Math.floor(Math.random()*events.length)];
+    e.fn();
+    addLog(e.text, e.type);
+    notify(e.text, e.type==="good"?"#10b981":"#ef4444");
+    beep(e.type==="good"?700:200, 0.3);
+    if(document.getElementById("screen-events").classList.contains("active")) renderEvents();
+    saveNow();
+}
+
+// ===== СОХРАНЕНИЕ =====
+function saveNow(){
+    try { localStorage.setItem("messengerSim_v2", JSON.stringify(S)); } catch(e){}
+}
+
+function load(){
+    const d = localStorage.getItem("messengerSim_v2");
+    if(!d) return false;
+    try {
+        const parsed = JSON.parse(d);
+        Object.assign(S, parsed);
+        // Восстанавливаем индекс сюжета
+        storyIndex = Math.min(STORY.length, Math.floor(S.playtime / 180));
+        // Оффлайн-доход
+        if(S.lastPlaytime){
+            const offlineSec = Math.min(3600, Math.floor(Date.now()/1000) - S.lastPlaytime);
+            if(offlineSec > 60){
+                const offlineIncome = offlineSec * calcIncome();
+                S.money += offlineIncome;
+                setTimeout(()=>notify("💤 Оффлайн-доход: +$" + Math.floor(offlineIncome), "#10b981"), 1000);
+            }
+        }
+        return true;
+    } catch(e){ return false; }
+}
+
+// ===== ТЕМА =====
+function toggleTheme(){
+    S.light = !S.light;
+    document.body.classList.toggle("light", S.light);
+    saveNow();
+}
+
+// ===== КНОПКИ =====
+function newGame(){ show("screen-create"); }
+
+function continueGame(){
+    if(load()){
+        updateUI(); renderTechs(); renderStaff(); renderServers(); renderEvents(); renderAchievements();
+        document.body.classList.toggle("light", S.light);
+        show("screen-main");
+        notify("💾 Прогресс загружен", "#10b981");
+    } else {
+        notify("Нет сохранений", "#ef4444");
+    }
+}
+
+function createMessenger(){
+    const name = document.getElementById("input-name").value.trim();
+    if(!name){ notify("Введи название!", "#ef4444"); return; }
+    S = {
+        name, color:document.getElementById("select-color").value, logo:document.getElementById("select-logo").value,
+        users:0, money:1000, rep:50, techs:[], staff:[], servers:[],
+        staffLevels:{}, log:[], achievements:[], playtime:0,
+        level:1, xp:0, dailyTasks:[], tasksDate:"", lastPlaytime:0, light:false
+    };
+    generateTasks();
+    addLog("Мессенджер создан: " + name, "good");
+    notify("✨ " + name + " запущен!", "#10b981");
+    saveNow();
+    updateUI(); renderTechs(); renderStaff(); renderServers(); renderEvents(); renderAchievements();
+    show("screen-main");
+}
+
+function resetGame(){
+    if(confirm("Точно сбросить ВСЁ?")){
+        localStorage.removeItem("messengerSim_v2");
+        localStorage.removeItem("messengerSim");
+        location.reload();
+    }
+}
+
+// ===== СТАРТ =====
+updateUI();
+setInterval(tick, 1000);
+
+// Сохраняем время и прогресс при выходе
+window.addEventListener("beforeunload", ()=>{
+    S.lastPlaytime = Math.floor(Date.now()/1000);
+    saveNow();
+});
+
+// Автосохранение каждые 5 секунд для надёжности
+setInterval(()=>{
+    S.lastPlaytime = Math.floor(Date.now()/1000);
+    saveNow();
+}, 5000);
+</script>
+</body>
+</html>
