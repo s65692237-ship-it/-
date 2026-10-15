@@ -54,6 +54,7 @@ body.light .event { background:#f1f5f9; }
 .event.story { border-left-color:#8b5cf6; }
 .event.good { border-left-color:#10b981; }
 .event.bad { border-left-color:#ef4444; }
+.event.quest { border-left-color:#ec4899; }
 .notify { position:fixed; top:20px; right:20px; background:#1e293b; padding:12px 18px; border-radius:10px; border-left:4px solid #10b981; font-size:14px; box-shadow:0 10px 30px rgba(0,0,0,.5); z-index:100; animation:slideInRight .4s; max-width:300px; color:#e2e8f0; }
 body.light .notify { background:#fff; color:#0f172a; }
 @keyframes slideInRight { from{transform:translateX(400px);opacity:0;} to{transform:translateX(0);opacity:1;} }
@@ -68,14 +69,19 @@ body.light .notify { background:#fff; color:#0f172a; }
 .btn-gold { background:linear-gradient(90deg,#f59e0b,#ef4444); }
 .btn-gold:hover:not(:disabled) { background:linear-gradient(90deg,#d97706,#dc2626); }
 .btn-green { background:linear-gradient(90deg,#10b981,#059669); }
+.btn-green:hover:not(:disabled) { background:linear-gradient(90deg,#059669,#047857); }
 .task { background:#0f172a; padding:8px 10px; border-radius:8px; margin-bottom:6px; font-size:13px; border-left:3px solid #10b981; display:flex; justify-content:space-between; }
 body.light .task { background:#f1f5f9; }
 .task.done { opacity:.5; text-decoration:line-through; }
+.quest { background:#0f172a; padding:10px; border-radius:8px; margin-bottom:8px; font-size:13px; border-left:3px solid #ec4899; }
+body.light .quest { background:#f1f5f9; }
+.quest.done { opacity:.5; }
 .badge { background:#3b82f6; padding:2px 8px; border-radius:10px; font-size:11px; }
+.badge-crystal { background:#06b6d4; }
 .confetti { position:fixed; width:10px; height:10px; pointer-events:none; z-index:200; animation:fall 3s linear forwards; }
 .comp-bar { display:flex; justify-content:space-between; font-size:12px; padding:6px 0; border-bottom:1px solid #1e293b; }
 .comp-bar:last-child { border-bottom:none; }
-.comp-bar.you { color:#10b981; }
+.comp-bar.you { color:#10b981; font-weight:700; }
 canvas { width:100%; height:100px; background:#0f172a; border-radius:8px; margin-bottom:10px; }
 body.light canvas { background:#f8fafc; }
 .koll-item { background:#0f172a; padding:10px; border-radius:8px; text-align:center; font-size:22px; cursor:pointer; transition:.2s; }
@@ -94,7 +100,18 @@ body.light canvas { background:#f8fafc; }
 .tag-normal { background:#3b82f6; }
 .tag-genius { background:#f59e0b; }
 .tag-work { background:#10b981; }
-.tag-star { background:#ec4899; }
+.crystal-count { background:#06b6d4; padding:3px 10px; border-radius:10px; font-size:13px; margin-left:auto; }
+.daily-reward { background:linear-gradient(135deg,#f59e0b,#ef4444); padding:12px; border-radius:10px; text-align:center; margin-bottom:10px; }
+.rank { display:flex; justify-content:space-between; padding:6px 8px; border-radius:6px; margin-bottom:4px; font-size:13px; background:#0f172a; }
+body.light .rank { background:#f1f5f9; }
+.rank.gold { background:linear-gradient(90deg,#f59e0b33,#f59e0b11); border-left:3px solid #f59e0b; }
+.rank.silver { background:linear-gradient(90deg,#94a3b833,#94a3b811); border-left:3px solid #94a3b8; }
+.rank.bronze { background:linear-gradient(90deg,#92400e33,#92400e11); border-left:3px solid #92400e; }
+.rank.you { border:1px solid #10b981; }
+.logo-picker { display:grid; grid-template-columns:repeat(6,1fr); gap:6px; }
+.logo-item { background:#0f172a; padding:10px; border-radius:8px; text-align:center; font-size:22px; cursor:pointer; transition:.2s; }
+.logo-item:hover { transform:scale(1.1); }
+.logo-item.active { border:2px solid #3b82f6; }
 </style>
 </head>
 <body>
@@ -136,7 +153,8 @@ body.light canvas { background:#f8fafc; }
     <div class="header">
         <span id="header-logo">💬</span>
         <span id="header-name">Мессенджер</span>
-        <span style="margin-left:auto;font-size:14px;background:#3b82f6;padding:3px 10px;border-radius:10px;" id="header-level">Lv.1</span>
+        <span class="crystal-count" id="header-crystals">💎 0</span>
+        <span style="margin-left:8px;font-size:14px;background:#3b82f6;padding:3px 10px;border-radius:10px;" id="header-level">Lv.1</span>
     </div>
 
     <div class="stats">
@@ -155,16 +173,20 @@ body.light canvas { background:#f8fafc; }
     <button onclick="show('screen-depts')">🏢 Отделы</button>
     <button onclick="show('screen-company')">💼 Компания</button>
     <button onclick="show('screen-skills')">🌳 Навыки</button>
+    <button onclick="show('screen-quests')">🎯 Квесты</button>
+    <button onclick="show('screen-crystals')">💎 Магазин кристаллов</button>
     <button onclick="show('screen-stocks')">📈 Акции</button>
     <button onclick="show('screen-crypto')">🪙 Крипта</button>
     <button onclick="show('screen-investors')">💼 Инвесторы</button>
     <button onclick="show('screen-comp')">🥊 Конкуренты</button>
+    <button onclick="show('screen-rank')">🏆 Рейтинг</button>
     <button onclick="show('screen-koll')">🎨 Коллекции</button>
     <button onclick="show('screen-stats')">📊 Аналитика</button>
     <button onclick="show('screen-tasks')">📅 Задания</button>
     <button onclick="show('screen-events')">📜 События</button>
     <button onclick="show('screen-achieve')">🏆 Достижения</button>
     <button class="btn-gold" onclick="watchAd()">📺 Реклама (+$500)</button>
+    <button class="btn-green" onclick="claimDaily()">🎁 Ежедневная награда</button>
     <button class="btn-prestige" onclick="show('screen-prestige')">🌟 Престиж</button>
     <button class="btn-sec" onclick="toggleTheme()">🌓 Тема</button>
     <button class="btn-danger" onclick="resetGame()">🗑️ Сброс</button>
@@ -172,7 +194,7 @@ body.light canvas { background:#f8fafc; }
 
 <!-- ТЕХНОЛОГИИ -->
 <div id="screen-tech" class="screen">
-    <h2>🔬 Дерево технологий</h2>
+    <h2>🔬 Технологии</h2>
     <div class="section"><div id="tech-list"></div></div>
     <button class="btn-sec" onclick="show('screen-main')">Назад</button>
 </div>
@@ -205,7 +227,7 @@ body.light canvas { background:#f8fafc; }
 <div id="screen-company" class="screen">
     <h2>💼 Компания</h2>
     <div class="section">
-        <div class="stat-label">Уровень компании</div>
+        <div class="stat-label">Уровень</div>
         <div class="stat-value" id="company-level" style="font-size:16px;margin-bottom:8px;">Малый стартап</div>
         <div style="font-size:12px;color:#94a3b8;">Оценка: <b id="company-value">$0</b></div>
     </div>
@@ -218,8 +240,25 @@ body.light canvas { background:#f8fafc; }
 
 <!-- НАВЫКИ -->
 <div id="screen-skills" class="screen">
-    <h2>🌳 Дерево навыков</h2>
+    <h2>🌳 Навыки</h2>
     <div class="section"><div id="skill-list"></div></div>
+    <button class="btn-sec" onclick="show('screen-main')">Назад</button>
+</div>
+
+<!-- КВЕСТЫ -->
+<div id="screen-quests" class="screen">
+    <h2>🎯 Квесты</h2>
+    <div class="section"><div id="quest-list"></div></div>
+    <button class="btn-sec" onclick="show('screen-main')">Назад</button>
+</div>
+
+<!-- КРИСТАЛЛЫ -->
+<div id="screen-crystals" class="screen">
+    <h2>💎 Магазин кристаллов</h2>
+    <div class="section">
+        <div style="text-align:center;margin-bottom:12px;font-size:16px;">У тебя: <b>💎 <span id="crystal-balance">0</span></b></div>
+        <div id="crystal-shop"></div>
+    </div>
     <button class="btn-sec" onclick="show('screen-main')">Назад</button>
 </div>
 
@@ -262,6 +301,13 @@ body.light canvas { background:#f8fafc; }
     <button class="btn-sec" onclick="show('screen-main')">Назад</button>
 </div>
 
+<!-- РЕЙТИНГ -->
+<div id="screen-rank" class="screen">
+    <h2>🏆 Рейтинг</h2>
+    <div class="section"><div id="rank-list"></div></div>
+    <button class="btn-sec" onclick="show('screen-main')">Назад</button>
+</div>
+
 <!-- КОЛЛЕКЦИИ -->
 <div id="screen-koll" class="screen">
     <h2>🎨 Коллекции</h2>
@@ -273,6 +319,10 @@ body.light canvas { background:#f8fafc; }
         <div class="section-title">Темы</div>
         <div class="kollekciya" id="koll-themes"></div>
     </div>
+    <div class="section">
+        <div class="section-title">Сменить логотип</div>
+        <div class="logo-picker" id="logo-picker"></div>
+    </div>
     <button class="btn-sec" onclick="show('screen-main')">Назад</button>
 </div>
 
@@ -282,6 +332,10 @@ body.light canvas { background:#f8fafc; }
     <div class="section">
         <canvas id="chart"></canvas>
         <div style="font-size:12px;color:#94a3b8;text-align:center;">Рост юзеров</div>
+    </div>
+    <div class="section">
+        <div class="section-title">Прогноз</div>
+        <div id="forecast" style="font-size:13px;"></div>
     </div>
     <button class="btn-sec" onclick="show('screen-main')">Назад</button>
 </div>
@@ -311,7 +365,7 @@ body.light canvas { background:#f8fafc; }
 <div id="screen-prestige" class="screen">
     <h2>🌟 Престиж</h2>
     <div class="section">
-        <p>Достигни 1 000 000 юзеров и переродись. Получишь ×2 к доходу.</p>
+        <p>Достигни 1 000 000 юзеров и переродись. ×2 к доходу навсегда.</p>
         <div style="text-align:center;margin-bottom:10px;">Множитель: <b id="prestige-mult">×1</b></div>
         <div style="text-align:center;margin-bottom:10px;">Уровень: <b id="prestige-level">0</b></div>
     </div>
@@ -344,9 +398,13 @@ let S = {
     usersHistory:[0],
     crisis:false, crisisTimer:0,
     investors:[], season:1, seasonTimer:0,
-    koll:{icons:[], themes:[]},
+    koll:{icons:[], themes:[], unlockedLogos:["💬"]},
     inflation:0, credit:0,
-    company:{offices:0, absorbed:0, ipo:false, board:false, lawyers:false, franchise:false, partners:0}
+    company:{offices:0, absorbed:0, ipo:false, board:false, lawyers:false, franchise:false, partners:0},
+    crystals:0,
+    dailyRewardDate:"",
+    dailyStreak:0,
+    quests:[], questIndex:0
 };
 
 // ===== ТЕХНОЛОГИИ =====
@@ -403,7 +461,7 @@ const DEPTS = [
 
 // ===== НАВЫКИ =====
 const SKILLS = [
-    {id:"speed", name:"Скорость", cost:2000, maxLevel:10, effect:"-5% цена технологий"},
+    {id:"speed", name:"Скорость", cost:2000, maxLevel:10, effect:"-5% цена"},
     {id:"profit", name:"Прибыльность", cost:3000, maxLevel:10, effect:"+10% доход"},
     {id:"defense", name:"Защита", cost:2500, maxLevel:10, effect:"-10% урон"},
     {id:"growth", name:"Рост юзеров", cost:4000, maxLevel:10, effect:"+10% рост"}
@@ -413,11 +471,32 @@ const SKILLS = [
 const COMPANY_UPGRADES = [
     {id:"office", name:"Второй офис", cost:50000, desc:"+20% доход"},
     {id:"absorb", name:"Поглотить мессенджер", cost:100000, desc:"+50000 юзеров"},
-    {id:"ipo", name:"IPO (биржа)", cost:500000, desc:"Продажа акций, +$5000/сек"},
-    {id:"board", name:"Совет директоров", cost:200000, desc:"+15% ко всем бонусам"},
+    {id:"ipo", name:"IPO", cost:500000, desc:"+$5000/сек"},
+    {id:"board", name:"Совет директоров", cost:200000, desc:"+15% бонусов"},
     {id:"lawyers", name:"Юристы", cost:80000, desc:"Защита от штрафов"},
-    {id:"franchise",name:"Франшиза", cost:150000, desc:"+$500/сек пассивно"},
-    {id:"partners", name:"Партнёрство", cost:60000, desc:"+10% рост юзеров"}
+    {id:"franchise",name:"Франшиза", cost:150000, desc:"+$500/сек"},
+    {id:"partners", name:"Партнёрство", cost:60000, desc:"+10% рост"}
+];
+
+// ===== КВЕСТЫ =====
+const QUESTS = [
+    {id:"q1", name:"Первый шаг", desc:"Создай мессенджер и купи 1 технологию", check:()=>S.techs.length>=1, reward:500, crystals:1},
+    {id:"q2", name:"Первые люди", desc:"Найми первого сотрудника", check:()=>S.staff.length>=1, reward:800, crystals:1},
+    {id:"q3", name:"Растущий бизнес", desc:"Достигни 1000 юзеров", check:()=>S.users>=1000, reward:2000, crystals:2},
+    {id:"q4", name:"Мощность", desc:"Купи сервер", check:()=>S.servers.length>=1, reward:1500, crystals:2},
+    {id:"q5", name:"Команда", desc:"Найми всех 5 сотрудников", check:()=>S.staff.length===STAFF.length, reward:5000, crystals:3},
+    {id:"q6", name:"Инвестор", desc:"Возьми инвестиции", check:()=>S.investors.length===0 && S.money>=50000, reward:10000, crystals:5},
+    {id:"q7", name:"Империя", desc:"Достигни 100000 юзеров", check:()=>S.users>=100000, reward:50000, crystals:10},
+    {id:"q8", name:"Миллион", desc:"Достигни 1 000 000 юзеров", check:()=>S.users>=1000000, reward:500000, crystals:25}
+];
+
+// ===== КРИСТАЛЛЫ =====
+const CRYSTAL_SHOP = [
+    {id:"c1", name:"+$10000", cost:5, action:()=>{ S.money += 10000; }},
+    {id:"c2", name:"+50000 юзеров", cost:10, action:()=>{ S.users += 50000; }},
+    {id:"c3", name:"Мгновенный сервер", cost:15, action:()=>{ S.servers.push("mega"); }},
+    {id:"c4", name:"Все технологии", cost:50, action:()=>{ TECHS.forEach(t=>{ if(!S.techs.includes(t.id)) S.techs.push(t.id); }); }},
+    {id:"c5", name:"×2 к доходу на 5 мин", cost:20, action:()=>{ S.prestigeMult *= 2; setTimeout(()=>{ S.prestigeMult /= 2; }, 300000); }}
 ];
 
 // ===== ДОСТИЖЕНИЯ =====
@@ -427,7 +506,7 @@ const ACHIEVEMENTS = [
     {id:"first10k", name:"10 000 юзеров", check:()=>S.users>=10000},
     {id:"first100k",name:"100 000 юзеров", check:()=>S.users>=100000},
     {id:"million", name:"Миллион юзеров", check:()=>S.users>=1000000},
-    {id:"rich", name:"Богач ($10000)", check:()=>S.money>=10000},
+    {id:"rich", name:"Богач", check:()=>S.money>=10000},
     {id:"veryrich", name:"Миллионер", check:()=>S.money>=1000000},
     {id:"allTech", name:"Все технологии", check:()=>S.techs.length===TECHS.length},
     {id:"fullStaff",name:"Команда мечты", check:()=>S.staff.length===STAFF.length && S.staff.every(id=>S.staffLevels[id] && S.staffLevels[id].level===3)},
@@ -437,7 +516,8 @@ const ACHIEVEMENTS = [
     {id:"prestige", name:"Первое перерождение",check:()=>S.prestige>=1},
     {id:"crypto", name:"Криптоинвестор", check:()=>S.crypto.owned>=100},
     {id:"company", name:"Империя", check:()=>S.company.ipo && S.company.board && S.company.offices>=1},
-    {id:"lawyers", name:"Защищённый", check:()=>S.company.lawyers}
+    {id:"quest", name:"Квест-мастер", check:()=>S.questIndex>=4},
+    {id:"daily", name:"Постоянный игрок", check:()=>S.dailyStreak>=3}
 ];
 
 // ===== ИНВЕСТОРЫ =====
@@ -451,6 +531,7 @@ const INVESTOR_TYPES = [
 // ===== КОЛЛЕКЦИИ =====
 const KOLL_ICONS = ["💬","📱","⚡","🌐","🚀","🔥","💎","⭐","🎯","🎨"];
 const KOLL_THEMES = ["Синий","Фиолетовый","Зелёный","Красный","Оранжевый","Розовый","Голубой","Золотой"];
+const ALL_LOGOS = ["💬","📱","⚡","🌐","🚀","🔥","💎","⭐","🎯","🎨","🦊","🐉"];
 
 // ===== ПОКАЗ ЭКРАНА =====
 function show(id){
@@ -465,12 +546,15 @@ function show(id){
     if(id==="screen-depts") renderDepts();
     if(id==="screen-company") renderCompany();
     if(id==="screen-skills") renderSkills();
+    if(id==="screen-quests") renderQuests();
+    if(id==="screen-crystals") renderCrystalShop();
     if(id==="screen-stocks") renderStocks();
     if(id==="screen-crypto") renderCrypto();
     if(id==="screen-investors") renderInvestors();
     if(id==="screen-comp") renderComp();
+    if(id==="screen-rank") renderRank();
     if(id==="screen-koll") renderKoll();
-    if(id==="screen-stats") drawChart();
+    if(id==="screen-stats") { drawChart(); renderForecast(); }
     if(id==="screen-prestige") renderPrestige();
 }
 
@@ -519,11 +603,12 @@ function addLog(text,type){
     if(S.log.length>50) S.log.pop();
 }
 
-// ===== ОБНОВИТЬ UI =====
+// ===== UI =====
 function updateUI(){
     document.getElementById("header-logo").textContent = S.logo;
     document.getElementById("header-name").textContent = S.name || "Мессенджер";
     document.getElementById("header-level").textContent = "Lv." + S.level;
+    document.getElementById("header-crystals").textContent = "💎 " + S.crystals;
     document.getElementById("stat-users").textContent = Math.floor(S.users).toLocaleString();
     document.getElementById("stat-money").textContent = "$" + Math.floor(S.money).toLocaleString();
     document.getElementById("stat-rep").textContent = Math.floor(S.rep);
@@ -547,9 +632,7 @@ function calcIncome(){
             const lvl = data.level || 1;
             const ch = data.char || "normal";
             const chMult = CHARACTERS.find(c=>c.id===ch)?.mult || 1;
-            // Отпуск снижает доход
             const vacation = S.staffVacation[id] ? 0.3 : 1;
-            // Обучение повышает
             const training = S.staffTraining[id] ? 1.5 : 1;
             staffBonus += s.income * lvl * chMult * vacation * training;
         }
@@ -575,12 +658,7 @@ function renderTechs(){
         const canBuy = S.money >= realCost && !owned;
         const div = document.createElement("div");
         div.className = "item";
-        div.innerHTML = `
-            <div class="item-info">
-                <div class="item-name">${t.name}</div>
-                <div class="item-cost">$${realCost.toLocaleString()} • +${t.users} юзеров • +${t.rep} реп</div>
-            </div>
-        `;
+        div.innerHTML = `<div class="item-info"><div class="item-name">${t.name}</div><div class="item-cost">$${realCost.toLocaleString()} • +${t.users} юзеров • +${t.rep} реп</div></div>`;
         const btn = document.createElement("button");
         btn.textContent = owned ? "✓" : "Купить";
         btn.disabled = owned || !canBuy;
@@ -589,7 +667,6 @@ function renderTechs(){
         list.appendChild(div);
     });
 }
-
 function buyTech(t, realCost){
     if(S.money < realCost || S.techs.includes(t.id)) return;
     S.money -= realCost;
@@ -607,10 +684,8 @@ function buyTech(t, realCost){
 function renderStaff(){
     const list = document.getElementById("staff-list");
     list.innerHTML = "";
-    // Статус команды
     const allMax = S.staff.length === STAFF.length && S.staff.every(id=>S.staffLevels[id] && S.staffLevels[id].level===3);
     document.getElementById("team-status").textContent = S.staff.length + "/" + STAFF.length + (allMax ? " 🏆 МЕЧТА" : "");
-    
     STAFF.forEach(s=>{
         const hired = S.staff.includes(s.id);
         const data = S.staffLevels[s.id];
@@ -622,7 +697,6 @@ function renderStaff(){
         const canUpgrade = hired && lvl < 3 && S.money >= upgradeCost;
         const onVacation = S.staffVacation[s.id];
         const onTraining = S.staffTraining[s.id];
-
         const div = document.createElement("div");
         div.className = "item";
         div.style.flexDirection = "column";
@@ -630,27 +704,22 @@ function renderStaff(){
         div.innerHTML = `
             <div style="display:flex;justify-content:space-between;align-items:center;">
                 <div class="item-info">
-                    <div class="item-name">${s.name} ${hired?"[Lv."+lvl+"/3]":""} 
-                        ${hired?'<span class="tag '+chData.tag+'">'+chData.name+'</span>':''}
-                        ${onVacation?'<span class="tag tag-lazy">🏖️</span>':''}
-                        ${onTraining?'<span class="tag tag-genius">📚</span>':''}
-                    </div>
+                    <div class="item-name">${s.name} ${hired?"[Lv."+lvl+"/3]":""} ${hired?'<span class="tag '+chData.tag+'">'+chData.name+'</span>':''} ${onVacation?'<span class="tag tag-lazy">🏖️</span>':''} ${onTraining?'<span class="tag tag-genius">📚</span>':''}</div>
                     <div class="item-cost">${hired ? "Доход: +" + (s.income*lvl*chData.mult).toFixed(1) + "$/сек" : "$" + s.cost + " • " + s.desc}</div>
                 </div>
             </div>
-            <div style="display:flex;gap:6px;margin-top:6px;">
-                ${!hired ? `<button style="flex:1;padding:6px;font-size:12px;" onclick="hireStaff('${s.id}')" ${!canBuy?'disabled':''}>Нанять $${s.cost}</button>` : ''}
-                ${hired && lvl<3 ? `<button style="flex:1;padding:6px;font-size:12px;" onclick="upgradeStaff('${s.id}')" ${!canUpgrade?'disabled':''}>↑ Lv.${lvl+1} $${upgradeCost}</button>` : ''}
-                ${hired && lvl>=3 ? `<button style="flex:1;padding:6px;font-size:12px;" disabled>MAX</button>` : ''}
-                ${hired ? `<button style="flex:1;padding:6px;font-size:12px;background:${onVacation?'#10b981':'#334155'};" onclick="toggleVacation('${s.id}')">${onVacation?'🏖️ Отдыхает':'🏖️ Отпуск'}</button>` : ''}
-                ${hired ? `<button style="flex:1;padding:6px;font-size:12px;background:${onTraining?'#f59e0b':'#334155'};" onclick="toggleTraining('${s.id}')">${onTraining?'📚 Учится':'📚 Обучить'}</button>` : ''}
-                ${hired ? `<button style="flex:1;padding:6px;font-size:12px;background:#dc2626;" onclick="fireStaff('${s.id}')">🚪 Уволить</button>` : ''}
+            <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">
+                ${!hired ? `<button style="flex:1;min-width:80px;padding:6px;font-size:12px;" onclick="hireStaff('${s.id}')" ${!canBuy?'disabled':''}>Нанять $${s.cost}</button>` : ''}
+                ${hired && lvl<3 ? `<button style="flex:1;min-width:80px;padding:6px;font-size:12px;" onclick="upgradeStaff('${s.id}')" ${!canUpgrade?'disabled':''}>↑ Lv.${lvl+1} $${upgradeCost}</button>` : ''}
+                ${hired && lvl>=3 ? `<button style="flex:1;min-width:80px;padding:6px;font-size:12px;" disabled>MAX</button>` : ''}
+                ${hired ? `<button style="flex:1;min-width:80px;padding:6px;font-size:12px;background:${onVacation?'#10b981':'#334155'};" onclick="toggleVacation('${s.id}')">${onVacation?'🏖️ Отдых':'🏖️ Отпуск'}</button>` : ''}
+                ${hired ? `<button style="flex:1;min-width:80px;padding:6px;font-size:12px;background:${onTraining?'#f59e0b':'#334155'};" onclick="toggleTraining('${s.id}')">${onTraining?'📚 Учится':'📚 Обучить'}</button>` : ''}
+                ${hired ? `<button style="flex:1;min-width:80px;padding:6px;font-size:12px;background:#dc2626;" onclick="fireStaff('${s.id}')">🚪 Уволить</button>` : ''}
             </div>
         `;
         list.appendChild(div);
     });
 }
-
 function hireStaff(id){
     const s = STAFF.find(x=>x.id===id);
     if(!s || S.money < s.cost || S.staff.includes(id)) return;
@@ -666,7 +735,6 @@ function hireStaff(id){
     beep(500, 0.15);
     saveNow(); updateUI(); renderStaff();
 }
-
 function upgradeStaff(id){
     const s = STAFF.find(x=>x.id===id);
     const data = S.staffLevels[id];
@@ -680,7 +748,6 @@ function upgradeStaff(id){
     beep(700, 0.2);
     saveNow(); updateUI(); renderStaff();
 }
-
 function fireStaff(id){
     const s = STAFF.find(x=>x.id===id);
     if(!s || !S.staff.includes(id)) return;
@@ -692,16 +759,14 @@ function fireStaff(id){
     delete S.staffVacation[id];
     delete S.staffTraining[id];
     addXp(10);
-    notify("🚪 Уволен: " + s.name + " (+$" + refund + ")", "#ef4444");
+    notify("🚪 Уволен: " + s.name, "#ef4444");
     saveNow(); updateUI(); renderStaff();
 }
-
 function toggleVacation(id){
     S.staffVacation[id] = !S.staffVacation[id];
-    notify(S.staffVacation[id] ? "🏖️ Отпуск (доход -70%)" : "🏖️ Вернулся", S.staffVacation[id] ? "#94a3b8" : "#10b981");
+    notify(S.staffVacation[id] ? "🏖️ В отпуске (-70% доход)" : "🏖️ Вернулся", S.staffVacation[id] ? "#94a3b8" : "#10b981");
     saveNow(); renderStaff(); updateUI();
 }
-
 function toggleTraining(id){
     const cost = 500;
     if(!S.staffTraining[id] && S.money < cost){ notify("Нужно $500", "#ef4444"); return; }
@@ -725,12 +790,7 @@ function renderServers(){
         const canBuy = S.money >= sv.cost && !owned;
         const div = document.createElement("div");
         div.className = "item";
-        div.innerHTML = `
-            <div class="item-info">
-                <div class="item-name">${sv.name}</div>
-                <div class="item-cost">$${sv.cost.toLocaleString()} • до ${sv.maxUsers.toLocaleString()}</div>
-            </div>
-        `;
+        div.innerHTML = `<div class="item-info"><div class="item-name">${sv.name}</div><div class="item-cost">$${sv.cost.toLocaleString()} • до ${sv.maxUsers.toLocaleString()}</div></div>`;
         const btn = document.createElement("button");
         btn.textContent = owned ? "✓" : "Купить";
         btn.disabled = owned || !canBuy;
@@ -739,7 +799,6 @@ function renderServers(){
         list.appendChild(div);
     });
 }
-
 function buyServer(sv){
     if(S.money < sv.cost || S.servers.includes(sv.id)) return;
     S.money -= sv.cost;
@@ -768,7 +827,6 @@ function renderDepts(){
         list.appendChild(div);
     });
 }
-
 function buyDept(d){
     if(S.money < d.cost || S.depts[d.id]) return;
     S.money -= d.cost;
@@ -788,15 +846,12 @@ function getCompanyLevel(){
     if(v < 2000000) return "Крупная компания";
     return "Империя";
 }
-
 function getCompanyValue(){
     return Math.floor(S.users * 1 + S.money + S.techs.length * 5000 + S.staff.length * 10000);
 }
-
 function renderCompany(){
     document.getElementById("company-level").textContent = getCompanyLevel();
     document.getElementById("company-value").textContent = "$" + getCompanyValue().toLocaleString();
-    
     const list = document.getElementById("company-list");
     list.innerHTML = "";
     COMPANY_UPGRADES.forEach(c=>{
@@ -813,7 +868,6 @@ function renderCompany(){
         list.appendChild(div);
     });
 }
-
 function buyCompany(c){
     if(S.money < c.cost || S.company[c.id]) return;
     S.money -= c.cost;
@@ -829,8 +883,7 @@ function buyCompany(c){
     addXp(100);
     addLog("Компания: " + c.name, "good");
     notify("💼 " + c.name, "#8b5cf6");
-    confetti();
-    beep(800, 0.3);
+    confetti(); beep(800, 0.3);
     saveNow(); updateUI(); renderCompany();
 }
 
@@ -853,7 +906,6 @@ function renderSkills(){
         list.appendChild(div);
     });
 }
-
 function buySkill(sk, cost){
     if(S.money < cost) return;
     S.money -= cost;
@@ -861,6 +913,60 @@ function buySkill(sk, cost){
     addXp(30);
     notify("🌳 " + sk.name + " → Lv." + S.skills[sk.id], "#10b981");
     saveNow(); updateUI(); renderSkills();
+}
+
+// ===== КВЕСТЫ =====
+function renderQuests(){
+    const list = document.getElementById("quest-list");
+    list.innerHTML = "";
+    QUESTS.forEach((q,i)=>{
+        const done = S.questIndex > i;
+        const active = S.questIndex === i;
+        const div = document.createElement("div");
+        div.className = "quest" + (done ? " done" : "");
+        div.innerHTML = `<b>${done?"✅":active?"⚡":"🔒"} ${q.name}</b><br><span style="color:#94a3b8;font-size:12px;">${q.desc}</span><br><span class="badge">+$${q.reward}</span> <span class="badge badge-crystal">+💎${q.crystals}</span>`;
+        list.appendChild(div);
+    });
+}
+function checkQuests(){
+    if(S.questIndex >= QUESTS.length) return;
+    const q = QUESTS[S.questIndex];
+    if(q.check()){
+        S.money += q.reward;
+        S.crystals += q.crystals;
+        S.questIndex++;
+        addLog("🎯 Квест: " + q.name, "quest");
+        notify("🎯 Квест выполнен: " + q.name + " +$" + q.reward + " +💎" + q.crystals, "#ec4899");
+        confetti(); beep(900, 0.3);
+        saveNow();
+    }
+}
+
+// ===== КРИСТАЛЛЫ =====
+function renderCrystalShop(){
+    document.getElementById("crystal-balance").textContent = S.crystals;
+    const list = document.getElementById("crystal-shop");
+    list.innerHTML = "";
+    CRYSTAL_SHOP.forEach(item=>{
+        const canBuy = S.crystals >= item.cost;
+        const div = document.createElement("div");
+        div.className = "item";
+        div.innerHTML = `<div class="item-info"><div class="item-name">${item.name}</div><div class="item-cost">Стоит 💎 ${item.cost}</div></div>`;
+        const btn = document.createElement("button");
+        btn.textContent = "Купить";
+        btn.disabled = !canBuy;
+        if(canBuy) btn.onclick = ()=>buyCrystal(item);
+        div.appendChild(btn);
+        list.appendChild(div);
+    });
+}
+function buyCrystal(item){
+    if(S.crystals < item.cost) return;
+    S.crystals -= item.cost;
+    item.action();
+    notify("💎 Куплено: " + item.name, "#06b6d4");
+    confetti();
+    saveNow(); updateUI(); renderCrystalShop();
 }
 
 // ===== АКЦИИ =====
@@ -938,7 +1044,6 @@ function renderInvestors(){
     takeBtn.onclick = findInvestor;
     list.appendChild(takeBtn);
 }
-
 function findInvestor(){
     if(S.users < 10000){ notify("Нужно 10000 юзеров", "#ef4444"); return; }
     const t = INVESTOR_TYPES[Math.floor(Math.random()*INVESTOR_TYPES.length)];
@@ -947,7 +1052,6 @@ function findInvestor(){
     notify("💼 " + t.name, "#8b5cf6");
     saveNow(); renderInvestors();
 }
-
 function takeInvestor(i){
     const inv = S.investors[i];
     S.money += inv.offer;
@@ -973,12 +1077,36 @@ function renderComp(){
     list.appendChild(you);
 }
 
+// ===== РЕЙТИНГ =====
+function renderRank(){
+    const list = document.getElementById("rank-list");
+    list.innerHTML = "";
+    // Локальные рекорды
+    const records = [
+        {name:"🥇 Твой рекорд (юзеры)", value: Math.floor(S.users), cls:"gold"},
+        {name:"🥈 Твой рекорд (деньги)", value: Math.floor(S.money), cls:"silver"},
+        {name:"🥉 Твой рекорд (доход/сек)", value: Math.floor(calcIncome()), cls:"bronze"}
+    ];
+    records.forEach(r=>{
+        const div = document.createElement("div");
+        div.className = "rank " + r.cls;
+        div.innerHTML = `<span>${r.name}</span><span>${r.value.toLocaleString()}</span>`;
+        list.appendChild(div);
+    });
+    const you = document.createElement("div");
+    you.className = "rank you";
+    you.innerHTML = `<span>💬 ${S.name} (сегодня)</span><span>${Math.floor(S.users).toLocaleString()}</span>`;
+    list.appendChild(you);
+}
+
 // ===== КОЛЛЕКЦИИ =====
 function renderKoll(){
     const iconsEl = document.getElementById("koll-icons");
     const themesEl = document.getElementById("koll-themes");
+    const logoEl = document.getElementById("logo-picker");
     iconsEl.innerHTML = "";
     themesEl.innerHTML = "";
+    logoEl.innerHTML = "";
     KOLL_ICONS.forEach(ic=>{
         const owned = S.koll.icons.includes(ic);
         const div = document.createElement("div");
@@ -999,6 +1127,19 @@ function renderKoll(){
             div.onclick = ()=>{ S.money -= 2000; S.koll.themes.push(t); notify("🎨 " + t, "#10b981"); saveNow(); updateUI(); renderKoll(); };
         }
         themesEl.appendChild(div);
+    });
+    ALL_LOGOS.forEach(lg=>{
+        const owned = S.koll.unlockedLogos.includes(lg);
+        const div = document.createElement("div");
+        div.className = "logo-item" + (S.logo === lg ? " active" : "") + (owned ? "" : " locked");
+        div.textContent = lg;
+        div.style.opacity = owned ? "1" : "0.3";
+        if(owned){
+            div.onclick = ()=>{ S.logo = lg; notify("🎨 Логотип сменён", "#10b981"); saveNow(); updateUI(); renderKoll(); };
+        } else if(S.crystals >= 3){
+            div.onclick = ()=>{ S.crystals -= 3; S.koll.unlockedLogos.push(lg); notify("🎨 Открыт " + lg + " (-💎3)", "#06b6d4"); saveNow(); updateUI(); renderKoll(); };
+        }
+        logoEl.appendChild(div);
     });
 }
 
@@ -1023,13 +1164,24 @@ function drawChart(){
     });
     ctx.stroke();
 }
+function renderForecast(){
+    const data = S.usersHistory.slice(-10);
+    const el = document.getElementById("forecast");
+    if(data.length < 2){ el.textContent = "Мало данных для прогноза."; return; }
+    const diff = data[data.length-1] - data[0];
+    const perSec = diff / data.length;
+    if(perSec > 0){
+        el.innerHTML = `📈 Рост: <b class="good">+${perSec.toFixed(1)} юзеров/сек</b><br>Прогноз через минуту: <b>${Math.floor(S.users + perSec*60).toLocaleString()}</b>`;
+    } else {
+        el.innerHTML = `📉 Падение: <b class="bad">${perSec.toFixed(1)} юзеров/сек</b>`;
+    }
+}
 
 // ===== ПРЕСТИЖ =====
 function renderPrestige(){
     document.getElementById("prestige-mult").textContent = "×" + S.prestigeMult.toFixed(2);
     document.getElementById("prestige-level").textContent = S.prestige;
 }
-
 function doPrestige(){
     if(S.users < 1000000){ notify("Нужно 1 000 000 юзеров", "#ef4444"); return; }
     if(!confirm("Переродиться? Прогресс сбросится, множитель ×2 навсегда.")) return;
@@ -1066,7 +1218,6 @@ function generateTasks(){
     ];
     S.dailyTasks = all.sort(()=>Math.random()-0.5).slice(0,3);
 }
-
 function renderTasks(){
     generateTasks();
     const list = document.getElementById("tasks-list");
@@ -1115,12 +1266,12 @@ function renderAchievements(){
         list.appendChild(div);
     });
 }
-
 function checkAchievements(){
     ACHIEVEMENTS.forEach(a=>{
         if(!S.achievements.includes(a.id) && a.check()){
             S.achievements.push(a.id);
-            notify("🏆 " + a.name, "#f59e0b");
+            S.crystals += 1;
+            notify("🏆 " + a.name + " (+💎1)", "#f59e0b");
             addLog("🏆 " + a.name, "good");
             confetti(); beep(900, 0.3);
             saveNow();
@@ -1141,11 +1292,26 @@ function addXp(amount){
     }
 }
 
-// ===== РЕКЛАМА =====
+// ===== РЕКЛАМА (бесплатная) =====
 function watchAd(){
     S.money += 500;
-    notify("📺 +$500", "#f59e0b");
+    notify("📺 +$500 (бесплатно)", "#f59e0b");
     beep(700, 0.2);
+    saveNow(); updateUI();
+}
+
+// ===== ЕЖЕДНЕВНАЯ НАГРАДА =====
+function claimDaily(){
+    const today = new Date().toDateString();
+    if(S.dailyRewardDate === today){ notify("Уже получено сегодня", "#94a3b8"); return; }
+    S.dailyRewardDate = today;
+    S.dailyStreak = (S.dailyStreak || 0) + 1;
+    const reward = 1000 * S.dailyStreak;
+    const crystals = Math.min(10, S.dailyStreak);
+    S.money += reward;
+    S.crystals += crystals;
+    notify("🎁 День " + S.dailyStreak + ": +$" + reward + " +💎" + crystals, "#f59e0b");
+    confetti(); beep(900, 0.4);
     saveNow(); updateUI();
 }
 
@@ -1157,7 +1323,11 @@ const STORY = [
     "📨 MAX: Привет от российских разработчиков! Хочешь сотрудничать?",
     "📨 Telegram: Твои 1000 юзеров — это капля в море. Мы смеёмся.",
     "📨 Аноним: Ты не сдашься? Хорошо. Продолжай.",
-    "📨 WhatsApp: Инвесторы говорят о тебе. Будь осторожен."
+    "📨 WhatsApp: Инвесторы говорят о тебе. Будь осторожен.",
+    "📨 Telegram: Мы видим твой рост. Это... интересно.",
+    "📨 MAX: Давай объединимся против Telegram?",
+    "📨 Аноним: В следующем сезоне будет война мессенджеров.",
+    "📨 WhatsApp: Готовься. Мы идём за тобой."
 ];
 
 // ===== ИГРОВОЙ ЦИКЛ =====
@@ -1170,7 +1340,6 @@ function tick(){
     cryptoTimer++; crisisTimer++; investorTimer++; seasonTimer++;
 
     S.inflation = Math.min(0.5, S.playtime * 0.00001);
-
     S.money += calcIncome();
 
     let upkeep = 0;
@@ -1215,8 +1384,6 @@ function tick(){
         cryptoTimer = 0;
         const change = (Math.random() - 0.5) * 0.5;
         S.crypto.price = Math.max(0.1, S.crypto.price + change);
-        S.crypto.history.push(S.crypto.price);
-        if(S.crypto.history.length > 50) S.crypto.history.shift();
     }
 
     if(!S.crisis && crisisTimer >= 600 && Math.random() < 0.1){
@@ -1271,7 +1438,6 @@ function tick(){
     if(S.depts.supp) S.rep = Math.min(100, S.rep + 0.05);
 
     addXp(0.5);
-
     if(Math.random() < 0.005) randomEvent();
 
     if(historyTimer >= 5){
@@ -1281,6 +1447,7 @@ function tick(){
     }
 
     checkAchievements();
+    checkQuests();
     updateUI();
 }
 
@@ -1302,11 +1469,11 @@ function randomEvent(){
         {text:"⚠️ Сервер упал! -5% юзеров", fn:()=>{ S.users *= 0.95; S.rep -= 5; }, type:"bad"},
         {text:"🎉 Вирусный пост! +500 юзеров", fn:()=>{ S.users += 500; }, type:"good"},
         {text:"💀 Хакерская атака! -10% денег", fn:()=>{ const dmg=S.money*0.1*(1 - (S.skills.defense||0)*0.1); S.money -= S.depts.sec ? dmg*0.5 : dmg; }, type:"bad"},
-        {text:"📰 Статья в СМИ! +10 репутации", fn:()=>{ S.rep = Math.min(100, S.rep+10); }, type:"good"},
-        {text:"🚨 Утечка данных! -15 репутации", fn:()=>{ S.rep -= 15; }, type:"bad"},
+        {text:"📰 Статья! +10 репутации", fn:()=>{ S.rep = Math.min(100, S.rep+10); }, type:"good"},
+        {text:"🚨 Утечка! -15 репутации", fn:()=>{ S.rep -= 15; }, type:"bad"},
         {text:"⭐ Инвестор! +$1000", fn:()=>{ S.money += 1000; }, type:"good"},
         {text:"🐛 Баг! -200 юзеров", fn:()=>{ S.users = Math.max(0, S.users-200); }, type:"bad"},
-        {text:"🔥 Мем про вас! +2000 юзеров", fn:()=>{ S.users += 2000; }, type:"good"}
+        {text:"🔥 Мем! +2000 юзеров", fn:()=>{ S.users += 2000; }, type:"good"}
     ];
     const e = events[Math.floor(Math.random()*events.length)];
     e.fn();
@@ -1332,12 +1499,12 @@ function load(){
     try {
         const parsed = JSON.parse(d);
         Object.assign(S, parsed);
-        // Дополняем новые поля
         if(!S.stocks) S.stocks = {owned:0, price:10, history:[10]};
         if(!S.crypto) S.crypto = {owned:0, price:1, history:[1]};
         if(!S.depts) S.depts = {};
         if(!S.skills) S.skills = {};
-        if(!S.koll) S.koll = {icons:[], themes:[]};
+        if(!S.koll) S.koll = {icons:[], themes:[], unlockedLogos:["💬"]};
+        if(!S.koll.unlockedLogos) S.koll.unlockedLogos = ["💬"];
         if(!S.investors) S.investors = [];
         if(!S.competitors) S.competitors = [
             {name:"Telegram", users:900000000, growth:100},
@@ -1353,7 +1520,10 @@ function load(){
         if(!S.staffVacation) S.staffVacation = {};
         if(!S.staffTraining) S.staffTraining = {};
         if(!S.company) S.company = {offices:0, absorbed:0, ipo:false, board:false, lawyers:false, franchise:false, partners:0};
-        // Миграция
+        if(S.crystals === undefined) S.crystals = 0;
+        if(S.dailyRewardDate === undefined) S.dailyRewardDate = "";
+        if(S.dailyStreak === undefined) S.dailyStreak = 0;
+        if(S.questIndex === undefined) S.questIndex = 0;
         for(const id in S.staffLevels){
             if(typeof S.staffLevels[id] === "number"){
                 S.staffLevels[id] = {level: S.staffLevels[id], char:"normal"};
@@ -1365,7 +1535,7 @@ function load(){
             if(offlineSec > 60){
                 const offlineIncome = offlineSec * calcIncome();
                 S.money += offlineIncome;
-                setTimeout(()=>notify("💤 Оффлайн-доход: +$" + Math.floor(offlineIncome), "#10b981"), 1000);
+                setTimeout(()=>notify("💤 Оффлайн: +$" + Math.floor(offlineIncome), "#10b981"), 1000);
             }
         }
         return true;
@@ -1411,9 +1581,14 @@ function createMessenger(){
         usersHistory:[0],
         crisis:false, crisisTimer:0,
         investors:[], season:1, seasonTimer:0,
-        koll:{icons:[], themes:[]},
+        koll:{icons:[], themes:[], unlockedLogos:["💬"]},
         inflation:0, credit:0,
-        company:{offices:0, absorbed:0, ipo:false, board:false, lawyers:false, franchise:false, partners:0}
+        company:{offices:0, absorbed:0, ipo:false, board:false, lawyers:false, franchise:false, partners:0},
+        crystals:0,
+        dailyRewardDate:"",
+        dailyStreak:0,
+        quests:[],
+        questIndex:0
     };
     generateTasks();
     addLog("Мессенджер создан: " + name, "good");
