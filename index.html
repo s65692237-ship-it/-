@@ -24,7 +24,7 @@ button { width:100%; padding:12px; margin-top:8px; background:#3b82f6; color:#ff
 button:hover:not(:disabled) { background:#2563eb; transform:translateY(-1px); }
 button:active:not(:disabled) { transform:translateY(0); }
 button:disabled { background:#334155; color:#64748b; cursor:not-allowed; opacity:.6; }
-.header { display:flex; align-items:center; gap:10px; margin-bottom:14px; padding:14px; background:#0f172a; border-radius:12px; font-size:19px; font-weight:700; transition:.3s; }
+.header { display:flex; align-items:center; gap:10px; margin-bottom:14px; padding:14px; background:#0f172a; border-radius:12px; font-size:19px; font-weight:700; transition:.3s; flex-wrap:wrap; }
 body.light .header { background:#f1f5f9; }
 #header-logo { font-size:26px; }
 .stats { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px; }
@@ -101,7 +101,6 @@ body.light canvas { background:#f8fafc; }
 .tag-genius { background:#f59e0b; }
 .tag-work { background:#10b981; }
 .crystal-count { background:#06b6d4; padding:3px 10px; border-radius:10px; font-size:13px; margin-left:auto; }
-.daily-reward { background:linear-gradient(135deg,#f59e0b,#ef4444); padding:12px; border-radius:10px; text-align:center; margin-bottom:10px; }
 .rank { display:flex; justify-content:space-between; padding:6px 8px; border-radius:6px; margin-bottom:4px; font-size:13px; background:#0f172a; }
 body.light .rank { background:#f1f5f9; }
 .rank.gold { background:linear-gradient(90deg,#f59e0b33,#f59e0b11); border-left:3px solid #f59e0b; }
@@ -112,6 +111,7 @@ body.light .rank { background:#f1f5f9; }
 .logo-item { background:#0f172a; padding:10px; border-radius:8px; text-align:center; font-size:22px; cursor:pointer; transition:.2s; }
 .logo-item:hover { transform:scale(1.1); }
 .logo-item.active { border:2px solid #3b82f6; }
+.logo-item.locked { opacity:.3; }
 </style>
 </head>
 <body>
@@ -154,7 +154,7 @@ body.light .rank { background:#f1f5f9; }
         <span id="header-logo">💬</span>
         <span id="header-name">Мессенджер</span>
         <span class="crystal-count" id="header-crystals">💎 0</span>
-        <span style="margin-left:8px;font-size:14px;background:#3b82f6;padding:3px 10px;border-radius:10px;" id="header-level">Lv.1</span>
+        <span style="font-size:14px;background:#3b82f6;padding:3px 10px;border-radius:10px;" id="header-level">Lv.1</span>
     </div>
 
     <div class="stats">
@@ -376,6 +376,9 @@ body.light .rank { background:#f1f5f9; }
 </div>
 
 <script>
+// ===== БЕЗОПАСНАЯ ЗАГРУЗКА =====
+function safeNumber(n, def){ return (typeof n === "number" && isFinite(n)) ? n : (def || 0); }
+
 // ===== СОСТОЯНИЕ =====
 let S = {
     name:"", color:"#3b82f6", logo:"💬",
@@ -404,7 +407,8 @@ let S = {
     crystals:0,
     dailyRewardDate:"",
     dailyStreak:0,
-    quests:[], questIndex:0
+    quests:[],
+    questIndex:0
 };
 
 // ===== ТЕХНОЛОГИИ =====
@@ -480,12 +484,12 @@ const COMPANY_UPGRADES = [
 
 // ===== КВЕСТЫ =====
 const QUESTS = [
-    {id:"q1", name:"Первый шаг", desc:"Создай мессенджер и купи 1 технологию", check:()=>S.techs.length>=1, reward:500, crystals:1},
+    {id:"q1", name:"Первый шаг", desc:"Купи 1 технологию", check:()=>S.techs.length>=1, reward:500, crystals:1},
     {id:"q2", name:"Первые люди", desc:"Найми первого сотрудника", check:()=>S.staff.length>=1, reward:800, crystals:1},
     {id:"q3", name:"Растущий бизнес", desc:"Достигни 1000 юзеров", check:()=>S.users>=1000, reward:2000, crystals:2},
     {id:"q4", name:"Мощность", desc:"Купи сервер", check:()=>S.servers.length>=1, reward:1500, crystals:2},
     {id:"q5", name:"Команда", desc:"Найми всех 5 сотрудников", check:()=>S.staff.length===STAFF.length, reward:5000, crystals:3},
-    {id:"q6", name:"Инвестор", desc:"Возьми инвестиции", check:()=>S.investors.length===0 && S.money>=50000, reward:10000, crystals:5},
+    {id:"q6", name:"Инвестор", desc:"Имей 50000$", check:()=>S.money>=50000, reward:10000, crystals:5},
     {id:"q7", name:"Империя", desc:"Достигни 100000 юзеров", check:()=>S.users>=100000, reward:50000, crystals:10},
     {id:"q8", name:"Миллион", desc:"Достигни 1 000 000 юзеров", check:()=>S.users>=1000000, reward:500000, crystals:25}
 ];
@@ -494,9 +498,9 @@ const QUESTS = [
 const CRYSTAL_SHOP = [
     {id:"c1", name:"+$10000", cost:5, action:()=>{ S.money += 10000; }},
     {id:"c2", name:"+50000 юзеров", cost:10, action:()=>{ S.users += 50000; }},
-    {id:"c3", name:"Мгновенный сервер", cost:15, action:()=>{ S.servers.push("mega"); }},
+    {id:"c3", name:"Мега-сервер", cost:15, action:()=>{ if(!S.servers.includes("mega")) S.servers.push("mega"); }},
     {id:"c4", name:"Все технологии", cost:50, action:()=>{ TECHS.forEach(t=>{ if(!S.techs.includes(t.id)) S.techs.push(t.id); }); }},
-    {id:"c5", name:"×2 к доходу на 5 мин", cost:20, action:()=>{ S.prestigeMult *= 2; setTimeout(()=>{ S.prestigeMult /= 2; }, 300000); }}
+    {id:"c5", name:"×2 к доходу 5 мин", cost:20, action:()=>{ S.prestigeMult *= 2; setTimeout(()=>{ S.prestigeMult /= 2; }, 300000); }}
 ];
 
 // ===== ДОСТИЖЕНИЯ =====
@@ -535,37 +539,41 @@ const ALL_LOGOS = ["💬","📱","⚡","🌐","🚀","🔥","💎","⭐","🎯",
 
 // ===== ПОКАЗ ЭКРАНА =====
 function show(id){
-    document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-    document.getElementById(id).classList.add("active");
-    if(id==="screen-tasks") renderTasks();
-    if(id==="screen-events") renderEvents();
-    if(id==="screen-tech") renderTechs();
-    if(id==="screen-staff") renderStaff();
-    if(id==="screen-servers") renderServers();
-    if(id==="screen-achieve") renderAchievements();
-    if(id==="screen-depts") renderDepts();
-    if(id==="screen-company") renderCompany();
-    if(id==="screen-skills") renderSkills();
-    if(id==="screen-quests") renderQuests();
-    if(id==="screen-crystals") renderCrystalShop();
-    if(id==="screen-stocks") renderStocks();
-    if(id==="screen-crypto") renderCrypto();
-    if(id==="screen-investors") renderInvestors();
-    if(id==="screen-comp") renderComp();
-    if(id==="screen-rank") renderRank();
-    if(id==="screen-koll") renderKoll();
-    if(id==="screen-stats") { drawChart(); renderForecast(); }
-    if(id==="screen-prestige") renderPrestige();
+    try {
+        document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+        document.getElementById(id).classList.add("active");
+        if(id==="screen-tasks") renderTasks();
+        if(id==="screen-events") renderEvents();
+        if(id==="screen-tech") renderTechs();
+        if(id==="screen-staff") renderStaff();
+        if(id==="screen-servers") renderServers();
+        if(id==="screen-achieve") renderAchievements();
+        if(id==="screen-depts") renderDepts();
+        if(id==="screen-company") renderCompany();
+        if(id==="screen-skills") renderSkills();
+        if(id==="screen-quests") renderQuests();
+        if(id==="screen-crystals") renderCrystalShop();
+        if(id==="screen-stocks") renderStocks();
+        if(id==="screen-crypto") renderCrypto();
+        if(id==="screen-investors") renderInvestors();
+        if(id==="screen-comp") renderComp();
+        if(id==="screen-rank") renderRank();
+        if(id==="screen-koll") renderKoll();
+        if(id==="screen-stats") { drawChart(); renderForecast(); }
+        if(id==="screen-prestige") renderPrestige();
+    } catch(e){ console.log("Ошибка show:", e); }
 }
 
 // ===== УВЕДОМЛЕНИЕ =====
 function notify(text,color){
-    const n = document.createElement("div");
-    n.className = "notify";
-    n.style.borderLeftColor = color || "#10b981";
-    n.textContent = text;
-    document.body.appendChild(n);
-    setTimeout(()=>n.remove(), 3500);
+    try {
+        const n = document.createElement("div");
+        n.className = "notify";
+        n.style.borderLeftColor = color || "#10b981";
+        n.textContent = text;
+        document.body.appendChild(n);
+        setTimeout(()=>n.remove(), 3500);
+    } catch(e){}
 }
 
 // ===== ЗВУК =====
@@ -585,87 +593,99 @@ function beep(freq,dur){
 
 // ===== КОНФЕТТИ =====
 function confetti(){
-    for(let i=0;i<40;i++){
-        const c = document.createElement("div");
-        c.className = "confetti";
-        c.style.left = Math.random()*100 + "vw";
-        c.style.top = "-20px";
-        c.style.background = ["#3b82f6","#8b5cf6","#10b981","#f59e0b","#ef4444"][Math.floor(Math.random()*5)];
-        c.style.animationDelay = Math.random()*0.5 + "s";
-        document.body.appendChild(c);
-        setTimeout(()=>c.remove(), 3500);
-    }
+    try {
+        for(let i=0;i<40;i++){
+            const c = document.createElement("div");
+            c.className = "confetti";
+            c.style.left = Math.random()*100 + "vw";
+            c.style.top = "-20px";
+            c.style.background = ["#3b82f6","#8b5cf6","#10b981","#f59e0b","#ef4444"][Math.floor(Math.random()*5)];
+            c.style.animationDelay = Math.random()*0.5 + "s";
+            document.body.appendChild(c);
+            setTimeout(()=>c.remove(), 3500);
+        }
+    } catch(e){}
 }
 
 // ===== ЛОГ =====
 function addLog(text,type){
-    S.log.unshift({text, time:new Date().toLocaleTimeString(), type:type||""});
-    if(S.log.length>50) S.log.pop();
+    try {
+        S.log.unshift({text, time:new Date().toLocaleTimeString(), type:type||""});
+        if(S.log.length>50) S.log.pop();
+    } catch(e){}
 }
 
 // ===== UI =====
 function updateUI(){
-    document.getElementById("header-logo").textContent = S.logo;
-    document.getElementById("header-name").textContent = S.name || "Мессенджер";
-    document.getElementById("header-level").textContent = "Lv." + S.level;
-    document.getElementById("header-crystals").textContent = "💎 " + S.crystals;
-    document.getElementById("stat-users").textContent = Math.floor(S.users).toLocaleString();
-    document.getElementById("stat-money").textContent = "$" + Math.floor(S.money).toLocaleString();
-    document.getElementById("stat-rep").textContent = Math.floor(S.rep);
-    document.getElementById("stat-income").textContent = "$" + calcIncome().toFixed(1);
-    document.getElementById("app").style.borderTop = "4px solid " + S.color;
+    try {
+        document.getElementById("header-logo").textContent = S.logo || "💬";
+        document.getElementById("header-name").textContent = S.name || "Мессенджер";
+        document.getElementById("header-level").textContent = "Lv." + Math.floor(safeNumber(S.level,1));
+        document.getElementById("header-crystals").textContent = "💎 " + Math.floor(safeNumber(S.crystals,0));
+        document.getElementById("stat-users").textContent = Math.floor(safeNumber(S.users,0)).toLocaleString();
+        document.getElementById("stat-money").textContent = "$" + Math.floor(safeNumber(S.money,0)).toLocaleString();
+        document.getElementById("stat-rep").textContent = Math.floor(safeNumber(S.rep,50));
+        document.getElementById("stat-income").textContent = "$" + calcIncome().toFixed(1);
+        document.getElementById("app").style.borderTop = "4px solid " + (S.color || "#3b82f6");
 
-    let pct = Math.min(100, (S.users / 1000000) * 100);
-    document.getElementById("progress-bar").style.width = pct + "%";
-    let xpNeed = S.level * 100;
-    document.getElementById("xp-bar").style.width = Math.min(100, (S.xp / xpNeed) * 100) + "%";
+        let pct = Math.min(100, (safeNumber(S.users,0) / 1000000) * 100);
+        document.getElementById("progress-bar").style.width = pct + "%";
+        let xpNeed = safeNumber(S.level,1) * 100;
+        document.getElementById("xp-bar").style.width = Math.min(100, (safeNumber(S.xp,0) / xpNeed) * 100) + "%";
+    } catch(e){ console.log("Ошибка UI:", e); }
 }
 
 // ===== ДОХОД =====
 function calcIncome(){
-    let base = S.users * 0.01 * (1 - S.inflation);
-    let staffBonus = 0;
-    S.staff.forEach(id=>{
-        const s = STAFF.find(x=>x.id===id);
-        const data = S.staffLevels[id];
-        if(s && data){
-            const lvl = data.level || 1;
-            const ch = data.char || "normal";
-            const chMult = CHARACTERS.find(c=>c.id===ch)?.mult || 1;
-            const vacation = S.staffVacation[id] ? 0.3 : 1;
-            const training = S.staffTraining[id] ? 1.5 : 1;
-            staffBonus += s.income * lvl * chMult * vacation * training;
+    try {
+        let base = safeNumber(S.users,0) * 0.01 * (1 - safeNumber(S.inflation,0));
+        let staffBonus = 0;
+        if(Array.isArray(S.staff)){
+            S.staff.forEach(id=>{
+                const s = STAFF.find(x=>x.id===id);
+                const data = S.staffLevels[id];
+                if(s && data && typeof data === "object"){
+                    const lvl = safeNumber(data.level,1);
+                    const ch = data.char || "normal";
+                    const chMult = CHARACTERS.find(c=>c.id===ch)?.mult || 1;
+                    const vacation = S.staffVacation[id] ? 0.3 : 1;
+                    const training = S.staffTraining[id] ? 1.5 : 1;
+                    staffBonus += s.income * lvl * chMult * vacation * training;
+                }
+            });
         }
-    });
-    let stockBonus = S.stocks.owned * 0.5;
-    let skillMult = 1 + (S.skills.profit || 0) * 0.1;
-    let companyMult = 1;
-    if(S.company.office) companyMult *= 1.2;
-    if(S.company.board) companyMult *= 1.15;
-    if(S.company.ipo) stockBonus += 5000;
-    if(S.company.franchise) staffBonus += 500;
-    return (base + staffBonus + stockBonus) * S.prestigeMult * skillMult * companyMult;
+        let stockBonus = safeNumber(S.stocks?.owned,0) * 0.5;
+        let skillMult = 1 + safeNumber(S.skills?.profit,0) * 0.1;
+        let companyMult = 1;
+        if(S.company?.office) companyMult *= 1.2;
+        if(S.company?.board) companyMult *= 1.15;
+        if(S.company?.ipo) stockBonus += 5000;
+        if(S.company?.franchise) staffBonus += 500;
+        return (base + staffBonus + stockBonus) * safeNumber(S.prestigeMult,1) * skillMult * companyMult;
+    } catch(e){ return 0; }
 }
 
 // ===== ТЕХНОЛОГИИ =====
 function renderTechs(){
-    const list = document.getElementById("tech-list");
-    list.innerHTML = "";
-    const discount = 1 - (S.skills.speed || 0) * 0.05;
-    TECHS.forEach(t=>{
-        const owned = S.techs.includes(t.id);
-        const realCost = Math.floor(t.cost * discount);
-        const canBuy = S.money >= realCost && !owned;
-        const div = document.createElement("div");
-        div.className = "item";
-        div.innerHTML = `<div class="item-info"><div class="item-name">${t.name}</div><div class="item-cost">$${realCost.toLocaleString()} • +${t.users} юзеров • +${t.rep} реп</div></div>`;
-        const btn = document.createElement("button");
-        btn.textContent = owned ? "✓" : "Купить";
-        btn.disabled = owned || !canBuy;
-        if(!owned && canBuy) btn.onclick = ()=>buyTech(t, realCost);
-        div.appendChild(btn);
-        list.appendChild(div);
-    });
+    try {
+        const list = document.getElementById("tech-list");
+        list.innerHTML = "";
+        const discount = 1 - safeNumber(S.skills?.speed,0) * 0.05;
+        TECHS.forEach(t=>{
+            const owned = S.techs.includes(t.id);
+            const realCost = Math.floor(t.cost * discount);
+            const canBuy = S.money >= realCost && !owned;
+            const div = document.createElement("div");
+            div.className = "item";
+            div.innerHTML = `<div class="item-info"><div class="item-name">${t.name}</div><div class="item-cost">$${realCost.toLocaleString()} • +${t.users} юзеров</div></div>`;
+            const btn = document.createElement("button");
+            btn.textContent = owned ? "✓" : "Купить";
+            btn.disabled = owned || !canBuy;
+            if(!owned && canBuy) btn.onclick = ()=>buyTech(t, realCost);
+            div.appendChild(btn);
+            list.appendChild(div);
+        });
+    } catch(e){}
 }
 function buyTech(t, realCost){
     if(S.money < realCost || S.techs.includes(t.id)) return;
@@ -674,7 +694,6 @@ function buyTech(t, realCost){
     S.rep = Math.min(100, S.rep + t.rep);
     S.techs.push(t.id);
     addXp(20);
-    addLog("Куплено: " + t.name, "good");
     notify("✅ " + t.name);
     beep(600, 0.15);
     saveNow(); updateUI(); renderTechs();
@@ -682,43 +701,45 @@ function buyTech(t, realCost){
 
 // ===== ПЕРСОНАЛ =====
 function renderStaff(){
-    const list = document.getElementById("staff-list");
-    list.innerHTML = "";
-    const allMax = S.staff.length === STAFF.length && S.staff.every(id=>S.staffLevels[id] && S.staffLevels[id].level===3);
-    document.getElementById("team-status").textContent = S.staff.length + "/" + STAFF.length + (allMax ? " 🏆 МЕЧТА" : "");
-    STAFF.forEach(s=>{
-        const hired = S.staff.includes(s.id);
-        const data = S.staffLevels[s.id];
-        const lvl = data ? data.level : 1;
-        const ch = data ? data.char : "normal";
-        const chData = CHARACTERS.find(c=>c.id===ch) || CHARACTERS[1];
-        const upgradeCost = Math.floor(s.cost * 2 * lvl);
-        const canBuy = S.money >= s.cost && !hired;
-        const canUpgrade = hired && lvl < 3 && S.money >= upgradeCost;
-        const onVacation = S.staffVacation[s.id];
-        const onTraining = S.staffTraining[s.id];
-        const div = document.createElement("div");
-        div.className = "item";
-        div.style.flexDirection = "column";
-        div.style.alignItems = "stretch";
-        div.innerHTML = `
-            <div style="display:flex;justify-content:space-between;align-items:center;">
-                <div class="item-info">
-                    <div class="item-name">${s.name} ${hired?"[Lv."+lvl+"/3]":""} ${hired?'<span class="tag '+chData.tag+'">'+chData.name+'</span>':''} ${onVacation?'<span class="tag tag-lazy">🏖️</span>':''} ${onTraining?'<span class="tag tag-genius">📚</span>':''}</div>
-                    <div class="item-cost">${hired ? "Доход: +" + (s.income*lvl*chData.mult).toFixed(1) + "$/сек" : "$" + s.cost + " • " + s.desc}</div>
+    try {
+        const list = document.getElementById("staff-list");
+        list.innerHTML = "";
+        const allMax = S.staff.length === STAFF.length && S.staff.every(id=>S.staffLevels[id] && S.staffLevels[id].level===3);
+        document.getElementById("team-status").textContent = S.staff.length + "/" + STAFF.length + (allMax ? " 🏆" : "");
+        STAFF.forEach(s=>{
+            const hired = S.staff.includes(s.id);
+            const data = S.staffLevels[s.id];
+            const lvl = data ? data.level : 1;
+            const ch = data ? data.char : "normal";
+            const chData = CHARACTERS.find(c=>c.id===ch) || CHARACTERS[1];
+            const upgradeCost = Math.floor(s.cost * 2 * lvl);
+            const canBuy = S.money >= s.cost && !hired;
+            const canUpgrade = hired && lvl < 3 && S.money >= upgradeCost;
+            const onVacation = S.staffVacation[s.id];
+            const onTraining = S.staffTraining[s.id];
+            const div = document.createElement("div");
+            div.className = "item";
+            div.style.flexDirection = "column";
+            div.style.alignItems = "stretch";
+            div.innerHTML = `
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <div class="item-info">
+                        <div class="item-name">${s.name} ${hired?"[Lv."+lvl+"/3]":""} ${hired?'<span class="tag '+chData.tag+'">'+chData.name+'</span>':''} ${onVacation?'<span class="tag tag-lazy">🏖️</span>':''} ${onTraining?'<span class="tag tag-genius">📚</span>':''}</div>
+                        <div class="item-cost">${hired ? "Доход: +" + (s.income*lvl*chData.mult).toFixed(1) + "$/сек" : "$" + s.cost}</div>
+                    </div>
                 </div>
-            </div>
-            <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">
-                ${!hired ? `<button style="flex:1;min-width:80px;padding:6px;font-size:12px;" onclick="hireStaff('${s.id}')" ${!canBuy?'disabled':''}>Нанять $${s.cost}</button>` : ''}
-                ${hired && lvl<3 ? `<button style="flex:1;min-width:80px;padding:6px;font-size:12px;" onclick="upgradeStaff('${s.id}')" ${!canUpgrade?'disabled':''}>↑ Lv.${lvl+1} $${upgradeCost}</button>` : ''}
-                ${hired && lvl>=3 ? `<button style="flex:1;min-width:80px;padding:6px;font-size:12px;" disabled>MAX</button>` : ''}
-                ${hired ? `<button style="flex:1;min-width:80px;padding:6px;font-size:12px;background:${onVacation?'#10b981':'#334155'};" onclick="toggleVacation('${s.id}')">${onVacation?'🏖️ Отдых':'🏖️ Отпуск'}</button>` : ''}
-                ${hired ? `<button style="flex:1;min-width:80px;padding:6px;font-size:12px;background:${onTraining?'#f59e0b':'#334155'};" onclick="toggleTraining('${s.id}')">${onTraining?'📚 Учится':'📚 Обучить'}</button>` : ''}
-                ${hired ? `<button style="flex:1;min-width:80px;padding:6px;font-size:12px;background:#dc2626;" onclick="fireStaff('${s.id}')">🚪 Уволить</button>` : ''}
-            </div>
-        `;
-        list.appendChild(div);
-    });
+                <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">
+                    ${!hired ? `<button style="flex:1;min-width:80px;padding:6px;font-size:12px;" onclick="hireStaff('${s.id}')" ${!canBuy?'disabled':''}>Нанять $${s.cost}</button>` : ''}
+                    ${hired && lvl<3 ? `<button style="flex:1;min-width:80px;padding:6px;font-size:12px;" onclick="upgradeStaff('${s.id}')" ${!canUpgrade?'disabled':''}>↑ Lv.${lvl+1} $${upgradeCost}</button>` : ''}
+                    ${hired && lvl>=3 ? `<button style="flex:1;min-width:80px;padding:6px;font-size:12px;" disabled>MAX</button>` : ''}
+                    ${hired ? `<button style="flex:1;min-width:80px;padding:6px;font-size:12px;background:${onVacation?'#10b981':'#334155'};" onclick="toggleVacation('${s.id}')">${onVacation?'🏖️ Отдых':'🏖️ Отпуск'}</button>` : ''}
+                    ${hired ? `<button style="flex:1;min-width:80px;padding:6px;font-size:12px;background:${onTraining?'#f59e0b':'#334155'};" onclick="toggleTraining('${s.id}')">${onTraining?'📚 Учится':'📚 Обучить'}</button>` : ''}
+                    ${hired ? `<button style="flex:1;min-width:80px;padding:6px;font-size:12px;background:#dc2626;" onclick="fireStaff('${s.id}')">🚪 Уволить</button>` : ''}
+                </div>
+            `;
+            list.appendChild(div);
+        });
+    } catch(e){}
 }
 function hireStaff(id){
     const s = STAFF.find(x=>x.id===id);
@@ -730,7 +751,6 @@ function hireStaff(id){
     S.users += s.users;
     addXp(30);
     const chName = CHARACTERS.find(c=>c.id===ch).name;
-    addLog("Нанят: " + s.name + " (" + chName + ")", "good");
     notify("👥 " + s.name + " [" + chName + "]", "#3b82f6");
     beep(500, 0.15);
     saveNow(); updateUI(); renderStaff();
@@ -751,20 +771,19 @@ function upgradeStaff(id){
 function fireStaff(id){
     const s = STAFF.find(x=>x.id===id);
     if(!s || !S.staff.includes(id)) return;
-    if(!confirm("Уволить " + s.name + "? Вернётся " + Math.floor(s.cost*0.5) + "$")) return;
+    if(!confirm("Уволить " + s.name + "?")) return;
     const refund = Math.floor(s.cost * 0.5);
     S.money += refund;
     S.staff = S.staff.filter(x=>x!==id);
     delete S.staffLevels[id];
     delete S.staffVacation[id];
     delete S.staffTraining[id];
-    addXp(10);
     notify("🚪 Уволен: " + s.name, "#ef4444");
     saveNow(); updateUI(); renderStaff();
 }
 function toggleVacation(id){
     S.staffVacation[id] = !S.staffVacation[id];
-    notify(S.staffVacation[id] ? "🏖️ В отпуске (-70% доход)" : "🏖️ Вернулся", S.staffVacation[id] ? "#94a3b8" : "#10b981");
+    notify(S.staffVacation[id] ? "🏖️ Отпуск" : "🏖️ Вернулся", S.staffVacation[id] ? "#94a3b8" : "#10b981");
     saveNow(); renderStaff(); updateUI();
 }
 function toggleTraining(id){
@@ -773,31 +792,33 @@ function toggleTraining(id){
     if(!S.staffTraining[id]){
         S.money -= cost;
         S.staffTraining[id] = true;
-        notify("📚 Обучается (+50% доход)", "#f59e0b");
+        notify("📚 Обучается", "#f59e0b");
     } else {
         S.staffTraining[id] = false;
-        notify("📚 Закончил обучение", "#10b981");
+        notify("📚 Закончил", "#10b981");
     }
     saveNow(); renderStaff(); updateUI();
 }
 
 // ===== СЕРВЕРЫ =====
 function renderServers(){
-    const list = document.getElementById("server-list");
-    list.innerHTML = "";
-    SERVERS.forEach(sv=>{
-        const owned = S.servers.includes(sv.id);
-        const canBuy = S.money >= sv.cost && !owned;
-        const div = document.createElement("div");
-        div.className = "item";
-        div.innerHTML = `<div class="item-info"><div class="item-name">${sv.name}</div><div class="item-cost">$${sv.cost.toLocaleString()} • до ${sv.maxUsers.toLocaleString()}</div></div>`;
-        const btn = document.createElement("button");
-        btn.textContent = owned ? "✓" : "Купить";
-        btn.disabled = owned || !canBuy;
-        if(!owned && canBuy) btn.onclick = ()=>buyServer(sv);
-        div.appendChild(btn);
-        list.appendChild(div);
-    });
+    try {
+        const list = document.getElementById("server-list");
+        list.innerHTML = "";
+        SERVERS.forEach(sv=>{
+            const owned = S.servers.includes(sv.id);
+            const canBuy = S.money >= sv.cost && !owned;
+            const div = document.createElement("div");
+            div.className = "item";
+            div.innerHTML = `<div class="item-info"><div class="item-name">${sv.name}</div><div class="item-cost">$${sv.cost.toLocaleString()} • до ${sv.maxUsers.toLocaleString()}</div></div>`;
+            const btn = document.createElement("button");
+            btn.textContent = owned ? "✓" : "Купить";
+            btn.disabled = owned || !canBuy;
+            if(!owned && canBuy) btn.onclick = ()=>buyServer(sv);
+            div.appendChild(btn);
+            list.appendChild(div);
+        });
+    } catch(e){}
 }
 function buyServer(sv){
     if(S.money < sv.cost || S.servers.includes(sv.id)) return;
@@ -811,21 +832,23 @@ function buyServer(sv){
 
 // ===== ОТДЕЛЫ =====
 function renderDepts(){
-    const list = document.getElementById("dept-list");
-    list.innerHTML = "";
-    DEPTS.forEach(d=>{
-        const owned = S.depts[d.id];
-        const canBuy = S.money >= d.cost && !owned;
-        const div = document.createElement("div");
-        div.className = "dept";
-        div.innerHTML = `<div><b>${d.name}</b><br><span style="color:#94a3b8;font-size:11px;">${d.effect}</span></div>`;
-        const btn = document.createElement("button");
-        btn.textContent = owned ? "✓" : "$" + d.cost;
-        btn.disabled = owned || !canBuy;
-        if(!owned && canBuy) btn.onclick = ()=>buyDept(d);
-        div.appendChild(btn);
-        list.appendChild(div);
-    });
+    try {
+        const list = document.getElementById("dept-list");
+        list.innerHTML = "";
+        DEPTS.forEach(d=>{
+            const owned = S.depts[d.id];
+            const canBuy = S.money >= d.cost && !owned;
+            const div = document.createElement("div");
+            div.className = "dept";
+            div.innerHTML = `<div><b>${d.name}</b><br><span style="color:#94a3b8;font-size:11px;">${d.effect}</span></div>`;
+            const btn = document.createElement("button");
+            btn.textContent = owned ? "✓" : "$" + d.cost;
+            btn.disabled = owned || !canBuy;
+            if(!owned && canBuy) btn.onclick = ()=>buyDept(d);
+            div.appendChild(btn);
+            list.appendChild(div);
+        });
+    } catch(e){}
 }
 function buyDept(d){
     if(S.money < d.cost || S.depts[d.id]) return;
@@ -847,26 +870,28 @@ function getCompanyLevel(){
     return "Империя";
 }
 function getCompanyValue(){
-    return Math.floor(S.users * 1 + S.money + S.techs.length * 5000 + S.staff.length * 10000);
+    return Math.floor(safeNumber(S.users,0) + safeNumber(S.money,0) + S.techs.length * 5000 + S.staff.length * 10000);
 }
 function renderCompany(){
-    document.getElementById("company-level").textContent = getCompanyLevel();
-    document.getElementById("company-value").textContent = "$" + getCompanyValue().toLocaleString();
-    const list = document.getElementById("company-list");
-    list.innerHTML = "";
-    COMPANY_UPGRADES.forEach(c=>{
-        const owned = S.company[c.id];
-        const canBuy = S.money >= c.cost && !owned;
-        const div = document.createElement("div");
-        div.className = "dept";
-        div.innerHTML = `<div><b>${c.name}</b><br><span style="color:#94a3b8;font-size:11px;">${c.desc}</span></div>`;
-        const btn = document.createElement("button");
-        btn.textContent = owned ? "✓" : "$" + c.cost.toLocaleString();
-        btn.disabled = owned || !canBuy;
-        if(!owned && canBuy) btn.onclick = ()=>buyCompany(c);
-        div.appendChild(btn);
-        list.appendChild(div);
-    });
+    try {
+        document.getElementById("company-level").textContent = getCompanyLevel();
+        document.getElementById("company-value").textContent = "$" + getCompanyValue().toLocaleString();
+        const list = document.getElementById("company-list");
+        list.innerHTML = "";
+        COMPANY_UPGRADES.forEach(c=>{
+            const owned = S.company[c.id];
+            const canBuy = S.money >= c.cost && !owned;
+            const div = document.createElement("div");
+            div.className = "dept";
+            div.innerHTML = `<div><b>${c.name}</b><br><span style="color:#94a3b8;font-size:11px;">${c.desc}</span></div>`;
+            const btn = document.createElement("button");
+            btn.textContent = owned ? "✓" : "$" + c.cost.toLocaleString();
+            btn.disabled = owned || !canBuy;
+            if(!owned && canBuy) btn.onclick = ()=>buyCompany(c);
+            div.appendChild(btn);
+            list.appendChild(div);
+        });
+    } catch(e){}
 }
 function buyCompany(c){
     if(S.money < c.cost || S.company[c.id]) return;
@@ -881,7 +906,6 @@ function buyCompany(c){
         S.company[c.id] = true;
     }
     addXp(100);
-    addLog("Компания: " + c.name, "good");
     notify("💼 " + c.name, "#8b5cf6");
     confetti(); beep(800, 0.3);
     saveNow(); updateUI(); renderCompany();
@@ -889,22 +913,24 @@ function buyCompany(c){
 
 // ===== НАВЫКИ =====
 function renderSkills(){
-    const list = document.getElementById("skill-list");
-    list.innerHTML = "";
-    SKILLS.forEach(sk=>{
-        const lvl = S.skills[sk.id] || 0;
-        const cost = sk.cost * (lvl + 1);
-        const canBuy = S.money >= cost && lvl < sk.maxLevel;
-        const div = document.createElement("div");
-        div.className = "skill";
-        div.innerHTML = `<div><b>${sk.name}</b> [${lvl}/${sk.maxLevel}]<br><span style="color:#94a3b8;font-size:11px;">${sk.effect}</span></div>`;
-        const btn = document.createElement("button");
-        btn.textContent = lvl >= sk.maxLevel ? "MAX" : "$" + cost;
-        btn.disabled = !canBuy || lvl >= sk.maxLevel;
-        if(canBuy && lvl < sk.maxLevel) btn.onclick = ()=>buySkill(sk, cost);
-        div.appendChild(btn);
-        list.appendChild(div);
-    });
+    try {
+        const list = document.getElementById("skill-list");
+        list.innerHTML = "";
+        SKILLS.forEach(sk=>{
+            const lvl = S.skills[sk.id] || 0;
+            const cost = sk.cost * (lvl + 1);
+            const canBuy = S.money >= cost && lvl < sk.maxLevel;
+            const div = document.createElement("div");
+            div.className = "skill";
+            div.innerHTML = `<div><b>${sk.name}</b> [${lvl}/${sk.maxLevel}]<br><span style="color:#94a3b8;font-size:11px;">${sk.effect}</span></div>`;
+            const btn = document.createElement("button");
+            btn.textContent = lvl >= sk.maxLevel ? "MAX" : "$" + cost;
+            btn.disabled = !canBuy || lvl >= sk.maxLevel;
+            if(canBuy && lvl < sk.maxLevel) btn.onclick = ()=>buySkill(sk, cost);
+            div.appendChild(btn);
+            list.appendChild(div);
+        });
+    } catch(e){}
 }
 function buySkill(sk, cost){
     if(S.money < cost) return;
@@ -917,48 +943,53 @@ function buySkill(sk, cost){
 
 // ===== КВЕСТЫ =====
 function renderQuests(){
-    const list = document.getElementById("quest-list");
-    list.innerHTML = "";
-    QUESTS.forEach((q,i)=>{
-        const done = S.questIndex > i;
-        const active = S.questIndex === i;
-        const div = document.createElement("div");
-        div.className = "quest" + (done ? " done" : "");
-        div.innerHTML = `<b>${done?"✅":active?"⚡":"🔒"} ${q.name}</b><br><span style="color:#94a3b8;font-size:12px;">${q.desc}</span><br><span class="badge">+$${q.reward}</span> <span class="badge badge-crystal">+💎${q.crystals}</span>`;
-        list.appendChild(div);
-    });
+    try {
+        const list = document.getElementById("quest-list");
+        list.innerHTML = "";
+        QUESTS.forEach((q,i)=>{
+            const done = S.questIndex > i;
+            const active = S.questIndex === i;
+            const div = document.createElement("div");
+            div.className = "quest" + (done ? " done" : "");
+            div.innerHTML = `<b>${done?"✅":active?"⚡":"🔒"} ${q.name}</b><br><span style="color:#94a3b8;font-size:12px;">${q.desc}</span><br><span class="badge">+$${q.reward}</span> <span class="badge badge-crystal">+💎${q.crystals}</span>`;
+            list.appendChild(div);
+        });
+    } catch(e){}
 }
 function checkQuests(){
-    if(S.questIndex >= QUESTS.length) return;
-    const q = QUESTS[S.questIndex];
-    if(q.check()){
-        S.money += q.reward;
-        S.crystals += q.crystals;
-        S.questIndex++;
-        addLog("🎯 Квест: " + q.name, "quest");
-        notify("🎯 Квест выполнен: " + q.name + " +$" + q.reward + " +💎" + q.crystals, "#ec4899");
-        confetti(); beep(900, 0.3);
-        saveNow();
-    }
+    try {
+        if(S.questIndex >= QUESTS.length) return;
+        const q = QUESTS[S.questIndex];
+        if(q.check()){
+            S.money += q.reward;
+            S.crystals += q.crystals;
+            S.questIndex++;
+            notify("🎯 " + q.name + " +$" + q.reward + " +💎" + q.crystals, "#ec4899");
+            confetti(); beep(900, 0.3);
+            saveNow();
+        }
+    } catch(e){}
 }
 
 // ===== КРИСТАЛЛЫ =====
 function renderCrystalShop(){
-    document.getElementById("crystal-balance").textContent = S.crystals;
-    const list = document.getElementById("crystal-shop");
-    list.innerHTML = "";
-    CRYSTAL_SHOP.forEach(item=>{
-        const canBuy = S.crystals >= item.cost;
-        const div = document.createElement("div");
-        div.className = "item";
-        div.innerHTML = `<div class="item-info"><div class="item-name">${item.name}</div><div class="item-cost">Стоит 💎 ${item.cost}</div></div>`;
-        const btn = document.createElement("button");
-        btn.textContent = "Купить";
-        btn.disabled = !canBuy;
-        if(canBuy) btn.onclick = ()=>buyCrystal(item);
-        div.appendChild(btn);
-        list.appendChild(div);
-    });
+    try {
+        document.getElementById("crystal-balance").textContent = Math.floor(safeNumber(S.crystals,0));
+        const list = document.getElementById("crystal-shop");
+        list.innerHTML = "";
+        CRYSTAL_SHOP.forEach(item=>{
+            const canBuy = S.crystals >= item.cost;
+            const div = document.createElement("div");
+            div.className = "item";
+            div.innerHTML = `<div class="item-info"><div class="item-name">${item.name}</div><div class="item-cost">Стоит 💎 ${item.cost}</div></div>`;
+            const btn = document.createElement("button");
+            btn.textContent = "Купить";
+            btn.disabled = !canBuy;
+            if(canBuy) btn.onclick = ()=>buyCrystal(item);
+            div.appendChild(btn);
+            list.appendChild(div);
+        });
+    } catch(e){}
 }
 function buyCrystal(item){
     if(S.crystals < item.cost) return;
@@ -971,8 +1002,10 @@ function buyCrystal(item){
 
 // ===== АКЦИИ =====
 function renderStocks(){
-    document.getElementById("stock-price").textContent = "$" + S.stocks.price.toFixed(2);
-    document.getElementById("stock-owned").textContent = S.stocks.owned;
+    try {
+        document.getElementById("stock-price").textContent = "$" + safeNumber(S.stocks?.price,10).toFixed(2);
+        document.getElementById("stock-owned").textContent = Math.floor(safeNumber(S.stocks?.owned,0));
+    } catch(e){}
 }
 function buyStock(){
     if(S.money < S.stocks.price) { notify("Не хватает", "#ef4444"); return; }
@@ -991,8 +1024,10 @@ function sellStock(){
 
 // ===== КРИПТА =====
 function renderCrypto(){
-    document.getElementById("crypto-price").textContent = "$" + S.crypto.price.toFixed(2);
-    document.getElementById("crypto-owned").textContent = S.crypto.owned;
+    try {
+        document.getElementById("crypto-price").textContent = "$" + safeNumber(S.crypto?.price,1).toFixed(2);
+        document.getElementById("crypto-owned").textContent = Math.floor(safeNumber(S.crypto?.owned,0));
+    } catch(e){}
 }
 function buyCrypto(){
     const cost = S.crypto.price * 10;
@@ -1023,26 +1058,28 @@ function mineCrypto(){
 
 // ===== ИНВЕСТОРЫ =====
 function renderInvestors(){
-    const list = document.getElementById("investor-list");
-    list.innerHTML = "";
-    if(S.investors.length === 0){
-        list.innerHTML = "<p style='font-size:13px;'>Инвесторов пока нет. Придут при 10000 юзеров.</p>";
-    } else {
-        S.investors.forEach((inv, i)=>{
-            const div = document.createElement("div");
-            div.className = "item";
-            div.innerHTML = `<div class="item-info"><div class="item-name">${inv.name}</div><div class="item-cost">$${inv.offer.toLocaleString()} за ${(inv.share*100)}%</div></div>`;
-            const btn = document.createElement("button");
-            btn.textContent = "Взять";
-            btn.onclick = ()=>takeInvestor(i);
-            div.appendChild(btn);
-            list.appendChild(div);
-        });
-    }
-    const takeBtn = document.createElement("button");
-    takeBtn.textContent = "📞 Найти инвестора";
-    takeBtn.onclick = findInvestor;
-    list.appendChild(takeBtn);
+    try {
+        const list = document.getElementById("investor-list");
+        list.innerHTML = "";
+        if(S.investors.length === 0){
+            list.innerHTML = "<p style='font-size:13px;'>Инвесторов нет. Придут при 10000 юзеров.</p>";
+        } else {
+            S.investors.forEach((inv, i)=>{
+                const div = document.createElement("div");
+                div.className = "item";
+                div.innerHTML = `<div class="item-info"><div class="item-name">${inv.name}</div><div class="item-cost">$${inv.offer.toLocaleString()} за ${(inv.share*100)}%</div></div>`;
+                const btn = document.createElement("button");
+                btn.textContent = "Взять";
+                btn.onclick = ()=>takeInvestor(i);
+                div.appendChild(btn);
+                list.appendChild(div);
+            });
+        }
+        const takeBtn = document.createElement("button");
+        takeBtn.textContent = "📞 Найти инвестора";
+        takeBtn.onclick = findInvestor;
+        list.appendChild(takeBtn);
+    } catch(e){}
 }
 function findInvestor(){
     if(S.users < 10000){ notify("Нужно 10000 юзеров", "#ef4444"); return; }
@@ -1063,128 +1100,139 @@ function takeInvestor(i){
 
 // ===== КОНКУРЕНТЫ =====
 function renderComp(){
-    const list = document.getElementById("comp-list");
-    list.innerHTML = "";
-    S.competitors.forEach(c=>{
-        const div = document.createElement("div");
-        div.className = "comp-bar";
-        div.innerHTML = `<span class="name">${c.name}</span><span class="num">${Math.floor(c.users).toLocaleString()}</span>`;
-        list.appendChild(div);
-    });
-    const you = document.createElement("div");
-    you.className = "comp-bar you";
-    you.innerHTML = `<span class="name">💬 ${S.name} (ТЫ)</span><span class="num">${Math.floor(S.users).toLocaleString()}</span>`;
-    list.appendChild(you);
+    try {
+        const list = document.getElementById("comp-list");
+        list.innerHTML = "";
+        S.competitors.forEach(c=>{
+            const div = document.createElement("div");
+            div.className = "comp-bar";
+            div.innerHTML = `<span class="name">${c.name}</span><span class="num">${Math.floor(c.users).toLocaleString()}</span>`;
+            list.appendChild(div);
+        });
+        const you = document.createElement("div");
+        you.className = "comp-bar you";
+        you.innerHTML = `<span class="name">💬 ${S.name} (ТЫ)</span><span class="num">${Math.floor(S.users).toLocaleString()}</span>`;
+        list.appendChild(you);
+    } catch(e){}
 }
 
 // ===== РЕЙТИНГ =====
 function renderRank(){
-    const list = document.getElementById("rank-list");
-    list.innerHTML = "";
-    // Локальные рекорды
-    const records = [
-        {name:"🥇 Твой рекорд (юзеры)", value: Math.floor(S.users), cls:"gold"},
-        {name:"🥈 Твой рекорд (деньги)", value: Math.floor(S.money), cls:"silver"},
-        {name:"🥉 Твой рекорд (доход/сек)", value: Math.floor(calcIncome()), cls:"bronze"}
-    ];
-    records.forEach(r=>{
-        const div = document.createElement("div");
-        div.className = "rank " + r.cls;
-        div.innerHTML = `<span>${r.name}</span><span>${r.value.toLocaleString()}</span>`;
-        list.appendChild(div);
-    });
-    const you = document.createElement("div");
-    you.className = "rank you";
-    you.innerHTML = `<span>💬 ${S.name} (сегодня)</span><span>${Math.floor(S.users).toLocaleString()}</span>`;
-    list.appendChild(you);
+    try {
+        const list = document.getElementById("rank-list");
+        list.innerHTML = "";
+        const records = [
+            {name:"🥇 Юзеры", value: Math.floor(safeNumber(S.users,0)), cls:"gold"},
+            {name:"🥈 Деньги", value: Math.floor(safeNumber(S.money,0)), cls:"silver"},
+            {name:"🥉 Доход/сек", value: Math.floor(calcIncome()), cls:"bronze"}
+        ];
+        records.forEach(r=>{
+            const div = document.createElement("div");
+            div.className = "rank " + r.cls;
+            div.innerHTML = `<span>${r.name}</span><span>${r.value.toLocaleString()}</span>`;
+            list.appendChild(div);
+        });
+        const you = document.createElement("div");
+        you.className = "rank you";
+        you.innerHTML = `<span>💬 ${S.name}</span><span>${Math.floor(S.users).toLocaleString()}</span>`;
+        list.appendChild(you);
+    } catch(e){}
 }
 
 // ===== КОЛЛЕКЦИИ =====
 function renderKoll(){
-    const iconsEl = document.getElementById("koll-icons");
-    const themesEl = document.getElementById("koll-themes");
-    const logoEl = document.getElementById("logo-picker");
-    iconsEl.innerHTML = "";
-    themesEl.innerHTML = "";
-    logoEl.innerHTML = "";
-    KOLL_ICONS.forEach(ic=>{
-        const owned = S.koll.icons.includes(ic);
-        const div = document.createElement("div");
-        div.className = "koll-item" + (owned ? " owned" : " locked");
-        div.textContent = ic;
-        if(!owned && S.money >= 1000){
-            div.onclick = ()=>{ S.money -= 1000; S.koll.icons.push(ic); notify("🎨 " + ic, "#10b981"); saveNow(); updateUI(); renderKoll(); };
-        }
-        iconsEl.appendChild(div);
-    });
-    KOLL_THEMES.forEach(t=>{
-        const owned = S.koll.themes.includes(t);
-        const div = document.createElement("div");
-        div.className = "koll-item" + (owned ? " owned" : " locked");
-        div.textContent = t[0];
-        div.title = t;
-        if(!owned && S.money >= 2000){
-            div.onclick = ()=>{ S.money -= 2000; S.koll.themes.push(t); notify("🎨 " + t, "#10b981"); saveNow(); updateUI(); renderKoll(); };
-        }
-        themesEl.appendChild(div);
-    });
-    ALL_LOGOS.forEach(lg=>{
-        const owned = S.koll.unlockedLogos.includes(lg);
-        const div = document.createElement("div");
-        div.className = "logo-item" + (S.logo === lg ? " active" : "") + (owned ? "" : " locked");
-        div.textContent = lg;
-        div.style.opacity = owned ? "1" : "0.3";
-        if(owned){
-            div.onclick = ()=>{ S.logo = lg; notify("🎨 Логотип сменён", "#10b981"); saveNow(); updateUI(); renderKoll(); };
-        } else if(S.crystals >= 3){
-            div.onclick = ()=>{ S.crystals -= 3; S.koll.unlockedLogos.push(lg); notify("🎨 Открыт " + lg + " (-💎3)", "#06b6d4"); saveNow(); updateUI(); renderKoll(); };
-        }
-        logoEl.appendChild(div);
-    });
+    try {
+        const iconsEl = document.getElementById("koll-icons");
+        const themesEl = document.getElementById("koll-themes");
+        const logoEl = document.getElementById("logo-picker");
+        iconsEl.innerHTML = "";
+        themesEl.innerHTML = "";
+        logoEl.innerHTML = "";
+        KOLL_ICONS.forEach(ic=>{
+            const owned = S.koll.icons.includes(ic);
+            const div = document.createElement("div");
+            div.className = "koll-item" + (owned ? " owned" : " locked");
+            div.textContent = ic;
+            if(!owned && S.money >= 1000){
+                div.onclick = ()=>{ S.money -= 1000; S.koll.icons.push(ic); notify("🎨 " + ic, "#10b981"); saveNow(); updateUI(); renderKoll(); };
+            }
+            iconsEl.appendChild(div);
+        });
+        KOLL_THEMES.forEach(t=>{
+            const owned = S.koll.themes.includes(t);
+            const div = document.createElement("div");
+            div.className = "koll-item" + (owned ? " owned" : " locked");
+            div.textContent = t[0];
+            div.title = t;
+            if(!owned && S.money >= 2000){
+                div.onclick = ()=>{ S.money -= 2000; S.koll.themes.push(t); notify("🎨 " + t, "#10b981"); saveNow(); updateUI(); renderKoll(); };
+            }
+            themesEl.appendChild(div);
+        });
+        ALL_LOGOS.forEach(lg=>{
+            const owned = S.koll.unlockedLogos.includes(lg);
+            const div = document.createElement("div");
+            div.className = "logo-item" + (S.logo === lg ? " active" : "") + (owned ? "" : " locked");
+            div.textContent = lg;
+            div.style.opacity = owned ? "1" : "0.3";
+            if(owned){
+                div.onclick = ()=>{ S.logo = lg; notify("🎨 Логотип сменён", "#10b981"); saveNow(); updateUI(); renderKoll(); };
+            } else if(S.crystals >= 3){
+                div.onclick = ()=>{ S.crystals -= 3; S.koll.unlockedLogos.push(lg); notify("🎨 Открыт " + lg + " (-💎3)", "#06b6d4"); saveNow(); updateUI(); renderKoll(); };
+            }
+            logoEl.appendChild(div);
+        });
+    } catch(e){}
 }
 
 // ===== ГРАФИК =====
 function drawChart(){
-    const canvas = document.getElementById("chart");
-    if(!canvas) return;
-    const ctx = canvas.getContext("2d");
-    canvas.width = canvas.offsetWidth;
-    canvas.height = 100;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const data = S.usersHistory.slice(-60);
-    if(data.length < 2) return;
-    const max = Math.max(...data, 1);
-    ctx.strokeStyle = "#3b82f6";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    data.forEach((v,i)=>{
-        const x = (i / (data.length-1)) * canvas.width;
-        const y = canvas.height - (v / max) * canvas.height;
-        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-    });
-    ctx.stroke();
+    try {
+        const canvas = document.getElementById("chart");
+        if(!canvas) return;
+        const ctx = canvas.getContext("2d");
+        canvas.width = canvas.offsetWidth;
+        canvas.height = 100;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const data = S.usersHistory.slice(-60);
+        if(data.length < 2) return;
+        const max = Math.max(...data, 1);
+        ctx.strokeStyle = "#3b82f6";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        data.forEach((v,i)=>{
+            const x = (i / (data.length-1)) * canvas.width;
+            const y = canvas.height - (v / max) * canvas.height;
+            if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+        });
+        ctx.stroke();
+    } catch(e){}
 }
 function renderForecast(){
-    const data = S.usersHistory.slice(-10);
-    const el = document.getElementById("forecast");
-    if(data.length < 2){ el.textContent = "Мало данных для прогноза."; return; }
-    const diff = data[data.length-1] - data[0];
-    const perSec = diff / data.length;
-    if(perSec > 0){
-        el.innerHTML = `📈 Рост: <b class="good">+${perSec.toFixed(1)} юзеров/сек</b><br>Прогноз через минуту: <b>${Math.floor(S.users + perSec*60).toLocaleString()}</b>`;
-    } else {
-        el.innerHTML = `📉 Падение: <b class="bad">${perSec.toFixed(1)} юзеров/сек</b>`;
-    }
+    try {
+        const data = S.usersHistory.slice(-10);
+        const el = document.getElementById("forecast");
+        if(data.length < 2){ el.textContent = "Мало данных."; return; }
+        const diff = data[data.length-1] - data[0];
+        const perSec = diff / data.length;
+        if(perSec > 0){
+            el.innerHTML = `📈 Рост: <b>+${perSec.toFixed(1)} юзеров/сек</b><br>Прогноз через минуту: <b>${Math.floor(S.users + perSec*60).toLocaleString()}</b>`;
+        } else {
+            el.innerHTML = `📉 Падение: <b>${perSec.toFixed(1)} юзеров/сек</b>`;
+        }
+    } catch(e){}
 }
 
 // ===== ПРЕСТИЖ =====
 function renderPrestige(){
-    document.getElementById("prestige-mult").textContent = "×" + S.prestigeMult.toFixed(2);
-    document.getElementById("prestige-level").textContent = S.prestige;
+    try {
+        document.getElementById("prestige-mult").textContent = "×" + safeNumber(S.prestigeMult,1).toFixed(2);
+        document.getElementById("prestige-level").textContent = Math.floor(safeNumber(S.prestige,0));
+    } catch(e){}
 }
 function doPrestige(){
     if(S.users < 1000000){ notify("Нужно 1 000 000 юзеров", "#ef4444"); return; }
-    if(!confirm("Переродиться? Прогресс сбросится, множитель ×2 навсегда.")) return;
+    if(!confirm("Переродиться? Прогресс сбросится, множитель ×2.")) return;
     S.prestige++;
     S.prestigeMult = Math.pow(2, S.prestige);
     S.users = 0; S.money = 1000; S.rep = 50;
@@ -1195,7 +1243,6 @@ function doPrestige(){
     S.stocks = {owned:0, price:10, history:[10]};
     S.usersHistory = [0];
     S.company = {offices:0, absorbed:0, ipo:false, board:false, lawyers:false, franchise:false, partners:0};
-    addLog("🌟 Престиж " + S.prestige + "! ×" + S.prestigeMult, "good");
     notify("🌟 Престиж " + S.prestige + "! ×" + S.prestigeMult, "#f59e0b");
     confetti(); beep(900, 0.5);
     saveNow(); updateUI(); show("screen-main");
@@ -1219,77 +1266,86 @@ function generateTasks(){
     S.dailyTasks = all.sort(()=>Math.random()-0.5).slice(0,3);
 }
 function renderTasks(){
-    generateTasks();
-    const list = document.getElementById("tasks-list");
-    list.innerHTML = "";
-    S.dailyTasks.forEach(t=>{
-        const done = t.done || t.check();
-        if(done && !t.done){
-            t.done = true;
-            S.money += t.reward;
-            addXp(50);
-            notify("📅 " + t.text + " (+$" + t.reward + ")", "#10b981");
-            confetti(); saveNow();
-        }
-        const div = document.createElement("div");
-        div.className = "task" + (t.done ? " done" : "");
-        div.innerHTML = `<span>${t.done?"✅":"⬜"} ${t.text}</span><span class="badge">+$${t.reward}</span>`;
-        list.appendChild(div);
-    });
+    try {
+        generateTasks();
+        const list = document.getElementById("tasks-list");
+        list.innerHTML = "";
+        S.dailyTasks.forEach(t=>{
+            const done = t.done || t.check();
+            if(done && !t.done){
+                t.done = true;
+                S.money += t.reward;
+                addXp(50);
+                notify("📅 " + t.text + " (+$" + t.reward + ")", "#10b981");
+                confetti(); saveNow();
+            }
+            const div = document.createElement("div");
+            div.className = "task" + (t.done ? " done" : "");
+            div.innerHTML = `<span>${t.done?"✅":"⬜"} ${t.text}</span><span class="badge">+$${t.reward}</span>`;
+            list.appendChild(div);
+        });
+    } catch(e){}
 }
 
 // ===== СОБЫТИЯ =====
 function renderEvents(){
-    const list = document.getElementById("events-list");
-    list.innerHTML = "";
-    if(S.log.length === 0){
-        list.innerHTML = "<div class='event'>Пока событий нет.</div>";
-        return;
-    }
-    S.log.forEach(e=>{
-        const d = document.createElement("div");
-        d.className = "event" + (e.type ? " " + e.type : "");
-        d.textContent = "[" + e.time + "] " + e.text;
-        list.appendChild(d);
-    });
+    try {
+        const list = document.getElementById("events-list");
+        list.innerHTML = "";
+        if(S.log.length === 0){
+            list.innerHTML = "<div class='event'>Пока событий нет.</div>";
+            return;
+        }
+        S.log.forEach(e=>{
+            const d = document.createElement("div");
+            d.className = "event" + (e.type ? " " + e.type : "");
+            d.textContent = "[" + e.time + "] " + e.text;
+            list.appendChild(d);
+        });
+    } catch(e){}
 }
 
 // ===== ДОСТИЖЕНИЯ =====
 function renderAchievements(){
-    const list = document.getElementById("achieve-list");
-    list.innerHTML = "";
-    ACHIEVEMENTS.forEach(a=>{
-        const done = S.achievements.includes(a.id);
-        const div = document.createElement("div");
-        div.className = "item";
-        div.innerHTML = `<div class="item-info"><div class="item-name">${done?"🏆":"🔒"} ${a.name}</div></div>`;
-        list.appendChild(div);
-    });
+    try {
+        const list = document.getElementById("achieve-list");
+        list.innerHTML = "";
+        ACHIEVEMENTS.forEach(a=>{
+            const done = S.achievements.includes(a.id);
+            const div = document.createElement("div");
+            div.className = "item";
+            div.innerHTML = `<div class="item-info"><div class="item-name">${done?"🏆":"🔒"} ${a.name}</div></div>`;
+            list.appendChild(div);
+        });
+    } catch(e){}
 }
 function checkAchievements(){
-    ACHIEVEMENTS.forEach(a=>{
-        if(!S.achievements.includes(a.id) && a.check()){
-            S.achievements.push(a.id);
-            S.crystals += 1;
-            notify("🏆 " + a.name + " (+💎1)", "#f59e0b");
-            addLog("🏆 " + a.name, "good");
-            confetti(); beep(900, 0.3);
-            saveNow();
-        }
-    });
+    try {
+        ACHIEVEMENTS.forEach(a=>{
+            if(!S.achievements.includes(a.id) && a.check()){
+                S.achievements.push(a.id);
+                S.crystals += 1;
+                notify("🏆 " + a.name + " (+💎1)", "#f59e0b");
+                confetti(); beep(900, 0.3);
+                saveNow();
+            }
+        });
+    } catch(e){}
 }
 
 // ===== XP =====
 function addXp(amount){
-    S.xp += amount;
-    const need = S.level * 100;
-    if(S.xp >= need){
-        S.xp -= need;
-        S.level++;
-        notify("⬆️ Уровень " + S.level + "!", "#f59e0b");
-        confetti(); beep(800, 0.3);
-        saveNow();
-    }
+    try {
+        S.xp += amount;
+        const need = S.level * 100;
+        if(S.xp >= need){
+            S.xp -= need;
+            S.level++;
+            notify("⬆️ Уровень " + S.level, "#f59e0b");
+            confetti(); beep(800, 0.3);
+            saveNow();
+        }
+    } catch(e){}
 }
 
 // ===== РЕКЛАМА (бесплатная) =====
@@ -1320,13 +1376,13 @@ let storyIndex = 0;
 const STORY = [
     "📨 Telegram: Слышал, ты запустил свой мессенджер. Удачи...",
     "📨 WhatsApp: Мы следим за тобой. Не расслабляйся.",
-    "📨 MAX: Привет от российских разработчиков! Хочешь сотрудничать?",
-    "📨 Telegram: Твои 1000 юзеров — это капля в море. Мы смеёмся.",
+    "📨 MAX: Привет! Хочешь сотрудничать?",
+    "📨 Telegram: Твои 1000 юзеров — капля в море.",
     "📨 Аноним: Ты не сдашься? Хорошо. Продолжай.",
-    "📨 WhatsApp: Инвесторы говорят о тебе. Будь осторожен.",
-    "📨 Telegram: Мы видим твой рост. Это... интересно.",
+    "📨 WhatsApp: Инвесторы говорят о тебе.",
+    "📨 Telegram: Мы видим твой рост.",
     "📨 MAX: Давай объединимся против Telegram?",
-    "📨 Аноним: В следующем сезоне будет война мессенджеров.",
+    "📨 Аноним: В следующем сезоне будет война.",
     "📨 WhatsApp: Готовься. Мы идём за тобой."
 ];
 
@@ -1335,153 +1391,161 @@ let taxTimer = 0, storyTimer = 0, stockTimer = 0, historyTimer = 0;
 let cryptoTimer = 0, crisisTimer = 0, investorTimer = 0, seasonTimer = 0;
 
 function tick(){
-    S.playtime++;
-    taxTimer++; storyTimer++; stockTimer++; historyTimer++;
-    cryptoTimer++; crisisTimer++; investorTimer++; seasonTimer++;
+    try {
+        S.playtime++;
+        taxTimer++; storyTimer++; stockTimer++; historyTimer++;
+        cryptoTimer++; crisisTimer++; investorTimer++; seasonTimer++;
 
-    S.inflation = Math.min(0.5, S.playtime * 0.00001);
-    S.money += calcIncome();
+        S.inflation = Math.min(0.5, S.playtime * 0.00001);
+        S.money += calcIncome();
 
-    let upkeep = 0;
-    S.servers.forEach(id=>{
-        const s = SERVERS.find(x=>x.id===id);
-        if(s) upkeep += s.cost * 0.001;
-    });
-    S.money -= upkeep;
+        let upkeep = 0;
+        S.servers.forEach(id=>{
+            const s = SERVERS.find(x=>x.id===id);
+            if(s) upkeep += s.cost * 0.001;
+        });
+        S.money -= upkeep;
 
-    if(S.credit > 0){
-        const pay = S.credit * 0.005;
-        S.money -= pay;
-        S.credit = Math.max(0, S.credit - pay);
-    }
-
-    if(taxTimer >= 300){
-        taxTimer = 0;
-        const tax = Math.max(0, S.money * 0.1);
-        S.money -= tax;
-        addLog("🏦 Налог: -$" + Math.floor(tax), "bad");
-        notify("🏦 Налог: -$" + Math.floor(tax), "#ef4444");
-    }
-
-    if(storyTimer >= 180){
-        storyTimer = 0;
-        if(storyIndex < STORY.length){
-            addLog(STORY[storyIndex], "story");
-            notify(STORY[storyIndex], "#8b5cf6");
-            storyIndex++;
+        if(S.credit > 0){
+            const pay = S.credit * 0.005;
+            S.money -= pay;
+            S.credit = Math.max(0, S.credit - pay);
         }
-    }
 
-    if(stockTimer >= 10){
-        stockTimer = 0;
-        const change = (Math.random() - 0.45) * 2;
-        S.stocks.price = Math.max(1, S.stocks.price + change);
-        S.stocks.history.push(S.stocks.price);
-        if(S.stocks.history.length > 50) S.stocks.history.shift();
-    }
-
-    if(cryptoTimer >= 8){
-        cryptoTimer = 0;
-        const change = (Math.random() - 0.5) * 0.5;
-        S.crypto.price = Math.max(0.1, S.crypto.price + change);
-    }
-
-    if(!S.crisis && crisisTimer >= 600 && Math.random() < 0.1){
-        S.crisis = true;
-        crisisTimer = 0;
-        showCrisisBanner();
-        addLog("🌍 Кризис! Доход -30%", "bad");
-        notify("🌍 КРИЗИС!", "#ef4444");
-    }
-    if(S.crisis){
-        S.crisisTimer = (S.crisisTimer || 0) + 1;
-        if(S.crisisTimer >= 60){
-            S.crisis = false; S.crisisTimer = 0;
-            hideCrisisBanner();
-            notify("🌍 Кризис закончился", "#10b981");
+        if(taxTimer >= 300){
+            taxTimer = 0;
+            const tax = Math.max(0, S.money * 0.1);
+            S.money -= tax;
+            addLog("🏦 Налог: -$" + Math.floor(tax), "bad");
+            notify("🏦 Налог: -$" + Math.floor(tax), "#ef4444");
         }
-    }
 
-    if(S.users >= 10000 && investorTimer >= 300 && S.investors.length < 3){
-        investorTimer = 0;
-        if(Math.random() < 0.5) findInvestor();
-    }
+        if(storyTimer >= 180){
+            storyTimer = 0;
+            if(storyIndex < STORY.length){
+                addLog(STORY[storyIndex], "story");
+                notify(STORY[storyIndex], "#8b5cf6");
+                storyIndex++;
+            }
+        }
 
-    if(seasonTimer >= 1800){
-        seasonTimer = 0;
-        S.season++;
-        notify("📅 Сезон " + S.season, "#8b5cf6");
-    }
+        if(stockTimer >= 10){
+            stockTimer = 0;
+            const change = (Math.random() - 0.45) * 2;
+            S.stocks.price = Math.max(1, S.stocks.price + change);
+            if(S.stocks.history.length > 50) S.stocks.history.shift();
+            S.stocks.history.push(S.stocks.price);
+        }
 
-    S.competitors.forEach(c=>{
-        c.users += c.growth * (0.8 + Math.random() * 0.4);
-    });
+        if(cryptoTimer >= 8){
+            cryptoTimer = 0;
+            const change = (Math.random() - 0.5) * 0.5;
+            S.crypto.price = Math.max(0.1, S.crypto.price + change);
+        }
 
-    let maxUsers = 1000;
-    S.servers.forEach(id=>{
-        const s = SERVERS.find(x=>x.id===id);
-        if(s) maxUsers += s.maxUsers;
-    });
+        if(!S.crisis && crisisTimer >= 600 && Math.random() < 0.1){
+            S.crisis = true;
+            crisisTimer = 0;
+            showCrisisBanner();
+            addLog("🌍 Кризис!", "bad");
+            notify("🌍 КРИЗИС!", "#ef4444");
+        }
+        if(S.crisis){
+            S.crisisTimer = (S.crisisTimer || 0) + 1;
+            if(S.crisisTimer >= 60){
+                S.crisis = false; S.crisisTimer = 0;
+                hideCrisisBanner();
+                notify("🌍 Кризис закончился", "#10b981");
+            }
+        }
 
-    if(S.users < maxUsers){
-        let growth = 1 + S.techs.length * 0.5 + S.staff.length * 2;
-        growth *= (S.rep / 50);
-        growth *= (1 + (S.level-1) * 0.1);
-        growth *= (1 + (S.skills.growth || 0) * 0.1);
-        if(S.depts.mark) growth *= 1.15;
-        if(S.company.partners) growth *= 1.1;
-        if(S.crisis) growth *= 0.7;
-        S.users += growth;
-    }
+        if(S.users >= 10000 && investorTimer >= 300 && S.investors.length < 3){
+            investorTimer = 0;
+            if(Math.random() < 0.5) findInvestor();
+        }
 
-    S.rep = Math.max(0, S.rep - 0.02);
-    if(S.depts.supp) S.rep = Math.min(100, S.rep + 0.05);
+        if(seasonTimer >= 1800){
+            seasonTimer = 0;
+            S.season++;
+            notify("📅 Сезон " + S.season, "#8b5cf6");
+        }
 
-    addXp(0.5);
-    if(Math.random() < 0.005) randomEvent();
+        S.competitors.forEach(c=>{
+            c.users += c.growth * (0.8 + Math.random() * 0.4);
+        });
 
-    if(historyTimer >= 5){
-        historyTimer = 0;
-        S.usersHistory.push(S.users);
-        if(S.usersHistory.length > 60) S.usersHistory.shift();
-    }
+        let maxUsers = 1000;
+        S.servers.forEach(id=>{
+            const s = SERVERS.find(x=>x.id===id);
+            if(s) maxUsers += s.maxUsers;
+        });
 
-    checkAchievements();
-    checkQuests();
-    updateUI();
+        if(S.users < maxUsers){
+            let growth = 1 + S.techs.length * 0.5 + S.staff.length * 2;
+            growth *= (S.rep / 50);
+            growth *= (1 + (S.level-1) * 0.1);
+            growth *= (1 + (S.skills.growth || 0) * 0.1);
+            if(S.depts.mark) growth *= 1.15;
+            if(S.company.partners) growth *= 1.1;
+            if(S.crisis) growth *= 0.7;
+            S.users += growth;
+        }
+
+        S.rep = Math.max(0, S.rep - 0.02);
+        if(S.depts.supp) S.rep = Math.min(100, S.rep + 0.05);
+
+        addXp(0.5);
+        if(Math.random() < 0.005) randomEvent();
+
+        if(historyTimer >= 5){
+            historyTimer = 0;
+            S.usersHistory.push(S.users);
+            if(S.usersHistory.length > 60) S.usersHistory.shift();
+        }
+
+        checkAchievements();
+        checkQuests();
+        updateUI();
+    } catch(e){ console.log("Ошибка tick:", e); }
 }
 
 function showCrisisBanner(){
-    if(document.getElementById("crisisBanner")) return;
-    const b = document.createElement("div");
-    b.id = "crisisBanner";
-    b.className = "crisis-banner";
-    b.textContent = "🌍 МИРОВОЙ КРИЗИС — ДОХОД -30%";
-    document.body.appendChild(b);
+    try {
+        if(document.getElementById("crisisBanner")) return;
+        const b = document.createElement("div");
+        b.id = "crisisBanner";
+        b.className = "crisis-banner";
+        b.textContent = "🌍 МИРОВОЙ КРИЗИС — ДОХОД -30%";
+        document.body.appendChild(b);
+    } catch(e){}
 }
 function hideCrisisBanner(){
-    const b = document.getElementById("crisisBanner");
-    if(b) b.remove();
+    try {
+        const b = document.getElementById("crisisBanner");
+        if(b) b.remove();
+    } catch(e){}
 }
 
 function randomEvent(){
-    const events = [
-        {text:"⚠️ Сервер упал! -5% юзеров", fn:()=>{ S.users *= 0.95; S.rep -= 5; }, type:"bad"},
-        {text:"🎉 Вирусный пост! +500 юзеров", fn:()=>{ S.users += 500; }, type:"good"},
-        {text:"💀 Хакерская атака! -10% денег", fn:()=>{ const dmg=S.money*0.1*(1 - (S.skills.defense||0)*0.1); S.money -= S.depts.sec ? dmg*0.5 : dmg; }, type:"bad"},
-        {text:"📰 Статья! +10 репутации", fn:()=>{ S.rep = Math.min(100, S.rep+10); }, type:"good"},
-        {text:"🚨 Утечка! -15 репутации", fn:()=>{ S.rep -= 15; }, type:"bad"},
-        {text:"⭐ Инвестор! +$1000", fn:()=>{ S.money += 1000; }, type:"good"},
-        {text:"🐛 Баг! -200 юзеров", fn:()=>{ S.users = Math.max(0, S.users-200); }, type:"bad"},
-        {text:"🔥 Мем! +2000 юзеров", fn:()=>{ S.users += 2000; }, type:"good"}
-    ];
-    const e = events[Math.floor(Math.random()*events.length)];
-    e.fn();
-    addLog(e.text, e.type);
-    notify(e.text, e.type==="good"?"#10b981":"#ef4444");
-    beep(e.type==="good"?700:200, 0.3);
-    if(document.getElementById("screen-events").classList.contains("active")) renderEvents();
-    saveNow();
+    try {
+        const events = [
+            {text:"⚠️ Сервер упал! -5% юзеров", fn:()=>{ S.users *= 0.95; S.rep -= 5; }, type:"bad"},
+            {text:"🎉 Вирусный пост! +500 юзеров", fn:()=>{ S.users += 500; }, type:"good"},
+            {text:"💀 Хакер! -10% денег", fn:()=>{ const dmg=S.money*0.1*(1 - (S.skills.defense||0)*0.1); S.money -= S.depts.sec ? dmg*0.5 : dmg; }, type:"bad"},
+            {text:"📰 Статья! +10 реп", fn:()=>{ S.rep = Math.min(100, S.rep+10); }, type:"good"},
+            {text:"🚨 Утечка! -15 реп", fn:()=>{ S.rep -= 15; }, type:"bad"},
+            {text:"⭐ Инвестор! +$1000", fn:()=>{ S.money += 1000; }, type:"good"},
+            {text:"🐛 Баг! -200 юзеров", fn:()=>{ S.users = Math.max(0, S.users-200); }, type:"bad"},
+            {text:"🔥 Мем! +2000 юзеров", fn:()=>{ S.users += 2000; }, type:"good"}
+        ];
+        const e = events[Math.floor(Math.random()*events.length)];
+        e.fn();
+        addLog(e.text, e.type);
+        notify(e.text, e.type==="good"?"#10b981":"#ef4444");
+        beep(e.type==="good"?700:200, 0.3);
+        if(document.getElementById("screen-events").classList.contains("active")) renderEvents();
+        saveNow();
+    } catch(e){}
 }
 
 // ===== СОХРАНЕНИЕ =====
@@ -1494,9 +1558,9 @@ function saveNow(){
 }
 
 function load(){
-    let d = localStorage.getItem("messengerSim_v3") || localStorage.getItem("messengerSim_v2");
-    if(!d) return false;
     try {
+        let d = localStorage.getItem("messengerSim_v3") || localStorage.getItem("messengerSim_v2");
+        if(!d) return false;
         const parsed = JSON.parse(d);
         Object.assign(S, parsed);
         if(!S.stocks) S.stocks = {owned:0, price:10, history:[10]};
@@ -1524,6 +1588,7 @@ function load(){
         if(S.dailyRewardDate === undefined) S.dailyRewardDate = "";
         if(S.dailyStreak === undefined) S.dailyStreak = 0;
         if(S.questIndex === undefined) S.questIndex = 0;
+        // Миграция
         for(const id in S.staffLevels){
             if(typeof S.staffLevels[id] === "number"){
                 S.staffLevels[id] = {level: S.staffLevels[id], char:"normal"};
@@ -1610,7 +1675,7 @@ function resetGame(){
 updateUI();
 setInterval(tick, 1000);
 window.addEventListener("beforeunload", saveNow);
-setInterval(saveNow, 5000);
+setInterval(saveNow, 3000);
 </script>
 </body>
 </html>
