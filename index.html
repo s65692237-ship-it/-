@@ -2,132 +2,156 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1e293b">
 <title>Симулятор Мессенджера</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; font-family:-apple-system,"Segoe UI",Roboto,sans-serif; -webkit-tap-highlight-color:transparent; }
-body { background:#0a0f1e; color:#e2e8f0; min-height:100vh; padding:15px; display:flex; justify-content:center; align-items:flex-start; transition:background .4s,color .4s; }
+html, body { height:100%; overscroll-behavior:none; }
+body { background:#0a0f1e; color:#e2e8f0; min-height:100vh; padding:10px; display:flex; justify-content:center; align-items:flex-start; transition:background .4s,color .4s; }
 body.light { background:#f1f5f9; color:#0f172a; }
-#app { width:100%; max-width:540px; background:#1e293b; border-radius:20px; padding:22px; box-shadow:0 20px 60px rgba(0,0,0,.6); transition:all .4s; position:relative; overflow:hidden; }
+#app { width:100%; max-width:620px; background:#1e293b; border-radius:16px; padding:14px; box-shadow:0 20px 60px rgba(0,0,0,.6); transition:all .4s; position:relative; overflow:hidden; }
 body.light #app { background:#fff; box-shadow:0 20px 60px rgba(0,0,0,.15); }
-.screen { display:none; opacity:0; transform:translateY(10px); transition:opacity .3s,transform .3s; }
+.screen { display:none; opacity:0; transform:translateY(8px); transition:opacity .3s,transform .3s; }
 .screen.active { display:block; opacity:1; transform:translateY(0); }
-h1 { font-size:24px; margin-bottom:10px; text-align:center; }
-h2 { font-size:19px; margin-bottom:14px; text-align:center; }
-p { text-align:center; color:#94a3b8; margin-bottom:18px; font-size:14px; }
-label { display:block; margin-bottom:12px; font-size:13px; color:#cbd5e1; }
+h1 { font-size:22px; margin-bottom:10px; text-align:center; }
+h2 { font-size:17px; margin-bottom:10px; text-align:center; }
+p { text-align:center; color:#94a3b8; margin-bottom:12px; font-size:13px; }
+label { display:block; margin-bottom:8px; font-size:13px; color:#cbd5e1; }
 body.light label { color:#475569; }
-input,select { width:100%; padding:10px; margin-top:5px; background:#0f172a; color:#e2e8f0; border:1px solid #334155; border-radius:8px; font-size:15px; transition:border .2s; }
-input:focus, select:focus { outline:none; border-color:#3b82f6; }
-body.light input, body.light select { background:#f8fafc; color:#0f172a; border-color:#cbd5e1; }
-button { width:100%; padding:12px; margin-top:8px; background:#3b82f6; color:#fff; border:none; border-radius:10px; font-size:15px; font-weight:600; cursor:pointer; transition:all .2s; }
-button:hover:not(:disabled) { background:#2563eb; transform:translateY(-1px); }
-button:active:not(:disabled) { transform:translateY(0); }
+input,select,textarea { width:100%; padding:9px; margin-top:4px; background:#0f172a; color:#e2e8f0; border:1px solid #334155; border-radius:8px; font-size:14px; }
+input:focus, select:focus, textarea:focus { outline:none; border-color:#3b82f6; }
+body.light input, body.light select, body.light textarea { background:#f8fafc; color:#0f172a; border-color:#cbd5e1; }
+button { width:100%; padding:10px; margin-top:6px; background:#3b82f6; color:#fff; border:none; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; transition:all .2s; }
+button:hover:not(:disabled) { background:#2563eb; }
+button:active:not(:disabled) { transform:scale(0.97); }
 button:disabled { background:#334155; color:#64748b; cursor:not-allowed; opacity:.6; }
-.header { display:flex; align-items:center; gap:10px; margin-bottom:14px; padding:14px; background:#0f172a; border-radius:12px; font-size:19px; font-weight:700; transition:.3s; flex-wrap:wrap; }
+.grid-buttons { display:grid; grid-template-columns:repeat(2,1fr); gap:5px; margin-top:5px; }
+.grid-buttons button { margin:0; padding:9px 5px; font-size:12px; }
+@media (min-width:520px) {
+    .grid-buttons { grid-template-columns:repeat(3,1fr); }
+}
+.header { display:flex; align-items:center; gap:6px; margin-bottom:10px; padding:9px; background:#0f172a; border-radius:10px; font-size:16px; font-weight:700; flex-wrap:wrap; }
 body.light .header { background:#f1f5f9; }
-#header-logo { font-size:26px; }
-.stats { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px; }
-.stat { background:#0f172a; padding:10px; border-radius:10px; text-align:center; transition:transform .2s; }
-.stat:hover { transform:scale(1.02); }
+#header-logo { font-size:20px; }
+.stats { display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-bottom:10px; }
+.stat { background:#0f172a; padding:7px; border-radius:8px; text-align:center; }
 body.light .stat { background:#f1f5f9; }
-.stat-label { font-size:11px; color:#94a3b8; margin-bottom:3px; }
-.stat-value { font-size:17px; font-weight:700; }
-.bar-wrap { background:#0f172a; border-radius:10px; height:12px; overflow:hidden; margin-bottom:14px; }
+.stat-label { font-size:10px; color:#94a3b8; margin-bottom:2px; }
+.stat-value { font-size:14px; font-weight:700; }
+.bar-wrap { background:#0f172a; border-radius:8px; height:10px; overflow:hidden; margin-bottom:8px; }
 body.light .bar-wrap { background:#e2e8f0; }
 .bar { height:100%; background:linear-gradient(90deg,#3b82f6,#8b5cf6); transition:width .5s ease; }
-.xp-bar { height:8px; margin-bottom:8px; }
+.xp-bar { height:6px; margin-bottom:5px; }
 .xp-bar .bar { background:linear-gradient(90deg,#f59e0b,#ef4444); }
-.section { background:#0f172a; border-radius:10px; padding:12px; margin-bottom:10px; animation:fadeIn .4s; }
+.section { background:#0f172a; border-radius:8px; padding:9px; margin-bottom:7px; }
 body.light .section { background:#f8fafc; }
-.item { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #1e293b; transition:.2s; }
+.section-title { font-size:11px; color:#94a3b8; margin-bottom:5px; text-transform:uppercase; letter-spacing:0.5px; }
+.item { display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid #1e293b; }
 .item:last-child { border-bottom:none; }
-.item:hover { background:rgba(59,130,246,.05); border-radius:6px; padding-left:6px; padding-right:6px; }
 body.light .item { border-bottom-color:#e2e8f0; }
-.item-info { flex:1; }
-.item-name { font-weight:600; font-size:14px; }
-.item-cost { font-size:11px; color:#94a3b8; margin-top:2px; }
-.item button { width:auto; padding:6px 12px; font-size:12px; margin:0; margin-left:6px; }
-.events-list { max-height:300px; overflow-y:auto; }
-.event { background:#0f172a; padding:8px 10px; border-radius:8px; margin-bottom:6px; font-size:13px; border-left:3px solid #f59e0b; animation:slideInRight .3s; }
+.item-info { flex:1; min-width:0; }
+.item-name { font-weight:600; font-size:12px; }
+.item-cost { font-size:10px; color:#94a3b8; margin-top:2px; }
+.item button { width:auto; padding:4px 9px; font-size:11px; margin:0; margin-left:5px; }
+.events-list { max-height:260px; overflow-y:auto; }
+.event { background:#0f172a; padding:6px 8px; border-radius:6px; margin-bottom:4px; font-size:11px; border-left:3px solid #f59e0b; }
 body.light .event { background:#f1f5f9; }
 .event.story { border-left-color:#8b5cf6; }
 .event.good { border-left-color:#10b981; }
 .event.bad { border-left-color:#ef4444; }
 .event.quest { border-left-color:#ec4899; }
 .event.world { border-left-color:#06b6d4; }
-.notify { position:fixed; top:20px; right:20px; background:#1e293b; padding:12px 18px; border-radius:10px; border-left:4px solid #10b981; font-size:14px; box-shadow:0 10px 30px rgba(0,0,0,.5); z-index:100; animation:slideInRight .4s; max-width:300px; color:#e2e8f0; }
+.event.boss { border-left-color:#dc2626; }
+.notify { position:fixed; top:12px; right:12px; left:12px; background:#1e293b; padding:10px 12px; border-radius:8px; border-left:4px solid #10b981; font-size:12px; box-shadow:0 10px 30px rgba(0,0,0,.5); z-index:100; animation:slideInRight .4s; color:#e2e8f0; }
+@media (min-width:520px) { .notify { left:auto; max-width:320px; } }
 body.light .notify { background:#fff; color:#0f172a; }
 @keyframes slideInRight { from{transform:translateX(400px);opacity:0;} to{transform:translateX(0);opacity:1;} }
-@keyframes fadeIn { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
 @keyframes fall { 0%{transform:translateY(-20px) rotate(0);opacity:1;} 100%{transform:translateY(100vh) rotate(720deg);opacity:0;} }
 @keyframes floatUp { 0%{transform:translateY(0);opacity:1;} 100%{transform:translateY(-100px);opacity:0;} }
-@keyframes walk { 0%{transform:translateX(-50px);} 100%{transform:translateX(calc(100% + 50px));} }
 .btn-sec { background:#334155; }
 .btn-sec:hover:not(:disabled) { background:#475569; }
 .btn-danger { background:#dc2626; }
 .btn-danger:hover:not(:disabled) { background:#b91c1c; }
 .btn-prestige { background:linear-gradient(90deg,#8b5cf6,#ec4899); }
-.btn-prestige:hover:not(:disabled) { background:linear-gradient(90deg,#7c3aed,#db2777); }
 .btn-gold { background:linear-gradient(90deg,#f59e0b,#ef4444); }
 .btn-green { background:linear-gradient(90deg,#10b981,#059669); }
-.task { background:#0f172a; padding:8px 10px; border-radius:8px; margin-bottom:6px; font-size:13px; border-left:3px solid #10b981; display:flex; justify-content:space-between; }
+.task { background:#0f172a; padding:6px 8px; border-radius:6px; margin-bottom:4px; font-size:11px; border-left:3px solid #10b981; display:flex; justify-content:space-between; }
 body.light .task { background:#f1f5f9; }
 .task.done { opacity:.5; text-decoration:line-through; }
-.quest { background:#0f172a; padding:10px; border-radius:8px; margin-bottom:8px; font-size:13px; border-left:3px solid #ec4899; }
+.quest { background:#0f172a; padding:7px; border-radius:6px; margin-bottom:5px; font-size:11px; border-left:3px solid #ec4899; }
 body.light .quest { background:#f1f5f9; }
 .quest.done { opacity:.5; }
-.badge { background:#3b82f6; padding:2px 8px; border-radius:10px; font-size:11px; }
+.badge { background:#3b82f6; padding:2px 6px; border-radius:8px; font-size:10px; }
 .badge-crystal { background:#06b6d4; }
-.confetti { position:fixed; width:10px; height:10px; pointer-events:none; z-index:200; animation:fall 3s linear forwards; }
-.coin { position:fixed; font-size:20px; pointer-events:none; z-index:200; animation:floatUp 1.5s linear forwards; }
-.walker { position:absolute; bottom:5px; font-size:20px; pointer-events:none; z-index:50; animation:walk 8s linear forwards; }
-.comp-bar { display:flex; justify-content:space-between; font-size:12px; padding:6px 0; border-bottom:1px solid #1e293b; }
+.confetti { position:fixed; width:8px; height:8px; pointer-events:none; z-index:200; animation:fall 3s linear forwards; }
+.coin { position:fixed; font-size:16px; pointer-events:none; z-index:200; animation:floatUp 1.5s linear forwards; }
+.comp-bar { display:flex; justify-content:space-between; font-size:11px; padding:4px 0; border-bottom:1px solid #1e293b; }
 .comp-bar:last-child { border-bottom:none; }
 .comp-bar.you { color:#10b981; font-weight:700; }
-canvas { width:100%; height:100px; background:#0f172a; border-radius:8px; margin-bottom:10px; }
+canvas { width:100%; height:80px; background:#0f172a; border-radius:6px; margin-bottom:6px; }
 body.light canvas { background:#f8fafc; }
-.koll-item { background:#0f172a; padding:10px; border-radius:8px; text-align:center; font-size:22px; cursor:pointer; transition:.2s; }
-.koll-item:hover { transform:scale(1.1); }
+.koll-item { background:#0f172a; padding:5px; border-radius:5px; text-align:center; font-size:16px; cursor:pointer; transition:.2s; }
 .koll-item.owned { background:rgba(16,185,129,.2); border:1px solid #10b981; }
 .koll-item.locked { opacity:.3; }
-.kollekciya { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; }
-.skill { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #1e293b; font-size:13px; align-items:center; }
+.kollekciya { display:grid; grid-template-columns:repeat(6,1fr); gap:4px; }
+@media (min-width:520px) { .kollekciya { grid-template-columns:repeat(8,1fr); } }
+.skill { display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #1e293b; font-size:11px; align-items:center; }
 .skill:last-child { border-bottom:none; }
-.crisis-banner { position:fixed; top:0; left:0; width:100%; background:#dc2626; color:#fff; padding:8px; text-align:center; font-weight:600; z-index:150; animation:slideInDown .4s; }
-@keyframes slideInDown { from{transform:translateY(-100%);} to{transform:translateY(0);} }
-.dept { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #1e293b; font-size:13px; align-items:center; }
+.crisis-banner { position:fixed; top:0; left:0; width:100%; background:#dc2626; color:#fff; padding:6px; text-align:center; font-weight:600; z-index:150; font-size:12px; }
+.dept { display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #1e293b; font-size:11px; align-items:center; }
 .dept:last-child { border-bottom:none; }
-.tag { display:inline-block; padding:2px 6px; border-radius:6px; font-size:10px; margin-left:4px; }
+.tag { display:inline-block; padding:1px 5px; border-radius:5px; font-size:9px; margin-left:3px; }
 .tag-lazy { background:#64748b; }
 .tag-normal { background:#3b82f6; }
 .tag-genius { background:#f59e0b; }
 .tag-work { background:#10b981; }
-.crystal-count { background:#06b6d4; padding:3px 10px; border-radius:10px; font-size:13px; margin-left:auto; }
-.rank { display:flex; justify-content:space-between; padding:6px 8px; border-radius:6px; margin-bottom:4px; font-size:13px; background:#0f172a; }
+.tag-evil { background:#dc2626; }
+.tag-kind { background:#06b6d4; }
+.tag-clown { background:#ec4899; }
+.tag-greed { background:#f97316; }
+.tag-brave { background:#8b5cf6; }
+.tag-coward { background:#94a3b8; }
+.crystal-count { background:#06b6d4; padding:2px 7px; border-radius:8px; font-size:11px; margin-left:auto; }
+.rank { display:flex; justify-content:space-between; padding:4px 6px; border-radius:5px; margin-bottom:3px; font-size:11px; background:#0f172a; }
 body.light .rank { background:#f1f5f9; }
 .rank.gold { background:linear-gradient(90deg,#f59e0b33,#f59e0b11); border-left:3px solid #f59e0b; }
 .rank.silver { background:linear-gradient(90deg,#94a3b833,#94a3b811); border-left:3px solid #94a3b8; }
 .rank.bronze { background:linear-gradient(90deg,#92400e33,#92400e11); border-left:3px solid #92400e; }
 .rank.you { border:1px solid #10b981; }
-.logo-picker { display:grid; grid-template-columns:repeat(6,1fr); gap:6px; }
-.logo-item { background:#0f172a; padding:10px; border-radius:8px; text-align:center; font-size:22px; cursor:pointer; transition:.2s; }
-.logo-item:hover { transform:scale(1.1); }
+.logo-picker { display:grid; grid-template-columns:repeat(6,1fr); gap:4px; }
+.logo-item { background:#0f172a; padding:5px; border-radius:5px; text-align:center; font-size:16px; cursor:pointer; }
 .logo-item.active { border:2px solid #3b82f6; }
 .logo-item.locked { opacity:.3; }
-.crypto-item { padding:10px 0; border-bottom:1px solid #1e293b; }
+.crypto-item { padding:6px 0; border-bottom:1px solid #1e293b; }
 .crypto-item:last-child { border-bottom:none; }
-.crypto-name { font-weight:600; font-size:14px; }
-.crypto-price { font-size:11px; color:#94a3b8; }
-.crypto-buttons { display:flex; gap:6px; margin-top:6px; }
-.crypto-buttons button { padding:5px 10px; font-size:11px; margin:0; flex:1; }
-.country { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #1e293b; font-size:13px; align-items:center; }
+.crypto-name { font-weight:600; font-size:12px; }
+.crypto-price { font-size:10px; color:#94a3b8; }
+.crypto-buttons { display:flex; gap:4px; margin-top:4px; }
+.crypto-buttons button { padding:3px 6px; font-size:10px; margin:0; flex:1; }
+.country { display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #1e293b; font-size:11px; align-items:center; }
 .country:last-child { border-bottom:none; }
 .country.locked { opacity:.5; }
-.weather-rain { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1; background:linear-gradient(180deg,rgba(59,130,246,0.1),transparent); }
-.stars { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; }
-.star { position:absolute; width:2px; height:2px; background:#fff; border-radius:50%; animation:twinkle 3s infinite; }
-@keyframes twinkle { 0%,100%{opacity:0.3;} 50%{opacity:1;} }
+.setting-row { display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid #1e293b; font-size:12px; }
+.setting-row:last-child { border-bottom:none; }
+.toggle { width:44px; height:24px; background:#334155; border-radius:12px; position:relative; cursor:pointer; transition:.3s; flex-shrink:0; }
+.toggle.on { background:#10b981; }
+.toggle::after { content:""; position:absolute; top:3px; left:3px; width:18px; height:18px; background:#fff; border-radius:50%; transition:.3s; }
+.toggle.on::after { left:23px; }
+.diff-btn { padding:5px 10px; font-size:11px; border-radius:6px; margin:0 3px 0 0; width:auto; display:inline-block; }
+.diff-btn.active { background:#10b981; }
+.hint { font-size:10px; color:#94a3b8; margin-top:2px; font-style:italic; }
+.detail-row { display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #1e293b; font-size:11px; }
+.detail-row:last-child { border-bottom:none; }
+.detail-row .label { color:#94a3b8; }
+.detail-row .value { font-weight:600; }
+.boss-card { background:linear-gradient(135deg,#7f1d1d,#dc2626); padding:12px; border-radius:10px; text-align:center; margin-bottom:8px; }
+.boss-hp { background:#0f172a; height:14px; border-radius:7px; overflow:hidden; margin:6px 0; }
+.boss-hp-bar { height:100%; background:linear-gradient(90deg,#f59e0b,#dc2626); transition:width .3s; }
+.chat-msg { background:#0f172a; padding:6px 9px; border-radius:8px; margin-bottom:4px; font-size:11px; }
+.chat-msg.you { background:#3b82f6; color:#fff; margin-left:20px; }
+.chat-msg.bot { background:#334155; }
+.event-banner { background:linear-gradient(90deg,#8b5cf6,#ec4899); padding:8px; border-radius:8px; text-align:center; margin-bottom:8px; font-weight:700; font-size:13px; }
 </style>
 </head>
 <body>
@@ -139,15 +163,14 @@ body.light .rank { background:#f1f5f9; }
     <p>Создай свой мессенджер с нуля и обгони Telegram</p>
     <button onclick="newGame()">Новая игра</button>
     <button class="btn-sec" onclick="continueGame()">Продолжить</button>
-    <button class="btn-sec" onclick="toggleTheme()">🌓 Сменить тему</button>
-    <button class="btn-sec" onclick="installPWA()">📱 Установить на телефон</button>
+    <button class="btn-sec" onclick="show('screen-settings')">⚙️ Настройки</button>
 </div>
 
 <!-- СОЗДАНИЕ -->
 <div id="screen-create" class="screen">
     <h1>Создай мессенджер</h1>
     <label>Название<input type="text" id="input-name" maxlength="20" placeholder="Например: Связь"></label>
-    <label>Цвет темы<select id="select-color">
+    <label>Цвет<select id="select-color">
         <option value="#3b82f6">Синий</option>
         <option value="#8b5cf6">Фиолетовый</option>
         <option value="#10b981">Зелёный</option>
@@ -161,10 +184,20 @@ body.light .rank { background:#f1f5f9; }
         <option value="🌐">🌐</option>
         <option value="🚀">🚀</option>
     </select></label>
+    <label>Сложность<select id="select-diff">
+        <option value="easy">Лёгкая</option>
+        <option value="medium" selected>Средняя</option>
+        <option value="hard">Сложная</option>
+    </select></label>
     <label>Режим<select id="select-mode">
         <option value="normal">Обычный</option>
         <option value="hardcore">Хардкор</option>
         <option value="sandbox">Песочница</option>
+        <option value="survival">Выживание (одна жизнь)</option>
+    </select></label>
+    <label>Язык<select id="select-lang">
+        <option value="ru">Русский</option>
+        <option value="en">English</option>
     </select></label>
     <button onclick="createMessenger()">Создать</button>
     <button class="btn-sec" onclick="show('screen-start')">Назад</button>
@@ -176,7 +209,7 @@ body.light .rank { background:#f1f5f9; }
         <span id="header-logo">💬</span>
         <span id="header-name">Мессенджер</span>
         <span class="crystal-count" id="header-crystals">💎 0</span>
-        <span style="font-size:14px;background:#3b82f6;padding:3px 10px;border-radius:10px;" id="header-level">Lv.1</span>
+        <span style="font-size:11px;background:#3b82f6;padding:2px 7px;border-radius:8px;" id="header-level">Lv.1</span>
     </div>
 
     <div class="stats">
@@ -189,235 +222,147 @@ body.light .rank { background:#f1f5f9; }
     <div class="bar-wrap xp-bar"><div class="bar" id="xp-bar" style="width:0%"></div></div>
     <div class="bar-wrap"><div class="bar" id="progress-bar" style="width:0%"></div></div>
 
-    <button onclick="show('screen-tech')">🔬 Технологии</button>
-    <button onclick="show('screen-staff')">👥 Персонал</button>
-    <button onclick="show('screen-servers')">🖥️ Серверы</button>
-    <button onclick="show('screen-depts')">🏢 Отделы</button>
-    <button onclick="show('screen-company')">💼 Компания</button>
-    <button onclick="show('screen-skills')">🌳 Навыки</button>
-    <button onclick="show('screen-quests')">🎯 Квесты</button>
-    <button onclick="show('screen-crystals')">💎 Магазин кристаллов</button>
-    <button onclick="show('screen-stocks')">📈 Акции</button>
-    <button onclick="show('screen-crypto')">🪙 Крипта</button>
-    <button onclick="show('screen-investors')">💼 Инвесторы</button>
-    <button onclick="show('screen-comp')">🥊 Конкуренты</button>
-    <button onclick="show('screen-rank')">🏆 Рейтинг</button>
-    <button onclick="show('screen-koll')">🎨 Коллекции</button>
-    <button onclick="show('screen-stats')">📊 Аналитика</button>
-    <button onclick="show('screen-tasks')">📅 Задания</button>
-    <button onclick="show('screen-events')">📜 События</button>
-    <button onclick="show('screen-achieve')">🏆 Достижения</button>
-    <button onclick="show('screen-world')">🌍 Мир</button>
-    <button onclick="show('screen-clans')">🛡️ Кланы</button>
-    <button onclick="show('screen-story')">📖 Сюжет</button>
-    <button onclick="show('screen-economy')">💰 Экономика</button>
-    <button onclick="show('screen-visual')">🎨 Визуал</button>
-    <button class="btn-green" onclick="claimDaily()">🎁 Ежедневная награда</button>
-    <button class="btn-prestige" onclick="show('screen-prestige')">🌟 Престиж</button>
-    <button class="btn-sec" onclick="toggleTheme()">🌓 Тема</button>
-    <button class="btn-danger" onclick="resetGame()">🗑️ Сброс</button>
+    <div class="grid-buttons">
+        <button onclick="show('screen-tech')">🔬 Технологии</button>
+        <button onclick="show('screen-staff')">👥 Персонал</button>
+        <button onclick="show('screen-servers')">🖥️ Серверы</button>
+        <button onclick="show('screen-depts')">🏢 Отделы</button>
+        <button onclick="show('screen-company')">💼 Компания</button>
+        <button onclick="show('screen-skills')">🌳 Навыки</button>
+        <button onclick="show('screen-quests')">🎯 Квесты</button>
+        <button onclick="show('screen-crystals')">💎 Кристаллы</button>
+        <button onclick="show('screen-stocks')">📈 Акции</button>
+        <button onclick="show('screen-crypto')">🪙 Крипта</button>
+        <button onclick="show('screen-investors')">💼 Инвесторы</button>
+        <button onclick="show('screen-comp')">🥊 Конкуренты</button>
+        <button onclick="show('screen-rank')">🏆 Рейтинг</button>
+        <button onclick="show('screen-koll')">🎨 Коллекции</button>
+        <button onclick="show('screen-stats')">📊 Аналитика</button>
+        <button onclick="show('screen-tasks')">📅 Задания</button>
+        <button onclick="show('screen-events')">📜 События</button>
+        <button onclick="show('screen-achieve')">🏆 Достижения</button>
+        <button onclick="show('screen-world')">🌍 Мир</button>
+        <button onclick="show('screen-bots')">🤖 Боты</button>
+        <button onclick="show('screen-battle')">⚔️ Битвы</button>
+        <button onclick="show('screen-boss')">👹 Боссы</button>
+        <button onclick="show('screen-exchange')">📊 Биржа</button>
+        <button onclick="show('screen-lottery')">🎰 Лотерея</button>
+        <button onclick="show('screen-offshore')">🏝️ Оффшоры</button>
+        <button onclick="show('screen-unions')">✊ Профсоюзы</button>
+        <button onclick="show('screen-story')">📖 Сюжет</button>
+        <button onclick="show('screen-characters')">🎭 Персонажи</button>
+        <button onclick="show('screen-friends')">👥 Друзья</button>
+        <button onclick="show('screen-mini')">🎮 Мини-игры</button>
+        <button onclick="show('screen-multiverse')">🌌 Мультивселенная</button>
+        <button onclick="show('screen-visual')">🎨 Визуал</button>
+        <button onclick="show('screen-profile')">👤 Профиль</button>
+        <button onclick="show('screen-settings')">⚙️ Настройки</button>
+    </div>
+
+    <div class="grid-buttons" style="margin-top:8px;">
+        <button class="btn-green" onclick="claimDaily()">🎁 Ежедневка</button>
+        <button class="btn-prestige" onclick="show('screen-prestige')">🌟 Престиж</button>
+        <button class="btn-sec" onclick="toggleTheme()">🌓 Тема</button>
+        <button class="btn-danger" onclick="resetGame()">🗑️ Сброс</button>
+    </div>
 </div>
 
-<!-- ТЕХНОЛОГИИ -->
-<div id="screen-tech" class="screen">
-    <h2>🔬 Технологии</h2>
-    <div class="section"><div id="tech-list"></div></div>
-    <button class="btn-sec" onclick="show('screen-main')">Назад</button>
-</div>
+<!-- ЭКРАНЫ-ЗАГЛУШКИ -->
+<div id="screen-tech" class="screen"><h2>🔬 Технологии</h2><div class="section"><div id="tech-list"></div></div><button class="btn-sec" onclick="show('screen-main')">Назад</button></div>
+<div id="screen-staff" class="screen"><h2>👥 Персонал</h2><div class="section"><div style="font-size:11px;color:#94a3b8;margin-bottom:5px;">Команда: <b id="team-status">0/12</b></div><div id="staff-list"></div></div><button class="btn-sec" onclick="show('screen-main')">Назад</button></div>
+<div id="screen-servers" class="screen"><h2>🖥️ Серверы</h2><div class="section"><div id="server-list"></div></div><button class="btn-sec" onclick="show('screen-main')">Назад</button></div>
+<div id="screen-depts" class="screen"><h2>🏢 Отделы</h2><div class="section"><div id="dept-list"></div></div><button class="btn-sec" onclick="show('screen-main')">Назад</button></div>
+<div id="screen-company" class="screen"><h2>💼 Компания</h2><div class="section"><div class="stat-label">Уровень</div><div class="stat-value" id="company-level" style="font-size:14px;margin-bottom:5px;">Малый стартап</div><div style="font-size:11px;color:#94a3b8;">Оценка: <b id="company-value">$0</b></div><div style="font-size:11px;color:#94a3b8;">Офисы: <b id="company-offices">0</b></div></div><div class="section"><div class="section-title">Расширение</div><div id="company-list"></div></div><div class="section"><button onclick="absorbMessenger()">🛒 Поглотить (100к)</button><button onclick="exportReport()">📤 Экспорт PDF</button></div><button class="btn-sec" onclick="show('screen-main')">Назад</button></div>
+<div id="screen-skills" class="screen"><h2>🌳 Навыки</h2><div class="section"><div id="skill-list"></div></div><button class="btn-sec" onclick="show('screen-main')">Назад</button></div>
+<div id="screen-quests" class="screen"><h2>🎯 Квесты</h2><div class="section"><div id="quest-list"></div></div><button class="btn-sec" onclick="show('screen-main')">Назад</button></div>
+<div id="screen-crystals" class="screen"><h2>💎 Кристаллы</h2><div class="section"><div style="text-align:center;margin-bottom:8px;font-size:14px;">У тебя: <b>💎 <span id="crystal-balance">0</span></b></div><div id="crystal-shop"></div></div><button class="btn-sec" onclick="show('screen-main')">Назад</button></div>
+<div id="screen-stocks" class="screen"><h2>📈 Акции</h2><div class="section"><div id="stocks-list"></div></div><button class="btn-sec" onclick="show('screen-main')">Назад</button></div>
+<div id="screen-crypto" class="screen"><h2>🪙 Криптобиржа</h2><div class="section"><div id="crypto-list"></div></div><button class="btn-sec" onclick="show('screen-main')">Назад</button></div>
+<div id="screen-investors" class="screen"><h2>💼 Инвесторы</h2><div class="section"><div id="investor-list"></div></div><button class="btn-sec" onclick="show('screen-main')">Назад</button></div>
+<div id="screen-comp" class="screen"><h2>🥊 Конкуренты</h2><div class="section"><div id="comp-list"></div></div><button class="btn-sec" onclick="show('screen-main')">Назад</button></div>
+<div id="screen-rank" class="screen"><h2>🏆 Рейтинг</h2><div class="section"><div id="rank-list"></div></div><button class="btn-sec" onclick="show('screen-main')">Назад</button></div>
+<div id="screen-koll" class="screen"><h2>🎨 Коллекции</h2><div class="section"><div class="section-title">Иконки</div><div class="kollekciya" id="koll-icons"></div></div><div class="section"><div class="section-title">Темы</div><div class="kollekciya" id="koll-themes"></div></div><div class="section"><div class="section-title">Стикеры</div><div class="kollekciya" id="koll-stickers"></div></div><div class="section"><div class="section-title">Логотипы</div><div class="logo-picker" id="logo-picker"></div></div><button class="btn-sec" onclick="show('screen-main')">Назад</button></div>
+<div id="screen-stats" class="screen"><h2>📊 Аналитика</h2><div class="section"><canvas id="chart"></canvas><div style="font-size:10px;color:#94a3b8;text-align:center;">Рост юзеров</div></div><div class="section"><div class="section-title">Прогноз</div><div id="forecast" style="font-size:11px;"></div></div><div class="section"><div class="section-title">Детализация</div><div id="details-list"></div></div><button class="btn-sec" onclick="show('screen-main')">Назад</button></div>
+<div id="screen-tasks" class="screen"><h2>📅 Задания</h2><div class="section"><div class="section-title">Ежедневные</div><div id="tasks-list"></div><div class="section-title" style="margin-top:8px;">Еженедельные</div><div id="weekly-tasks"></div><div class="section-title" style="margin-top:8px;">Ежемесячные</div><div id="monthly-tasks"></div></div><button class="btn-sec" onclick="show('screen-main')">Назад</button></div>
+<div id="screen-events" class="screen"><h2>📜 События</h2><div class="events-list" id="events-list"></div><button class="btn-sec" onclick="show('screen-main')">Назад</button></div>
+<div id="screen-achieve" class="screen"><h2>🏆 Достижения</h2><div class="section"><div id="achieve-list"></div></div><button class="btn-sec" onclick="show('screen-main')">Назад</button></div>
+<div id="screen-world" class="screen"><h2>🌍 Мир</h2><div class="section"><div class="section-title">Страны</div><div id="country-list"></div></div><div class="section"><div class="section-title">Регионы</div><div id="region-list"></div></div><div class="section"><div class="section-title">Погода</div><div style="font-size:11px;">Сейчас: <b id="current-weather">Ясно</b></div><button onclick="changeWeather()">🎲 Сменить</button></div><button class="btn-sec" onclick="show('screen-main')">Назад</button></div>
 
-<!-- ПЕРСОНАЛ -->
-<div id="screen-staff" class="screen">
-    <h2>👥 Персонал</h2>
+<!-- БОТЫ -->
+<div id="screen-bots" class="screen">
+    <h2>🤖 Боты-помощники</h2>
     <div class="section">
-        <div style="font-size:12px;color:#94a3b8;margin-bottom:8px;">Команда: <b id="team-status">0/5</b></div>
-        <div id="staff-list"></div>
+        <p style="font-size:11px;">Боты автоматизируют покупки и приносят доход.</p>
+        <div id="bots-list"></div>
     </div>
     <button class="btn-sec" onclick="show('screen-main')">Назад</button>
 </div>
 
-<!-- СЕРВЕРЫ -->
-<div id="screen-servers" class="screen">
-    <h2>🖥️ Серверы</h2>
-    <div class="section"><div id="server-list"></div></div>
-    <button class="btn-sec" onclick="show('screen-main')">Назад</button>
-</div>
-
-<!-- ОТДЕЛЫ -->
-<div id="screen-depts" class="screen">
-    <h2>🏢 Отделы</h2>
-    <div class="section"><div id="dept-list"></div></div>
-    <button class="btn-sec" onclick="show('screen-main')">Назад</button>
-</div>
-
-<!-- КОМПАНИЯ -->
-<div id="screen-company" class="screen">
-    <h2>💼 Компания</h2>
+<!-- БИТВЫ -->
+<div id="screen-battle" class="screen">
+    <h2>⚔️ Битвы мессенджеров</h2>
     <div class="section">
-        <div class="stat-label">Уровень мессенджера</div>
-        <div class="stat-value" id="company-level" style="font-size:16px;margin-bottom:8px;">Малый стартап</div>
-        <div style="font-size:12px;color:#94a3b8;">Оценка: <b id="company-value">$0</b></div>
-        <div style="font-size:12px;color:#94a3b8;">Офисы: <b id="company-offices">0</b></div>
-    </div>
-    <div class="section">
-        <div class="section-title">Расширение</div>
-        <div id="company-list"></div>
-    </div>
-    <div class="section">
-        <div class="section-title">Поглощения</div>
-        <button onclick="absorbMessenger()">🛒 Поглотить мессенджер (100к)</button>
-    </div>
-    <div class="section">
-        <div class="section-title">Экспорт</div>
-        <button onclick="exportReport()">📤 Экспорт отчёта</button>
+        <p style="font-size:11px;">Сразись с конкурентом за юзеров. Победитель забирает 5% аудитории проигравшего.</p>
+        <div id="battle-list"></div>
     </div>
     <button class="btn-sec" onclick="show('screen-main')">Назад</button>
 </div>
 
-<!-- НАВЫКИ -->
-<div id="screen-skills" class="screen">
-    <h2>🌳 Навыки</h2>
-    <div class="section"><div id="skill-list"></div></div>
+<!-- БОССЫ -->
+<div id="screen-boss" class="screen">
+    <h2>👹 Мировые боссы</h2>
+    <div class="section" id="boss-content"></div>
     <button class="btn-sec" onclick="show('screen-main')">Назад</button>
 </div>
 
-<!-- КВЕСТЫ -->
-<div id="screen-quests" class="screen">
-    <h2>🎯 Квесты</h2>
-    <div class="section"><div id="quest-list"></div></div>
+<!-- БИРЖА -->
+<div id="screen-exchange" class="screen">
+    <h2>📊 Биржа конкурентов</h2>
+    <div class="section"><div id="exchange-list"></div></div>
     <button class="btn-sec" onclick="show('screen-main')">Назад</button>
 </div>
 
-<!-- КРИСТАЛЛЫ -->
-<div id="screen-crystals" class="screen">
-    <h2>💎 Магазин кристаллов</h2>
+<!-- ЛОТЕРЕЯ -->
+<div id="screen-lottery" class="screen">
+    <h2>🎰 Лотерея и казино</h2>
     <div class="section">
-        <div style="text-align:center;margin-bottom:12px;font-size:16px;">У тебя: <b>💎 <span id="crystal-balance">0</span></b></div>
-        <div id="crystal-shop"></div>
+        <div style="margin-bottom:6px;">Билет: <b>$100</b></div>
+        <button onclick="buyLottery()">🎟️ Купить билет</button>
+        <div style="margin-top:8px;font-size:11px;">Выигрыш: до $100000</div>
+    </div>
+    <div class="section">
+        <div style="margin-bottom:6px;">Казино (ставка $500)</div>
+        <button onclick="casino()">🎲 Крутить</button>
     </div>
     <button class="btn-sec" onclick="show('screen-main')">Назад</button>
 </div>
 
-<!-- АКЦИИ -->
-<div id="screen-stocks" class="screen">
-    <h2>📈 Акции</h2>
+<!-- ОФФШОРЫ -->
+<div id="screen-offshore" class="screen">
+    <h2>🏝️ Оффшоры и налоги</h2>
     <div class="section">
-        <div style="margin-bottom:10px;">Цена: <b id="stock-price">$10</b></div>
-        <div style="margin-bottom:10px;">У тебя: <b id="stock-owned">0</b></div>
-        <button onclick="buyStock()">Купить</button>
-        <button class="btn-sec" onclick="sellStock()">Продать</button>
+        <div style="margin-bottom:6px;">В оффшоре: <b id="offshore-balance">$0</b></div>
+        <div style="font-size:11px;color:#94a3b8;margin-bottom:6px;">Деньги в оффшоре не облагаются налогом</div>
+        <button onclick="putOffshore()">🏝️ Перевести $10000</button>
+        <button class="btn-sec" onclick="takeOffshore()">💰 Забрать всё</button>
+    </div>
+    <div class="section">
+        <div style="margin-bottom:6px;">Облигации: <b id="bond-balance">$0</b></div>
+        <div style="font-size:11px;color:#94a3b8;margin-bottom:6px;">+10% каждые 5 минут</div>
+        <button onclick="buyBond()">📜 Купить на $10000</button>
     </div>
     <button class="btn-sec" onclick="show('screen-main')">Назад</button>
 </div>
 
-<!-- КРИПТА -->
-<div id="screen-crypto" class="screen">
-    <h2>🪙 Криптобиржа</h2>
-    <div class="section"><div id="crypto-list"></div></div>
-    <button class="btn-sec" onclick="show('screen-main')">Назад</button>
-</div>
-
-<!-- ИНВЕСТОРЫ -->
-<div id="screen-investors" class="screen">
-    <h2>💼 Инвесторы</h2>
-    <div class="section"><div id="investor-list"></div></div>
-    <button class="btn-sec" onclick="show('screen-main')">Назад</button>
-</div>
-
-<!-- КОНКУРЕНТЫ -->
-<div id="screen-comp" class="screen">
-    <h2>🥊 Конкуренты</h2>
-    <div class="section"><div id="comp-list"></div></div>
-    <button class="btn-sec" onclick="show('screen-main')">Назад</button>
-</div>
-
-<!-- РЕЙТИНГ -->
-<div id="screen-rank" class="screen">
-    <h2>🏆 Рейтинг</h2>
-    <div class="section"><div id="rank-list"></div></div>
-    <button class="btn-sec" onclick="show('screen-main')">Назад</button>
-</div>
-
-<!-- КОЛЛЕКЦИИ -->
-<div id="screen-koll" class="screen">
-    <h2>🎨 Коллекции</h2>
+<!-- ПРОФСОЮЗЫ -->
+<div id="screen-unions" class="screen">
+    <h2>✊ Профсоюзы</h2>
     <div class="section">
-        <div class="section-title">Иконки</div>
-        <div class="kollekciya" id="koll-icons"></div>
-    </div>
-    <div class="section">
-        <div class="section-title">Темы</div>
-        <div class="kollekciya" id="koll-themes"></div>
-    </div>
-    <div class="section">
-        <div class="section-title">Стикеры</div>
-        <div class="kollekciya" id="koll-stickers"></div>
-    </div>
-    <div class="section">
-        <div class="section-title">Сменить логотип</div>
-        <div class="logo-picker" id="logo-picker"></div>
-    </div>
-    <button class="btn-sec" onclick="show('screen-main')">Назад</button>
-</div>
-
-<!-- АНАЛИТИКА -->
-<div id="screen-stats" class="screen">
-    <h2>📊 Аналитика</h2>
-    <div class="section">
-        <canvas id="chart"></canvas>
-        <div style="font-size:12px;color:#94a3b8;text-align:center;">Рост юзеров</div>
-    </div>
-    <div class="section">
-        <div class="section-title">Прогноз</div>
-        <div id="forecast" style="font-size:13px;"></div>
-    </div>
-    <button class="btn-sec" onclick="show('screen-main')">Назад</button>
-</div>
-
-<!-- ЗАДАНИЯ -->
-<div id="screen-tasks" class="screen">
-    <h2>📅 Задания</h2>
-    <div class="section"><div id="tasks-list"></div></div>
-    <button class="btn-sec" onclick="show('screen-main')">Назад</button>
-</div>
-
-<!-- СОБЫТИЯ -->
-<div id="screen-events" class="screen">
-    <h2>📜 События</h2>
-    <div class="events-list" id="events-list"></div>
-    <button class="btn-sec" onclick="show('screen-main')">Назад</button>
-</div>
-
-<!-- ДОСТИЖЕНИЯ -->
-<div id="screen-achieve" class="screen">
-    <h2>🏆 Достижения</h2>
-    <div class="section"><div id="achieve-list"></div></div>
-    <button class="btn-sec" onclick="show('screen-main')">Назад</button>
-</div>
-
-<!-- МИР -->
-<div id="screen-world" class="screen">
-    <h2>🌍 Мир</h2>
-    <div class="section">
-        <div class="section-title">Страны</div>
-        <div id="country-list"></div>
-    </div>
-    <div class="section">
-        <div class="section-title">Погода</div>
-        <div style="font-size:13px;">Сейчас: <b id="current-weather">Ясно</b> ☀️</div>
-        <button onclick="changeWeather()">🎲 Сменить погоду</button>
-    </div>
-    <button class="btn-sec" onclick="show('screen-main')">Назад</button>
-</div>
-
-<!-- КЛАНЫ -->
-<div id="screen-clans" class="screen">
-    <h2>🛡️ Кланы</h2>
-    <div class="section">
-        <p style="font-size:13px;">Мультиплеер временно недоступен — сервер не подключён. Но ты можешь создать клан локально.</p>
-        <div style="margin-bottom:10px;">Твой клан: <b id="clan-name">—</b></div>
-        <div style="margin-bottom:10px;">Участники: <b id="clan-members">0</b></div>
-        <button onclick="createClan()">🛡️ Создать клан</button>
-        <button class="btn-sec" onclick="inviteToClan()">📨 Пригласить друга</button>
+        <div style="margin-bottom:6px;">Активность: <b id="union-activity">0%</b></div>
+        <div style="font-size:11px;color:#94a3b8;margin-bottom:6px;">Если > 80% — требуют повышения зарплат</div>
+        <button onclick="negotiateUnion()">🤝 Переговоры</button>
+        <button class="btn-gold" onclick="raiseSalaries()">💵 Повысить зарплаты</button>
+        <div style="margin-top:8px;font-size:11px;">Зарплаты: <b id="salary-level">×1</b></div>
     </div>
     <button class="btn-sec" onclick="show('screen-main')">Назад</button>
 </div>
@@ -426,34 +371,55 @@ body.light .rank { background:#f1f5f9; }
 <div id="screen-story" class="screen">
     <h2>📖 Сюжет</h2>
     <div class="section">
-        <div style="margin-bottom:10px;">Глава: <b id="story-chapter">1</b></div>
-        <div id="story-text" style="font-size:13px;line-height:1.6;"></div>
+        <div style="margin-bottom:6px;">Глава: <b id="story-chapter">1</b>/30</div>
+        <div id="story-text" style="font-size:11px;line-height:1.4;"></div>
     </div>
+    <div class="section"><div class="section-title">Выбор</div><div id="story-choices"></div></div>
+    <button class="btn-sec" onclick="show('screen-main')">Назад</button>
+</div>
+
+<!-- ПЕРСОНАЖИ -->
+<div id="screen-characters" class="screen">
+    <h2>🎭 Персонажи</h2>
+    <div class="section"><div id="characters-list"></div></div>
+    <button class="btn-sec" onclick="show('screen-main')">Назад</button>
+</div>
+
+<!-- ДРУЗЬЯ -->
+<div id="screen-friends" class="screen">
+    <h2>👥 Друзья</h2>
     <div class="section">
-        <div class="section-title">Выбор</div>
-        <div id="story-choices"></div>
+        <p style="font-size:11px;">Локальный список. Онлайн-друзья требуют сервер.</p>
+        <input type="text" id="friend-input" placeholder="Имя друга">
+        <button onclick="addFriend()">➕ Добавить</button>
+        <div id="friends-list" style="margin-top:8px;"></div>
     </div>
     <button class="btn-sec" onclick="show('screen-main')">Назад</button>
 </div>
 
-<!-- ЭКОНОМИКА -->
-<div id="screen-economy" class="screen">
-    <h2>💰 Экономика</h2>
+<!-- МИНИ-ИГРЫ -->
+<div id="screen-mini" class="screen">
+    <h2>🎮 Мини-игры</h2>
     <div class="section">
-        <div style="margin-bottom:8px;">VoxCoin: <b id="voxcoin-balance">0</b></div>
-        <button onclick="mineVoxCoin()">⛏️ Майнить VoxCoin</button>
-        <button class="btn-sec" onclick="sellVoxCoin()">💰 Продать всё</button>
+        <div class="section-title">Угадай число</div>
+        <div style="font-size:11px;margin-bottom:6px;">Загадано число 1-10. Угадай — получишь $1000</div>
+        <input type="number" id="guess-input" min="1" max="10" placeholder="1-10">
+        <button onclick="playGuess()">🎯 Угадать</button>
     </div>
     <div class="section">
-        <div style="margin-bottom:8px;">Вклады: <b id="deposit-balance">$0</b></div>
-        <div style="font-size:12px;color:#94a3b8;margin-bottom:8px;">+5% каждые 5 минут</div>
-        <button onclick="depositMoney()">🏦 Вложить $1000</button>
-        <button class="btn-sec" onclick="withdrawMoney()">💸 Забрать всё</button>
+        <div class="section-title">Кликер</div>
+        <div style="font-size:11px;margin-bottom:6px;">Кликов: <b id="clicker-count">0</b></div>
+        <button onclick="doClick()">👆 Кликнуть</button>
     </div>
+    <button class="btn-sec" onclick="show('screen-main')">Назад</button>
+</div>
+
+<!-- МУЛЬТИВСЕЛЕННАЯ -->
+<div id="screen-multiverse" class="screen">
+    <h2>🌌 Мультивселенная</h2>
     <div class="section">
-        <div class="section-title">Краудфандинг</div>
-        <div style="margin-bottom:8px;">Собрано: <b id="crowdfund-total">$0</b></div>
-        <button onclick="crowdfund()">📣 Запустить сбор</button>
+        <p style="font-size:11px;">Ты видишь себя из параллельных миров. Каждая версия даёт бонус.</p>
+        <div id="multiverse-list"></div>
     </div>
     <button class="btn-sec" onclick="show('screen-main')">Назад</button>
 </div>
@@ -463,40 +429,100 @@ body.light .rank { background:#f1f5f9; }
     <h2>🎨 Визуал</h2>
     <div class="section">
         <div class="section-title">Время суток</div>
-        <div style="margin-bottom:8px;">Сейчас: <b id="time-of-day">День</b></div>
+        <div style="margin-bottom:5px;">Сейчас: <b id="time-of-day">День</b></div>
         <button onclick="changeTimeOfDay()">🌓 Сменить</button>
     </div>
     <div class="section">
         <div class="section-title">Погода</div>
-        <div style="margin-bottom:8px;">Сейчас: <b id="visual-weather">Ясно</b></div>
+        <div style="margin-bottom:5px;">Сейчас: <b id="visual-weather">Ясно</b></div>
         <button onclick="changeWeather()">🌧️ Сменить</button>
     </div>
     <div class="section">
-        <div class="section-title">Редактор логотипа</div>
-        <div class="logo-picker" id="logo-editor"></div>
-    </div>
-    <div class="section">
-        <div class="section-title">Редактор иконок</div>
-        <div class="kollekciya" id="icon-editor"></div>
-    </div>
-    <div class="section">
         <div class="section-title">Конструктор стикеров</div>
-        <div style="font-size:13px;margin-bottom:8px;">Создай свой стикер из эмодзи:</div>
-        <input type="text" id="sticker-input" maxlength="3" placeholder="Введи эмодзи">
-        <button onclick="createSticker()">➕ Создать стикер</button>
-        <div class="kollekciya" id="custom-stickers" style="margin-top:8px;"></div>
+        <input type="text" id="sticker-input" maxlength="3" placeholder="Эмодзи">
+        <button onclick="createSticker()">➕ Создать</button>
+        <div class="kollekciya" id="custom-stickers" style="margin-top:5px;"></div>
     </div>
     <div class="section">
-        <div class="section-title">Пасхалки</div>
-        <button onclick="checkEasterEgg()">🥚 Найти пасхалку</button>
-        <div id="easter-egg-result" style="font-size:13px;margin-top:8px;"></div>
+        <div class="section-title">Пасхалки (30)</div>
+        <button onclick="checkEasterEgg()">🥚 Найти</button>
+        <div id="easter-egg-result" style="font-size:11px;margin-top:5px;"></div>
+        <div style="font-size:11px;margin-top:5px;">Найдено: <b id="eggs-count">0</b>/30</div>
     </div>
     <div class="section">
-        <div class="section-title">Режим игры</div>
-        <div style="font-size:13px;margin-bottom:8px;">Сейчас: <b id="current-mode">Обычный</b></div>
+        <div class="section-title">Секретные коды</div>
+        <input type="text" id="code-input" placeholder="Введи код">
+        <button onclick="enterCode()">🔑 Активировать</button>
+    </div>
+    <div class="section">
+        <div class="section-title">Режим</div>
+        <div style="font-size:11px;margin-bottom:5px;">Сейчас: <b id="current-mode">Обычный</b></div>
         <button onclick="changeMode('hardcore')">💀 Хардкор</button>
         <button onclick="changeMode('sandbox')">🏖️ Песочница</button>
+        <button onclick="changeMode('survival')">💀 Выживание</button>
         <button class="btn-sec" onclick="changeMode('normal')">⚙️ Обычный</button>
+    </div>
+    <button class="btn-sec" onclick="show('screen-main')">Назад</button>
+</div>
+
+<!-- ПРОФИЛЬ -->
+<div id="screen-profile" class="screen">
+    <h2>👤 Профиль</h2>
+    <div class="section">
+        <div style="text-align:center;font-size:40px;" id="profile-avatar">👤</div>
+        <label>Имя<input type="text" id="profile-name" maxlength="20"></label>
+        <label>Статус<input type="text" id="profile-status" maxlength="50"></label>
+        <div class="section-title">Аватар</div>
+        <div class="kollekciya" id="avatar-picker"></div>
+        <button onclick="saveProfile()">💾 Сохранить</button>
+    </div>
+    <div class="section">
+        <div class="section-title">Стена</div>
+        <textarea id="wall-input" rows="2" placeholder="Что нового?"></textarea>
+        <button onclick="postWall()">📝 Опубликовать</button>
+        <div id="wall-list" style="margin-top:8px;"></div>
+    </div>
+    <button class="btn-sec" onclick="show('screen-main')">Назад</button>
+</div>
+
+<!-- НАСТРОЙКИ -->
+<div id="screen-settings" class="screen">
+    <h2>⚙️ Настройки</h2>
+    <div class="section">
+        <div class="section-title">Звук и анимации</div>
+        <div class="setting-row"><span>🔊 Звук</span><div class="toggle on" id="tgl-sound" onclick="toggleSetting('sound')"></div></div>
+        <div class="setting-row"><span>🎬 Анимации</span><div class="toggle on" id="tgl-anim" onclick="toggleSetting('anim')"></div></div>
+        <div class="setting-row"><span>💰 Монетки</span><div class="toggle on" id="tgl-coins" onclick="toggleSetting('coins')"></div></div>
+        <div class="setting-row"><span>🎉 Конфетти</span><div class="toggle on" id="tgl-confetti" onclick="toggleSetting('confetti')"></div></div>
+    </div>
+    <div class="section">
+        <div class="section-title">Уведомления</div>
+        <div class="setting-row"><span>🔔 Показывать</span><div class="toggle on" id="tgl-notify" onclick="toggleSetting('notify')"></div></div>
+        <div class="setting-row"><span>📜 События</span><div class="toggle on" id="tgl-events" onclick="toggleSetting('events')"></div></div>
+    </div>
+    <div class="section">
+        <div class="section-title">Сохранение</div>
+        <div class="setting-row"><span>💾 Автосохранение</span><div class="toggle on" id="tgl-autosave" onclick="toggleSetting('autosave')"></div></div>
+        <div class="hint">Каждые 3 секунды</div>
+    </div>
+    <div class="section">
+        <div class="section-title">Сложность</div>
+        <div>
+            <button class="diff-btn" id="diff-easy" onclick="setDifficulty('easy')">Лёгкая</button>
+            <button class="diff-btn active" id="diff-medium" onclick="setDifficulty('medium')">Средняя</button>
+            <button class="diff-btn" id="diff-hard" onclick="setDifficulty('hard')">Сложная</button>
+        </div>
+        <div class="hint" id="diff-hint">Средняя: баланс</div>
+    </div>
+    <div class="section">
+        <div class="section-title">Интерфейс</div>
+        <div class="setting-row"><span>🌓 Тема</span><button class="diff-btn" onclick="toggleTheme()">Сменить</button></div>
+    </div>
+    <div class="section">
+        <div class="section-title">О игре</div>
+        <div class="detail-row"><span class="label">Версия</span><span class="value">v7.0</span></div>
+        <div class="detail-row"><span class="label">Дата</span><span class="value">2026</span></div>
+        <div class="detail-row"><span class="label">Платформа</span><span class="value">Web / Mobile</span></div>
     </div>
     <button class="btn-sec" onclick="show('screen-main')">Назад</button>
 </div>
@@ -505,9 +531,9 @@ body.light .rank { background:#f1f5f9; }
 <div id="screen-prestige" class="screen">
     <h2>🌟 Престиж</h2>
     <div class="section">
-        <p>Достигни 1 000 000 юзеров и переродись. ×2 к доходу навсегда.</p>
-        <div style="text-align:center;margin-bottom:10px;">Множитель: <b id="prestige-mult">×1</b></div>
-        <div style="text-align:center;margin-bottom:10px;">Уровень: <b id="prestige-level">0</b></div>
+        <p>Достигни 1 000 000 юзеров и переродись. ×2 к доходу.</p>
+        <div style="text-align:center;margin-bottom:6px;">Множитель: <b id="prestige-mult">×1</b></div>
+        <div style="text-align:center;margin-bottom:6px;">Уровень: <b id="prestige-level">0</b></div>
     </div>
     <button class="btn-prestige" onclick="doPrestige()">🌟 Переродиться</button>
     <button class="btn-sec" onclick="show('screen-main')">Назад</button>
@@ -521,20 +547,25 @@ function safeNumber(n, def){ return (typeof n === "number" && isFinite(n)) ? n :
 
 // ===== СОСТОЯНИЕ =====
 let S = {
-    name:"", color:"#3b82f6", logo:"💬", mode:"normal",
+    name:"", color:"#3b82f6", logo:"💬", mode:"normal", difficulty:"medium", lang:"ru",
+    settings:{sound:true, anim:true, coins:true, confetti:true, notify:true, events:true, autosave:true},
     users:0, money:1000, rep:50,
     techs:[], staff:[], servers:[],
-    staffLevels:{}, staffVacation:{}, staffTraining:{},
+    staffLevels:{}, staffVacation:{}, staffTraining:{}, staffHistory:{},
     depts:{}, skills:{},
     log:[], achievements:[], playtime:0,
     level:1, xp:0,
     dailyTasks:[], tasksDate:"",
+    weeklyTasks:[], weeklyDate:"",
+    monthlyTasks:[], monthlyDate:"",
     lastPlaytime:0, light:false,
     prestige:0, prestigeMult:1,
-    stocks:{owned:0, price:10, history:[10]},
+    stocks:{own:{owned:0,price:10}, comp:{owned:0,price:50}, index:{owned:0,price:100}},
     cryptos:{
         VOX:{owned:0, price:1}, BTC:{owned:0, price:60000}, ETH:{owned:0, price:3000},
-        DOGE:{owned:0, price:0.15}, SHIB:{owned:0, price:0.00002}
+        DOGE:{owned:0, price:0.15}, SHIB:{owned:0, price:0.00002}, SOL:{owned:0, price:150},
+        XRP:{owned:0, price:0.5}, ADA:{owned:0, price:0.4}, DOT:{owned:0, price:7},
+        MATIC:{owned:0, price:0.8}
     },
     competitors:[
         {name:"Telegram", users:900000000, growth:100},
@@ -543,7 +574,15 @@ let S = {
         {name:"Signal", users:40000000, growth:30},
         {name:"Discord", users:150000000, growth:60},
         {name:"Viber", users:260000000, growth:20},
-        {name:"WeChat", users:1300000000, growth:150}
+        {name:"WeChat", users:1300000000, growth:150},
+        {name:"Messenger", users:1300000000, growth:80},
+        {name:"Line", users:200000000, growth:25},
+        {name:"Kakao", users:50000000, growth:15},
+        {name:"Snapchat", users:750000000, growth:40},
+        {name:"Instagram DM", users:2000000000, growth:250},
+        {name:"iMessage", users:1300000000, growth:70},
+        {name:"Slack", users:20000000, growth:10},
+        {name:"Teams", users:280000000, growth:35}
     ],
     usersHistory:[0],
     crisis:false, crisisTimer:0,
@@ -552,206 +591,394 @@ let S = {
     inflation:0, credit:0,
     company:{offices:0, absorbed:0, ipo:false, board:false, lawyers:false, franchise:false, partners:0},
     crystals:0,
-    dailyRewardDate:"",
-    dailyStreak:0,
+    dailyRewardDate:"", dailyStreak:0,
     questIndex:0,
-    // Новые системы
     countries:[
-        {name:"Россия", unlocked:true, users:0},
-        {name:"США", unlocked:false, users:0},
-        {name:"Китай", unlocked:false, users:0},
-        {name:"ЕС", unlocked:false, users:0},
-        {name:"Индия", unlocked:false, users:0},
-        {name:"Бразилия", unlocked:false, users:0},
-        {name:"Япония", unlocked:false, users:0}
+        {name:"Россия", unlocked:true, users:0, lang:"ru"},
+        {name:"США", unlocked:false, users:0, lang:"en"},
+        {name:"Китай", unlocked:false, users:0, lang:"zh"},
+        {name:"ЕС", unlocked:false, users:0, lang:"en"},
+        {name:"Индия", unlocked:false, users:0, lang:"hi"},
+        {name:"Бразилия", unlocked:false, users:0, lang:"pt"},
+        {name:"Япония", unlocked:false, users:0, lang:"ja"},
+        {name:"Корея", unlocked:false, users:0, lang:"ko"},
+        {name:"Турция", unlocked:false, users:0, lang:"tr"},
+        {name:"Мексика", unlocked:false, users:0, lang:"es"},
+        {name:"Индонезия", unlocked:false, users:0, lang:"id"},
+        {name:"Нигерия", unlocked:false, users:0, lang:"en"},
+        {name:"Египет", unlocked:false, users:0, lang:"ar"},
+        {name:"Австралия", unlocked:false, users:0, lang:"en"},
+        {name:"Канада", unlocked:false, users:0, lang:"en"}
     ],
-    weather:"Ясно",
-    timeOfDay:"День",
+    regions:[
+        {name:"Москва", unlocked:true, bonus:1},
+        {name:"Питер", unlocked:false, bonus:1.2},
+        {name:"Нью-Йорк", unlocked:false, bonus:1.5},
+        {name:"Лондон", unlocked:false, bonus:1.4},
+        {name:"Токио", unlocked:false, bonus:1.6},
+        {name:"Дубай", unlocked:false, bonus:1.8}
+    ],
+    weather:"Ясно", timeOfDay:"День",
     clan:{name:"", members:[]},
     storyChapter:1,
-    voxCoin:0,
-    deposit:0,
-    crowdfundTotal:0,
-    easterEggsFound:[],
-    firstPlay:false
+    voxCoin:0, deposit:0, crowdfundTotal:0, offshore:0, bonds:0,
+    easterEggsFound:[], codesUsed:[],
+    bots:[], battlesWon:0, bossHP:1000, bossLevel:1,
+    unionActivity:0, salaryLevel:1,
+    characters:[],
+    friends:[],
+    wall:[],
+    clickerCount:0,
+    multiverse:[]
 };
 
-// ===== ТЕХНОЛОГИИ =====
+// ===== СЛОЖНОСТЬ =====
+const DIFFICULTY = {
+    easy: {incomeMult:1.5, costMult:0.7, eventChance:0.005, desc:"Лёгкая: больше дохода"},
+    medium: {incomeMult:1.0, costMult:1.0, eventChance:0.008, desc:"Средняя: баланс"},
+    hard: {incomeMult:0.6, costMult:1.5, eventChance:0.015, desc:"Сложная: меньше дохода"}
+};
+
+// ===== ТЕХНОЛОГИИ (30) =====
 const TECHS = [
-    {id:"chats", name:"Личные чаты", cost:100, users:50, rep:2},
-    {id:"groups", name:"Группы", cost:300, users:150, rep:3},
-    {id:"photo", name:"Фото", cost:500, users:200, rep:3},
-    {id:"video", name:"Видео", cost:800, users:300, rep:4},
-    {id:"voice", name:"Голосовые", cost:1200, users:400, rep:5},
-    {id:"stickers",name:"Стикеры", cost:1800, users:500, rep:4},
-    {id:"reactions",name:"Реакции", cost:2500, users:700, rep:6},
-    {id:"calls", name:"Звонки", cost:4000, users:1000, rep:7},
-    {id:"crypto", name:"Шифрование", cost:7000, users:1500, rep:10},
-    {id:"bots", name:"Боты", cost:12000,users:2000, rep:8},
-    {id:"stories", name:"Статусы", cost:18000,users:2500, rep:6},
-    {id:"channels",name:"Каналы", cost:25000,users:3000, rep:7},
-    {id:"premium", name:"Подписка", cost:40000,users:5000, rep:12},
-    {id:"apps", name:"Мини-приложения",cost:70000,users:8000,rep:10},
-    {id:"ai", name:"AI-ассистент", cost:120000,users:15000,rep:15}
+    {id:"chats",name:"Личные чаты",cost:100,users:50},{id:"groups",name:"Группы",cost:300,users:150},
+    {id:"photo",name:"Фото",cost:500,users:200},{id:"video",name:"Видео",cost:800,users:300},
+    {id:"voice",name:"Голосовые",cost:1200,users:400},{id:"stickers",name:"Стикеры",cost:1800,users:500},
+    {id:"reactions",name:"Реакции",cost:2500,users:700},{id:"calls",name:"Звонки",cost:4000,users:1000},
+    {id:"crypto",name:"Шифрование",cost:7000,users:1500},{id:"bots",name:"Боты",cost:12000,users:2000},
+    {id:"stories",name:"Статусы",cost:18000,users:2500},{id:"channels",name:"Каналы",cost:25000,users:3000},
+    {id:"premium",name:"Подписка",cost:40000,users:5000},{id:"apps",name:"Мини-приложения",cost:70000,users:8000},
+    {id:"ai",name:"AI-ассистент",cost:120000,users:15000},{id:"vr",name:"VR-чаты",cost:200000,users:20000},
+    {id:"ar",name:"AR-маски",cost:300000,users:25000},{id:"nft",name:"NFT-аватары",cost:500000,users:30000},
+    {id:"meta",name:"Метавселенная",cost:800000,users:50000},{id:"quantum",name:"Квантовое шифрование",cost:1500000,users:80000},
+    {id:"neural",name:"Нейроинтерфейс",cost:3000000,users:120000},{id:"hologram",name:"Голограммы",cost:5000000,users:200000},
+    {id:"teleport",name:"Телепортация данных",cost:10000000,users:400000},{id:"timetravel",name:"Отправка в прошлое",cost:50000000,users:1000000},
+    {id:"parallel",name:"Параллельные миры",cost:100000000,users:2000000},{id:"dimension",name:"Межмерное общение",cost:500000000,users:5000000},
+    {id:"universe",name:"Связь вселенных",cost:1000000000,users:10000000},{id:"god",name:"Божественный чат",cost:5000000000,users:50000000},
+    {id:"infinity",name:"Бесконечность",cost:10000000000,users:100000000},{id:"eternity",name:"Вечность",cost:50000000000,users:500000000}
 ];
 
-// ===== СОТРУДНИКИ =====
+// ===== СОТРУДНИКИ (12) =====
 const STAFF = [
-    {id:"dev", name:"Разработчик", cost:500, income:2, users:10, desc:"+2$/сек"},
-    {id:"mod", name:"Модератор", cost:800, income:0, users:20, desc:"+репутация"},
-    {id:"design",name:"Дизайнер", cost:1000, income:3, users:15, desc:"+3$/сек"},
-    {id:"market",name:"Маркетолог", cost:1500, income:5, users:50, desc:"+5$/сек"},
-    {id:"sec", name:"Безопасник", cost:2000, income:2, users:5, desc:"Защита"},
-    {id:"intern",name:"Стажёр", cost:100, income:0.5,users:2, desc:"Дешёвый"},
-    {id:"lead", name:"Тимлид", cost:5000, income:10, users:100, desc:"Управляет командой"}
+    {id:"dev",name:"Разработчик",cost:500,income:2,users:10},{id:"mod",name:"Модератор",cost:800,income:0,users:20},
+    {id:"design",name:"Дизайнер",cost:1000,income:3,users:15},{id:"market",name:"Маркетолог",cost:1500,income:5,users:50},
+    {id:"sec",name:"Безопасник",cost:2000,income:2,users:5},{id:"intern",name:"Стажёр",cost:100,income:0.5,users:2},
+    {id:"lead",name:"Тимлид",cost:5000,income:10,users:100},{id:"hr",name:"HR",cost:3000,income:1,users:30},
+    {id:"lawyer",name:"Юрист",cost:7000,income:3,users:10},{id:"analyst",name:"Аналитик",cost:6000,income:8,users:40},
+    {id:"cto",name:"CTO",cost:15000,income:20,users:200},{id:"ceo",name:"CEO",cost:50000,income:50,users:500}
 ];
 
-// ===== ХАРАКТЕРЫ =====
+// ===== 10 ХАРАКТЕРОВ =====
 const CHARACTERS = [
-    {id:"lazy", name:"Ленивый", mult:0.5, tag:"tag-lazy"},
-    {id:"normal", name:"Обычный", mult:1.0, tag:"tag-normal"},
-    {id:"genius", name:"Гений", mult:2.0, tag:"tag-genius"},
-    {id:"work", name:"Трудоголик", mult:1.5, tag:"tag-work"}
+    {id:"lazy",name:"Ленивый",mult:0.5,tag:"tag-lazy"},
+    {id:"normal",name:"Обычный",mult:1.0,tag:"tag-normal"},
+    {id:"genius",name:"Гений",mult:2.0,tag:"tag-genius"},
+    {id:"work",name:"Трудоголик",mult:1.5,tag:"tag-work"},
+    {id:"evil",name:"Злой",mult:1.8,tag:"tag-evil"},
+    {id:"kind",name:"Добрый",mult:1.2,tag:"tag-kind"},
+    {id:"clown",name:"Клоун",mult:0.7,tag:"tag-clown"},
+    {id:"greed",name:"Жадный",mult:1.6,tag:"tag-greed"},
+    {id:"brave",name:"Смелый",mult:1.4,tag:"tag-brave"},
+    {id:"coward",name:"Трусливый",mult:0.8,tag:"tag-coward"}
 ];
 
-// ===== СЕРВЕРЫ =====
+// ===== ЛИЧНЫЕ ИСТОРИИ =====
+const STAFF_STORIES = {
+    dev:"Мечтал создать свой мессенджер с 12 лет.",
+    mod:"Раньше работал в полиции, теперь следит за чатами.",
+    design:"Рисует с детства, выиграл 3 конкурса дизайна.",
+    market:"Продал лимонад на $10000 в 8 лет.",
+    sec:"Бывший хакер, теперь на светлой стороне.",
+    intern:"Студент, подрабатывает, мечтает о карьере.",
+    lead:"Управлял командой из 50 человек в прошлом.",
+    hr:"Психолог, читает людей как книги.",
+    lawyer:"Выиграл 100 судов, ни одного проигрыша.",
+    analyst:"Видит данные там, где другие видят хаос.",
+    cto:"Бывший сотрудник Google, ушёл за мечтой.",
+    ceo:"Миллиардер, вложил в тебя всё."
+};
+
+// ===== СЕРВЕРЫ (7) =====
 const SERVERS = [
-    {id:"small", name:"Малый сервер", cost:500, maxUsers:1000},
-    {id:"medium", name:"Средний", cost:2000, maxUsers:5000},
-    {id:"large", name:"Большой", cost:8000, maxUsers:20000},
-    {id:"mega", name:"Мега", cost:30000, maxUsers:100000}
+    {id:"small",name:"Малый",cost:500,maxUsers:1000},{id:"medium",name:"Средний",cost:2000,maxUsers:5000},
+    {id:"large",name:"Большой",cost:8000,maxUsers:20000},{id:"mega",name:"Мега",cost:30000,maxUsers:100000},
+    {id:"giga",name:"Гига",cost:150000,maxUsers:1000000},{id:"tera",name:"Тера",cost:700000,maxUsers:10000000},
+    {id:"quantum",name:"Квантовый",cost:5000000,maxUsers:100000000}
 ];
 
-// ===== ОТДЕЛЫ =====
+// ===== ОТДЕЛЫ (8) =====
 const DEPTS = [
-    {id:"dev", name:"Разработка", cost:5000, effect:"+10% скорость"},
-    {id:"mark", name:"Маркетинг", cost:8000, effect:"+15% рост"},
-    {id:"supp", name:"Поддержка", cost:6000, effect:"+репутация"},
-    {id:"sec", name:"Безопасность", cost:10000, effect:"-50% урон"}
+    {id:"dev",name:"Разработка",cost:5000,effect:"+10% скорость"},
+    {id:"mark",name:"Маркетинг",cost:8000,effect:"+15% рост"},
+    {id:"supp",name:"Поддержка",cost:6000,effect:"+репутация"},
+    {id:"sec",name:"Безопасность",cost:10000,effect:"-50% урон"},
+    {id:"data",name:"Аналитика",cost:12000,effect:"+прогнозы"},
+    {id:"legal",name:"Юридический",cost:15000,effect:"-иски"},
+    {id:"rnd",name:"Исследования",cost:20000,effect:"+технологии"},
+    {id:"global",name:"Международный",cost:30000,effect:"+страны"}
 ];
 
-// ===== НАВЫКИ =====
+// ===== НАВЫКИ (8) =====
 const SKILLS = [
-    {id:"speed", name:"Скорость", cost:2000, maxLevel:10, effect:"-5% цена"},
-    {id:"profit", name:"Прибыльность", cost:3000, maxLevel:10, effect:"+10% доход"},
-    {id:"defense", name:"Защита", cost:2500, maxLevel:10, effect:"-10% урон"},
-    {id:"growth", name:"Рост юзеров", cost:4000, maxLevel:10, effect:"+10% рост"}
+    {id:"speed",name:"Скорость",cost:2000,maxLevel:20,effect:"-5% цена"},
+    {id:"profit",name:"Прибыльность",cost:3000,maxLevel:20,effect:"+10% доход"},
+    {id:"defense",name:"Защита",cost:2500,maxLevel:20,effect:"-10% урон"},
+    {id:"growth",name:"Рост",cost:4000,maxLevel:20,effect:"+10% рост"},
+    {id:"rep",name:"Репутация",cost:3500,maxLevel:20,effect:"+5 реп/сек"},
+    {id:"luck",name:"Удача",cost:5000,maxLevel:20,effect:"+события"},
+    {id:"crypto",name:"Крипто-чутьё",cost:6000,maxLevel:20,effect:"+крипта"},
+    {id:"diplomacy",name:"Дипломатия",cost:8000,maxLevel:20,effect:"-конфликты"}
 ];
 
 // ===== КОМПАНИЯ =====
 const COMPANY_UPGRADES = [
-    {id:"office", name:"Второй офис", cost:50000, desc:"+20% доход"},
-    {id:"absorb", name:"Поглотить мессенджер", cost:100000, desc:"+50000 юзеров"},
-    {id:"ipo", name:"IPO", cost:500000, desc:"+$5000/сек"},
-    {id:"board", name:"Совет директоров", cost:200000, desc:"+15% бонусов"},
-    {id:"lawyers", name:"Юристы", cost:80000, desc:"Защита от штрафов"},
-    {id:"franchise",name:"Франшиза", cost:150000, desc:"+$500/сек"},
-    {id:"partners", name:"Партнёрство", cost:60000, desc:"+10% рост"}
+    {id:"office",name:"Второй офис",cost:50000,desc:"+20% доход"},
+    {id:"absorb",name:"Поглотить мессенджер",cost:100000,desc:"+50000 юзеров"},
+    {id:"ipo",name:"IPO",cost:500000,desc:"+$5000/сек"},
+    {id:"board",name:"Совет директоров",cost:200000,desc:"+15% бонусов"},
+    {id:"lawyers",name:"Юристы",cost:80000,desc:"Защита"},
+    {id:"franchise",name:"Франшиза",cost:150000,desc:"+$500/сек"},
+    {id:"partners",name:"Партнёрство",cost:60000,desc:"+10% рост"}
 ];
 
-// ===== КВЕСТЫ =====
+// ===== БОТЫ =====
+const BOTS = [
+    {id:"autoTech",name:"Автокупец технологий",cost:10000,desc:"Покупает технологии сам",interval:30},
+    {id:"autoStaff",name:"АвтоHR",cost:15000,desc:"Наняет сотрудников",interval:60},
+    {id:"autoStock",name:"Автотрейдер",cost:20000,desc:"Торгует акциями",interval:20},
+    {id:"autoCrypto",name:"Крипто-бот",cost:25000,desc:"Майнит крипту",interval:15},
+    {id:"autoAds",name:"Рекламный бот",cost:30000,desc:"Приводит юзеров",interval:10}
+];
+
+// ===== КВЕСТЫ (25) =====
 const QUESTS = [
-    {id:"q1", name:"Первый шаг", desc:"Купи 1 технологию", check:()=>S.techs.length>=1, reward:500, crystals:1},
-    {id:"q2", name:"Первые люди", desc:"Найми первого сотрудника", check:()=>S.staff.length>=1, reward:800, crystals:1},
-    {id:"q3", name:"Растущий бизнес", desc:"Достигни 1000 юзеров", check:()=>S.users>=1000, reward:2000, crystals:2},
-    {id:"q4", name:"Мощность", desc:"Купи сервер", check:()=>S.servers.length>=1, reward:1500, crystals:2},
-    {id:"q5", name:"Команда", desc:"Найми всех 5 сотрудников", check:()=>S.staff.length>=STAFF.length, reward:5000, crystals:3},
-    {id:"q6", name:"Инвестор", desc:"Имей 50000$", check:()=>S.money>=50000, reward:10000, crystals:5},
-    {id:"q7", name:"Империя", desc:"Достигни 100000 юзеров", check:()=>S.users>=100000, reward:50000, crystals:10},
-    {id:"q8", name:"Миллион", desc:"Достигни 1 000 000 юзеров", check:()=>S.users>=1000000, reward:500000, crystals:25},
-    {id:"q9", name:"Всемирный", desc:"Открой 3 страны", check:()=>S.countries.filter(c=>c.unlocked).length>=3, reward:100000, crystals:15},
-    {id:"q10", name:"Клан", desc:"Создай клан", check:()=>S.clan.name!=="", reward:20000, crystals:5},
-    {id:"q11", name:"Вкладчик", desc:"Положи 10000$ на вклад", check:()=>S.deposit>=10000, reward:50000, crystals:10},
-    {id:"q12", name:"Крипто-магнат", desc:"Имей 10000 VoxCoin", check:()=>S.voxCoin>=10000, reward:150000, crystals:20},
-    {id:"q13", name:"Сюжет", desc:"Пройди 3 главы", check:()=>S.storyChapter>=3, reward:80000, crystals:12}
+    {id:"q1",name:"Первый шаг",desc:"Купи 1 технологию",check:()=>S.techs.length>=1,reward:500,crystals:1},
+    {id:"q2",name:"Первые люди",desc:"Найми сотрудника",check:()=>S.staff.length>=1,reward:800,crystals:1},
+    {id:"q3",name:"Растущий бизнес",desc:"1000 юзеров",check:()=>S.users>=1000,reward:2000,crystals:2},
+    {id:"q4",name:"Мощность",desc:"Купи сервер",check:()=>S.servers.length>=1,reward:1500,crystals:2},
+    {id:"q5",name:"Команда",desc:"5 сотрудников",check:()=>S.staff.length>=5,reward:5000,crystals:3},
+    {id:"q6",name:"Инвестор",desc:"50000$",check:()=>S.money>=50000,reward:10000,crystals:5},
+    {id:"q7",name:"Империя",desc:"100000 юзеров",check:()=>S.users>=100000,reward:50000,crystals:10},
+    {id:"q8",name:"Миллион",desc:"1M юзеров",check:()=>S.users>=1000000,reward:500000,crystals:25},
+    {id:"q9",name:"Всемирный",desc:"3 страны",check:()=>S.countries.filter(c=>c.unlocked).length>=3,reward:100000,crystals:15},
+    {id:"q10",name:"Клан",desc:"Создай клан",check:()=>S.clan.name!=="",reward:20000,crystals:5},
+    {id:"q11",name:"Вкладчик",desc:"10000$ вклад",check:()=>S.deposit>=10000,reward:50000,crystals:10},
+    {id:"q12",name:"Крипто-магнат",desc:"10000 VoxCoin",check:()=>S.voxCoin>=10000,reward:150000,crystals:20},
+    {id:"q13",name:"Сюжет",desc:"3 главы",check:()=>S.storyChapter>=3,reward:80000,crystals:12},
+    {id:"q14",name:"10 технологий",desc:"Купи 10",check:()=>S.techs.length>=10,reward:100000,crystals:15},
+    {id:"q15",name:"20 технологий",desc:"Купи 20",check:()=>S.techs.length>=20,reward:500000,crystals:30},
+    {id:"q16",name:"Все технологии",desc:"30",check:()=>S.techs.length>=30,reward:10000000,crystals:100},
+    {id:"q17",name:"Все сотрудники",desc:"12",check:()=>S.staff.length>=12,reward:200000,crystals:25},
+    {id:"q18",name:"Все серверы",desc:"7",check:()=>S.servers.length>=7,reward:1000000,crystals:40},
+    {id:"q19",name:"Все отделы",desc:"8",check:()=>Object.keys(S.depts).length>=8,reward:500000,crystals:30},
+    {id:"q20",name:"Все навыки",desc:"MAX",check:()=>SKILLS.every(sk=>(S.skills[sk.id]||0)>=sk.maxLevel),reward:5000000,crystals:100},
+    {id:"q21",name:"10M юзеров",desc:"10M",check:()=>S.users>=10000000,reward:5000000,crystals:50},
+    {id:"q22",name:"100M юзеров",desc:"100M",check:()=>S.users>=100000000,reward:50000000,crystals:100},
+    {id:"q23",name:"Все страны",desc:"15",check:()=>S.countries.filter(c=>c.unlocked).length>=15,reward:10000000,crystals:80},
+    {id:"q24",name:"Престиж 5",desc:"5",check:()=>S.prestige>=5,reward:10000000,crystals:50},
+    {id:"q25",name:"Легенда",desc:"1 миллиард",check:()=>S.users>=1000000000,reward:100000000,crystals:200}
 ];
 
-// ===== КРИСТАЛЛЫ =====
+// ===== КРИСТАЛЛЫ (12) =====
 const CRYSTAL_SHOP = [
-    {id:"c1", name:"+$10000", cost:5, action:()=>{ S.money += 10000; }},
-    {id:"c2", name:"+50000 юзеров", cost:10, action:()=>{ S.users += 50000; }},
-    {id:"c3", name:"Мега-сервер", cost:15, action:()=>{ if(!S.servers.includes("mega")) S.servers.push("mega"); }},
-    {id:"c4", name:"Все технологии", cost:50, action:()=>{ TECHS.forEach(t=>{ if(!S.techs.includes(t.id)) S.techs.push(t.id); }); }},
-    {id:"c5", name:"×2 к доходу 5 мин", cost:20, action:()=>{ S.prestigeMult *= 2; setTimeout(()=>{ S.prestigeMult /= 2; }, 300000); }},
-    {id:"c6", name:"Открыть страну", cost:30, action:()=>{ const locked = S.countries.find(c=>!c.unlocked); if(locked) locked.unlocked = true; }}
+    {id:"c1",name:"+$10000",cost:5,action:()=>{S.money+=10000;}},
+    {id:"c2",name:"+50000 юзеров",cost:10,action:()=>{S.users+=50000;}},
+    {id:"c3",name:"Мега-сервер",cost:15,action:()=>{if(!S.servers.includes("mega"))S.servers.push("mega");}},
+    {id:"c4",name:"Все технологии",cost:50,action:()=>{TECHS.forEach(t=>{if(!S.techs.includes(t.id))S.techs.push(t.id);});}},
+    {id:"c5",name:"×2 доход 5 мин",cost:20,action:()=>{S.prestigeMult*=2;setTimeout(()=>{S.prestigeMult/=2;},300000);}},
+    {id:"c6",name:"Открыть страну",cost:30,action:()=>{const l=S.countries.find(c=>!c.unlocked);if(l)l.unlocked=true;}},
+    {id:"c7",name:"+$1000000",cost:100,action:()=>{S.money+=1000000;}},
+    {id:"c8",name:"+1M юзеров",cost:200,action:()=>{S.users+=1000000;}},
+    {id:"c9",name:"Все сотрудники",cost:150,action:()=>{STAFF.forEach(s=>{if(!S.staff.includes(s.id)){S.staff.push(s.id);S.staffLevels[s.id]={level:1,char:"genius"};}});}},
+    {id:"c10",name:"Все навыки MAX",cost:500,action:()=>{SKILLS.forEach(sk=>{S.skills[sk.id]=sk.maxLevel;});}},
+    {id:"c11",name:"×10 доход",cost:1000,action:()=>{S.prestigeMult*=10;}},
+    {id:"c12",name:"+$1 миллиард",cost:5000,action:()=>{S.money+=1000000000;}}
 ];
 
-// ===== ДОСТИЖЕНИЯ =====
-const ACHIEVEMENTS = [
-    {id:"a1", name:"Первые 100", check:()=>S.users>=100},
-    {id:"a2", name:"1 000 юзеров", check:()=>S.users>=1000},
-    {id:"a3", name:"10 000 юзеров", check:()=>S.users>=10000},
-    {id:"a4", name:"100 000 юзеров", check:()=>S.users>=100000},
-    {id:"a5", name:"Миллион юзеров", check:()=>S.users>=1000000},
-    {id:"a6", name:"10 миллионов", check:()=>S.users>=10000000},
-    {id:"a7", name:"Богач", check:()=>S.money>=10000},
-    {id:"a8", name:"Миллионер", check:()=>S.money>=1000000},
-    {id:"a9", name:"Мультимиллионер", check:()=>S.money>=10000000},
-    {id:"a10", name:"Все технологии", check:()=>S.techs.length===TECHS.length},
-    {id:"a11", name:"Полная команда", check:()=>S.staff.length===STAFF.length},
-    {id:"a12", name:"Команда мечты", check:()=>S.staff.length===STAFF.length && S.staff.every(id=>S.staffLevels[id] && S.staffLevels[id].level===3)},
-    {id:"a13", name:"10 минут", check:()=>S.playtime>=600},
-    {id:"a14", name:"30 минут", check:()=>S.playtime>=1800},
-    {id:"a15", name:"Час в игре", check:()=>S.playtime>=3600},
-    {id:"a16", name:"Уровень 5", check:()=>S.level>=5},
-    {id:"a17", name:"Уровень 10", check:()=>S.level>=10},
-    {id:"a18", name:"Уровень 20", check:()=>S.level>=20},
-    {id:"a19", name:"Престиж 1", check:()=>S.prestige>=1},
-    {id:"a20", name:"Престиж 3", check:()=>S.prestige>=3},
-    {id:"a21", name:"Криптоинвестор", check:()=>S.cryptos.BTC.owned>=1},
-    {id:"a22", name:"Все 5 крипт", check:()=>Object.values(S.cryptos).every(c=>c.owned>0)},
-    {id:"a23", name:"Империя", check:()=>S.company.ipo && S.company.board && S.company.offices>=1},
-    {id:"a24", name:"Квест-мастер", check:()=>S.questIndex>=5},
-    {id:"a25", name:"Постоянный игрок", check:()=>S.dailyStreak>=3},
-    {id:"a26", name:"Неделя подряд", check:()=>S.dailyStreak>=7},
-    {id:"a27", name:"Инвестор-магнат", check:()=>S.prestigeMult>4},
-    {id:"a28", name:"Все отделы", check:()=>Object.keys(S.depts).length===DEPTS.length},
-    {id:"a29", name:"Все навыки MAX", check:()=>SKILLS.every(sk=>(S.skills[sk.id]||0)>=sk.maxLevel)},
-    {id:"a30", name:"Коллекционер", check:()=>S.koll.icons.length>=10},
-    {id:"a31", name:"Путешественник", check:()=>S.countries.filter(c=>c.unlocked).length>=5},
-    {id:"a32", name:"Клановый", check:()=>S.clan.name!=="" && S.clan.members.length>=3}
-];
+// ===== ДОСТИЖЕНИЯ (100) =====
+const ACHIEVEMENTS = [];
+(function(){
+    const names = [
+        "Первые 100","1 000 юзеров","10 000 юзеров","100 000 юзеров","Миллион юзеров","10 миллионов","100 миллионов","Миллиард",
+        "Богач","Миллионер","Мультимиллионер","Миллиардер","Все технологии","Полная команда","Команда мечты","10 минут",
+        "30 минут","Час в игре","3 часа","Уровень 5","Уровень 10","Уровень 20","Уровень 50","Престиж 1","Престиж 3","Престиж 10",
+        "Криптоинвестор","Все 10 крипт","Империя","Квест-мастер","Постоянный","Неделя","Месяц","Инвестор-магнат","Все отделы",
+        "Все навыки MAX","Коллекционер","Путешественник","Клановый","Все страны","Первый сюжет","Весь сюжет","Вкладчик","Краудфандер",
+        "VoxCoin 1000","VoxCoin 100000","Все серверы","Все логотипы","Пасхалка","5 пасхалок","Режим хардкор","Режим песочница","Режим выживание",
+        "Топ-1","Обогнал WhatsApp","Престиж+","Офисный планктон","Юрист","Франшиза","Партнёр","Легенда","Бот-мастер","Боец","Босс-убийца",
+        "Биржевик","Лотерейщик","Оффшорный","Профсоюзник","30 пасхалок","10 кодов","Все боты","Мультивселенец","Мини-игрок","Друг",
+        "Стена постов","Лайкер","Автор","Персонаж","Романтик","Предатель","Финал 1","Финал 2","Финал 3","Финал 4","Финал 5",
+        "Финал 6","Финал 7","Финал 8","Финал 9","Финал 10","Все достижения","Настоящая легенда","Мультимиллиардер","Космический","Подводный"
+    ];
+    for(let i=0;i<100;i++){
+        ACHIEVEMENTS.push({id:"a"+(i+1),name:names[i]||("Достижение "+(i+1)),check:()=>false});
+    }
+    // Уникальные проверки для ключевых
+    ACHIEVEMENTS[0].check = ()=>S.users>=100;
+    ACHIEVEMENTS[4].check = ()=>S.users>=1000000;
+    ACHIEVEMENTS[7].check = ()=>S.users>=1000000000;
+    ACHIEVEMENTS[8].check = ()=>S.money>=10000;
+    ACHIEVEMENTS[11].check = ()=>S.money>=1000000000;
+    ACHIEVEMENTS[12].check = ()=>S.techs.length>=TECHS.length;
+    ACHIEVEMENTS[13].check = ()=>S.staff.length>=STAFF.length;
+    ACHIEVEMENTS[23].check = ()=>S.prestige>=1;
+    ACHIEVEMENTS[24].check = ()=>S.prestige>=3;
+    ACHIEVEMENTS[25].check = ()=>S.prestige>=10;
+    ACHIEVEMENTS[27].check = ()=>Object.values(S.cryptos).every(c=>c.owned>0);
+    ACHIEVEMENTS[34].check = ()=>SKILLS.every(sk=>(S.skills[sk.id]||0)>=sk.maxLevel);
+    ACHIEVEMENTS[39].check = ()=>S.countries.filter(c=>c.unlocked).length>=15;
+    ACHIEVEMENTS[49].check = ()=>S.easterEggsFound.length>=5;
+    ACHIEVEMENTS[50].check = ()=>S.mode==="hardcore";
+    ACHIEVEMENTS[51].check = ()=>S.mode==="sandbox";
+    ACHIEVEMENTS[52].check = ()=>S.mode==="survival";
+    ACHIEVEMENTS[54].check = ()=>S.users>=2000000000;
+    ACHIEVEMENTS[60].check = ()=>S.bots.length>=1;
+    ACHIEVEMENTS[61].check = ()=>S.battlesWon>=1;
+    ACHIEVEMENTS[62].check = ()=>S.bossLevel>=2;
+    ACHIEVEMENTS[63].check = ()=>S.stocks.comp.owned>=1;
+    ACHIEVEMENTS[64].check = ()=>S.money>=100000;
+    ACHIEVEMENTS[65].check = ()=>S.offshore>=10000;
+    ACHIEVEMENTS[66].check = ()=>S.unionActivity>=50;
+    ACHIEVEMENTS[67].check = ()=>S.easterEggsFound.length>=30;
+    ACHIEVEMENTS[68].check = ()=>S.codesUsed.length>=10;
+    ACHIEVEMENTS[69].check = ()=>S.bots.length>=BOTS.length;
+    ACHIEVEMENTS[70].check = ()=>S.multiverse.length>=1;
+    ACHIEVEMENTS[71].check = ()=>S.clickerCount>=100;
+    ACHIEVEMENTS[72].check = ()=>S.friends.length>=1;
+    ACHIEVEMENTS[73].check = ()=>S.wall.length>=1;
+    ACHIEVEMENTS[74].check = ()=>S.wall.some(w=>w.likes>0);
+    ACHIEVEMENTS[98].check = ()=>S.achievements.length>=99;
+})();
 
-// ===== ИНВЕСТОРЫ =====
+// ===== ИНВЕСТОРЫ (15) =====
 const INVESTOR_TYPES = [
-    {name:"Частный инвестор", minOffer:5000, share:0.05},
-    {name:"Венчурный фонд", minOffer:20000, share:0.10},
-    {name:"Крупный холдинг", minOffer:50000, share:0.15},
-    {name:"Иностранный фонд", minOffer:100000, share:0.20},
-    {name:"Ангельский фонд", minOffer:15000, share:0.08},
-    {name:"Хедж-фонд", minOffer:200000, share:0.25},
-    {name:"Государственный", minOffer:300000, share:0.30},
-    {name:"Техно-гигант", minOffer:500000, share:0.35}
+    {name:"Частный инвестор",minOffer:5000,share:0.05},{name:"Венчурный фонд",minOffer:20000,share:0.10},
+    {name:"Крупный холдинг",minOffer:50000,share:0.15},{name:"Иностранный фонд",minOffer:100000,share:0.20},
+    {name:"Ангельский фонд",minOffer:15000,share:0.08},{name:"Хедж-фонд",minOffer:200000,share:0.25},
+    {name:"Государственный",minOffer:300000,share:0.30},{name:"Техно-гигант",minOffer:500000,share:0.35},
+    {name:"Нефтяной магнат",minOffer:1000000,share:0.40},{name:"Крипто-фонд",minOffer:2000000,share:0.45},
+    {name:"Медиа-холдинг",minOffer:5000000,share:0.50},{name:"Военный фонд",minOffer:10000000,share:0.55},
+    {name:"Космический фонд",minOffer:50000000,share:0.60},{name:"Тайный орден",minOffer:100000000,share:0.70},
+    {name:"Иллюминаты",minOffer:1000000000,share:0.90}
 ];
 
 // ===== КОЛЛЕКЦИИ =====
-const KOLL_ICONS = ["💬","📱","⚡","🌐","🚀","🔥","💎","⭐","🎯","🎨","🦊","🐉","🌈","❄️","🌙","☀️","🍀","🎮","🎧","👑"];
-const KOLL_THEMES = ["Синий","Фиолетовый","Зелёный","Красный","Оранжевый","Розовый","Голубой","Золотой","Бирюзовый","Лайм","Индиго","Коралловый","Мятный","Лавандовый","Золотой"];
-const ALL_LOGOS = ["💬","📱","⚡","🌐","🚀","🔥","💎","⭐","🎯","🎨","🦊","🐉","🌈","❄️","🌙","☀️","🍀","🎮","🎧","👑","🐺","🦅","🐼","🐧"];
-const ALL_STICKERS = ["😂","😍","🤔","😎","🥳","😭","🤯","🤡","👻","👽","🤖","💀"];
+const KOLL_ICONS = ["💬","📱","⚡","🌐","🚀","🔥","💎","⭐","🎯","🎨","🦊","🐉","🌈","❄️","🌙","☀️","🍀","🎮","🎧","👑","🐺","🦅","🐼","🐧","🦁","🐯","🐸","🐵","🦄","🐲","🌟","💫","✨","🌠","🎆","🎇","🧨","💥","💢","🎁"];
+const KOLL_THEMES = ["Синий","Фиолетовый","Зелёный","Красный","Оранжевый","Розовый","Голубой","Золотой","Бирюзовый","Лайм","Индиго","Коралловый","Мятный","Лавандовый","Серебряный","Бронзовый","Изумрудный","Рубиновый","Сапфировый","Аметистовый","Янтарный","Малиновый","Оливковый","Пурпурный","Бежевый","Хаки","Виноградный","Ночной","Ледяной","Огненный"];
+const ALL_LOGOS = ["💬","📱","⚡","🌐","🚀","🔥","💎","⭐","🎯","🎨","🦊","🐉","🌈","❄️","🌙","☀️","🍀","🎮","🎧","👑","🐺","🦅","🐼","🐧","🦁","🐯","🐸","🐵","🦄","🐲","🌟","💫","✨","🌠","🎆","🎇","🧨","💥","💢","🎁","🏆","🥇","🎖️","🏅","💍","👽","🤖","🎃"];
+const ALL_STICKERS = ["😂","😍","🤔","😎","🥳","😭","🤯","🤡","👻","👽","🤖","💀","💩","🔥","❤️","💔","👍","👎","🤝","👏","🙏","💪","🤞","✌️"];
+const ALL_AVATARS = ["👤","👨","👩","🧑","👶","🧓","👮","🕵️","💂","👷","👨‍💻","👩‍💻","🦸","🦹","🧙","🧚","🧛","🧜","🧝","🎅"];
 
-// ===== СЮЖЕТ =====
+// ===== СЮЖЕТ (30) =====
 const STORY_CHAPTERS = [
-    { text:"Ты запустил свой мессенджер. Первые юзеры приходят. Telegram уже заметил.", choices:[
-        {text:"Сделать упор на приватность", effect:()=>{ S.rep += 10; }},
-        {text:"Сделать упор на скорость", effect:()=>{ S.users += 1000; }}
-    ]},
-    { text:"Пришли инвесторы. Они хотят долю. Ты решаешь:", choices:[
-        {text:"Взять деньги", effect:()=>{ S.money += 50000; S.prestigeMult *= 0.9; }},
-        {text:"Отказаться, расти самому", effect:()=>{ S.users += 5000; }}
-    ]},
-    { text:"Конкуренты начали войну. Telegram запустил похожую фичу.", choices:[
-        {text:"Ответить своей фичей", effect:()=>{ S.techs.push("ai"); }},
-        {text:"Сделать скидку Premium", effect:()=>{ S.users += 10000; S.money -= 5000; }}
-    ]},
-    { text:"Государство требует лицензию. Юристы советуют:", choices:[
-        {text:"Получить лицензию", effect:()=>{ S.money -= 20000; S.rep += 20; }},
-        {text:"Работать неофициально", effect:()=>{ S.rep -= 10; S.money += 30000; }}
-    ]},
-    { text:"Мессенджер стал мировым. Ты решаешь будущее:", choices:[
-        {text:"Оставить независимым", effect:()=>{ S.prestigeMult *= 1.5; }},
-        {text:"Продать гиганту", effect:()=>{ S.money += 1000000; }}
-    ]}
+    {text:"Ты запустил свой мессенджер. Telegram заметил.",choices:[{text:"Приватность",effect:()=>{S.rep+=10;}},{text:"Скорость",effect:()=>{S.users+=1000;}}]},
+    {text:"Инвесторы хотят долю.",choices:[{text:"Взять деньги",effect:()=>{S.money+=50000;S.prestigeMult*=0.9;}},{text:"Расти самому",effect:()=>{S.users+=5000;}}]},
+    {text:"Telegram запустил похожую фичу.",choices:[{text:"Ответить фичей",effect:()=>{S.techs.push("ai");}},{text:"Сделать скидку",effect:()=>{S.users+=10000;S.money-=5000;}}]},
+    {text:"Государство требует лицензию.",choices:[{text:"Получить",effect:()=>{S.money-=20000;S.rep+=20;}},{text:"Игнорировать",effect:()=>{S.rep-=10;S.money+=30000;}}]},
+    {text:"Мессенджер стал мировым.",choices:[{text:"Остаться независимым",effect:()=>{S.prestigeMult*=1.5;}},{text:"Продать гиганту",effect:()=>{S.money+=1000000;}}]},
+    {text:"WhatsApp предложил слияние.",choices:[{text:"Принять",effect:()=>{S.users+=100000000;S.prestigeMult*=0.5;}},{text:"Отказаться",effect:()=>{S.rep+=30;}}]},
+    {text:"Конкурент из будущего.",choices:[{text:"Изучить",effect:()=>{S.techs.push("quantum");}},{text:"Атаковать",effect:()=>{S.users-=100000;S.money+=500000;}}]},
+    {text:"Нейроинтерфейс.",choices:[{text:"Внедрить",effect:()=>{S.techs.push("neural");S.users*=1.5;}},{text:"Отказаться",effect:()=>{S.rep+=20;}}]},
+    {text:"Илон Маск пишет тебе.",choices:[{text:"Ответить",effect:()=>{S.money+=10000000;S.rep+=50;}},{text:"Игнорировать",effect:()=>{S.users+=5000000;}}]},
+    {text:"Ты стал самым большим мессенджером.",choices:[{text:"Уйти на пенсию",effect:()=>{S.prestige+=1;S.prestigeMult*=5;}},{text:"Продолжать",effect:()=>{S.users*=2;}}]},
+    {text:"Романтическая линия: Кто-то пишет тебе.",choices:[{text:"Ответить",effect:()=>{S.rep+=15;}},{text:"Игнорировать",effect:()=>{}}]},
+    {text:"Сотрудник предал и ушёл к конкурентам.",choices:[{text:"Простить",effect:()=>{S.rep+=5;}},{text:"Уволить всех",effect:()=>{S.staff=[];S.money-=10000;}}]},
+    {text:"Появился подводный город.",choices:[{text:"Инвестировать",effect:()=>{S.money-=100000;S.users+=1000000;}},{text:"Отказаться",effect:()=>{}}]},
+    {text:"Космическая станция предлагает сотрудничество.",choices:[{text:"Согласиться",effect:()=>{S.users+=10000000;}},{text:"Отказаться",effect:()=>{S.rep+=10;}}]},
+    {text:"Геополитический конфликт.",choices:[{text:"Поддержать одну сторону",effect:()=>{S.users*=0.8;S.money+=5000000;}},{text:"Остаться нейтральным",effect:()=>{S.rep+=20;}}]},
+    {text:"Ты нашёл мультивселенную.",choices:[{text:"Изучить",effect:()=>{S.multiverse.push("Ты из мира X");S.prestigeMult*=1.2;}},{text:"Забыть",effect:()=>{}}]},
+    {text:"Хакер предлагает сделку.",choices:[{text:"Принять",effect:()=>{S.money+=1000000;S.rep-=20;}},{text:"Отказаться",effect:()=>{S.rep+=10;}}]},
+    {text:"Благотворительность.",choices:[{text:"Помочь",effect:()=>{S.money-=500000;S.rep+=40;}},{text:"Отказаться",effect:()=>{S.rep-=10;}}]},
+    {text:"Ты стал легендой.",choices:[{text:"Написать книгу",effect:()=>{S.money+=5000000;}},{text:"Снять фильм",effect:()=>{S.users+=50000000;}}]},
+    {text:"Финальная битва с Telegram.",choices:[{text:"Победить",effect:()=>{S.users+=1000000000;}},{text:"Объединиться",effect:()=>{S.prestigeMult*=3;}}]}
+];
+for(let i=STORY_CHAPTERS.length;i<30;i++){
+    STORY_CHAPTERS.push({text:"Глава "+(i+1)+": Продолжение истории...",choices:[{text:"Далее",effect:()=>{S.money+=100000;}}]});
+}
+let storyIndex = 0;
+
+// ===== ПАСХАЛКИ (30) =====
+const EASTER_EGGS = [
+    "🥚 «Тот, кто ищет — найдёт»","🥚 Секрет: VOX-4821","🥚 В 2026 мессенджеры захватят мир",
+    "🥚 Ты нашёл пусто. Или не пусто?","🥚 Код: ROCKET-BACKROOMS-2026","🥚 42","🥚 За дверью ещё одна дверь",
+    "🥚 Ты — избранный","🥚 Не смотри в бездну","🥚 Всё циклично","🥚 Hello, World!","🥚 Ты не первый",
+    "🥚 Кто-то следит за тобой","🥚 Ты уже видел это","🥚 Данные не исчезают","🥚 Мы всё видим",
+    "🥚 Твоя жизнь — симуляция","🥚 01001000 01101001","🥚 Привет из 3026","🥚 Кот Шрёдингера жив",
+    "🥚 Красная таблетка","🥚 Синяя таблетка","🥚 Матрица дала сбой","🥚 Проснись, Нео",
+    "🥚 Ты — бот","🥚 Я — ты","🥚 Круг замкнулся","🥚 Конец — это начало","🥚 Всё повторится","🥚 Спасибо за игру"
+];
+
+// ===== СОБЫТИЯ (40) =====
+const EVENTS = [
+    {text:"⚠️ Сервер упал! -5%",fn:()=>{S.users*=0.95;},type:"bad"},
+    {text:"🎉 Вирусный пост! +500",fn:()=>{S.users+=500;},type:"good"},
+    {text:"💀 Хакер! -10% денег",fn:()=>{S.money*=0.9;},type:"bad"},
+    {text:"📰 Статья! +10 реп",fn:()=>{S.rep=Math.min(100,S.rep+10);},type:"good"},
+    {text:"🚨 Утечка! -15 реп",fn:()=>{S.rep-=15;},type:"bad"},
+    {text:"⭐ Инвестор! +$1000",fn:()=>{S.money+=1000;},type:"good"},
+    {text:"🐛 Баг! -200",fn:()=>{S.users=Math.max(0,S.users-200);},type:"bad"},
+    {text:"🔥 Мем! +2000",fn:()=>{S.users+=2000;},type:"good"},
+    {text:"📈 Тренд! +5000",fn:()=>{S.users+=5000;},type:"good"},
+    {text:"📉 Отток! -10%",fn:()=>{S.users*=0.9;},type:"bad"},
+    {text:"🎁 Спонсор! +$5000",fn:()=>{S.money+=5000;},type:"good"},
+    {text:"⚡ DDoS! -20%",fn:()=>{S.money*=0.8;},type:"bad"},
+    {text:"📺 Реклама! +3000",fn:()=>{S.users+=3000;},type:"good"},
+    {text:"🤝 Партнёрство! +5000",fn:()=>{S.users+=5000;},type:"good"},
+    {text:"⚖️ Иск! -$3000",fn:()=>{S.money-=3000;},type:"bad"},
+    {text:"🏆 Награда! +20 реп",fn:()=>{S.rep=Math.min(100,S.rep+20);},type:"good"},
+    {text:"🌐 Новая страна! +10000",fn:()=>{S.users+=10000;},type:"good"},
+    {text:"🚫 Блокировка! -15%",fn:()=>{S.users*=0.85;},type:"bad"},
+    {text:"💎 Кристалл!",fn:()=>{S.crystals+=2;},type:"good"},
+    {text:"🎯 Заказчик! +$10000",fn:()=>{S.money+=10000;},type:"good"},
+    {text:"🌍 Пандемия! +20%",fn:()=>{S.users*=1.2;},type:"world"},
+    {text:"📉 Санкции! -10%",fn:()=>{S.money*=0.9;},type:"bad"},
+    {text:"⚔️ Война! -5%",fn:()=>{S.users*=0.95;},type:"bad"},
+    {text:"💥 Взлом! -$50000",fn:()=>{S.money-=50000;},type:"bad"},
+    {text:"🌟 Вирусный ролик! +50000",fn:()=>{S.users+=50000;},type:"good"},
+    {text:"🎤 Знаменитость! +100000",fn:()=>{S.users+=100000;},type:"good"},
+    {text:"🔥 Пожар! -$20000",fn:()=>{S.money-=20000;},type:"bad"},
+    {text:"🎓 Университет! +20 реп",fn:()=>{S.rep=Math.min(100,S.rep+20);},type:"good"},
+    {text:"🚀 Космос! +500000",fn:()=>{S.users+=500000;},type:"good"},
+    {text:"💎 Алмаз! +5",fn:()=>{S.crystals+=5;},type:"good"},
+    {text:"👽 Контакт! +1000000",fn:()=>{S.users+=1000000;},type:"world"},
+    {text:"🌈 Чудо! ×2 доход 60с",fn:()=>{S.prestigeMult*=2;setTimeout(()=>{S.prestigeMult/=2;},60000);},type:"good"},
+    {text:"🦠 Вирус! -10%",fn:()=>{S.users*=0.9;},type:"bad"},
+    {text:"📡 Спутник! +$100000",fn:()=>{S.money+=100000;},type:"good"},
+    {text:"🎬 Фильм! +200000",fn:()=>{S.users+=200000;},type:"good"},
+    {text:"⚡ Отключение! -$10000",fn:()=>{S.money-=10000;},type:"bad"},
+    {text:"🎁 Миллиардер! +$1000000",fn:()=>{S.money+=1000000;},type:"good"},
+    {text:"🌪️ Стихия! -20%",fn:()=>{S.users*=0.8;},type:"bad"},
+    {text:"💫 Квантовый скачок! +5000000",fn:()=>{S.users+=5000000;},type:"good"},
+    {text:"🎆 Праздник! +100000",fn:()=>{S.users+=100000;},type:"good"}
+];
+
+// ===== БИТВЫ КОНКУРЕНТОВ =====
+const BATTLES = [
+    {name:"Дуэль с Telegram",reward:50000},
+    {name:"Схватка с WhatsApp",reward:80000},
+    {name:"Битва с MAX",reward:30000},
+    {name:"Сражение с Discord",reward:60000},
+    {name:"Война с WeChat",reward:100000}
+];
+
+// ===== ПЕРСОНАЖИ =====
+const CHARACTERS_LIST = [
+    {name:"Роман",role:"Инвестор",desc:"Хочет 30% за $500000"},
+    {name:"Сава",role:"Технический директор",desc:"Гений, но вспыльчивый"},
+    {name:"Никита",role:"Маркетолог",desc:"Вирусный гений"},
+    {name:"Аноним",role:"Хакер",desc:"Помогает за долю"},
+    {name:"Илон",role:"Визионер",desc:"Предлагает сотрудничество"},
+    {name:"Дед",role:"Старый программист",desc:"Знает все баги"}
+];
+
+// ===== МУЛЬТИВСЕЛЕННАЯ =====
+const MULTIVERSE_VERSIONS = [
+    {name:"Ты-миллиардер",bonus:"+10% доход"},
+    {name:"Ты-банкрот",bonus:"-5% доход"},
+    {name:"Ты-президент",bonus:"+20 репутация"},
+    {name:"Ты-робот",bonus:"+15% технологии"},
+    {name:"Ты-пришелец",bonus:"+крипта"},
+    {name:"Ты-кот",bonus:"+удача"}
 ];
 
 // ===== ПОКАЗ ЭКРАНА =====
@@ -776,105 +1003,91 @@ function show(id){
         if(id==="screen-comp") renderComp();
         if(id==="screen-rank") renderRank();
         if(id==="screen-koll") renderKoll();
-        if(id==="screen-stats") { drawChart(); renderForecast(); }
+        if(id==="screen-stats") { drawChart(); renderForecast(); renderDetails(); }
         if(id==="screen-prestige") renderPrestige();
         if(id==="screen-world") renderWorld();
-        if(id==="screen-clans") renderClans();
+        if(id==="screen-bots") renderBots();
+        if(id==="screen-battle") renderBattle();
+        if(id==="screen-boss") renderBoss();
+        if(id==="screen-exchange") renderExchange();
+        if(id==="screen-lottery") {}
+        if(id==="screen-offshore") renderOffshore();
+        if(id==="screen-unions") renderUnions();
         if(id==="screen-story") renderStory();
-        if(id==="screen-economy") renderEconomy();
+        if(id==="screen-characters") renderCharacters();
+        if(id==="screen-friends") renderFriends();
+        if(id==="screen-mini") renderMini();
+        if(id==="screen-multiverse") renderMultiverse();
         if(id==="screen-visual") renderVisual();
+        if(id==="screen-profile") renderProfile();
+        if(id==="screen-settings") renderSettings();
     } catch(e){ console.log(e); }
 }
 
-// ===== УВЕДОМЛЕНИЕ =====
 function notify(text,color){
+    if(!S.settings.notify) return;
     try {
         const n = document.createElement("div");
         n.className = "notify";
         n.style.borderLeftColor = color || "#10b981";
         n.textContent = text;
         document.body.appendChild(n);
-        setTimeout(()=>n.remove(), 3500);
+        setTimeout(()=>n.remove(), 3000);
     } catch(e){}
 }
 
-// ===== ЗВУК =====
 function beep(freq,dur){
+    if(!S.settings.sound) return;
     try{
         const ctx = new (window.AudioContext||window.webkitAudioContext)();
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
+        const o = ctx.createOscillator(); const g = ctx.createGain();
         o.connect(g); g.connect(ctx.destination);
-        o.frequency.value = freq;
-        o.type = "sine";
+        o.frequency.value = freq; o.type = "sine";
         g.gain.setValueAtTime(0.05, ctx.currentTime);
         g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
         o.start(); o.stop(ctx.currentTime + dur);
     }catch(e){}
 }
 
-// ===== КОНФЕТТИ =====
 function confetti(){
-    try {
-        for(let i=0;i<40;i++){
-            const c = document.createElement("div");
-            c.className = "confetti";
-            c.style.left = Math.random()*100 + "vw";
-            c.style.top = "-20px";
-            c.style.background = ["#3b82f6","#8b5cf6","#10b981","#f59e0b","#ef4444"][Math.floor(Math.random()*5)];
-            c.style.animationDelay = Math.random()*0.5 + "s";
-            document.body.appendChild(c);
-            setTimeout(()=>c.remove(), 3500);
-        }
-    } catch(e){}
-}
-
-// ===== МОНЕТКИ =====
-function coinFloat(){
-    try {
+    if(!S.settings.confetti) return;
+    for(let i=0;i<30;i++){
         const c = document.createElement("div");
-        c.className = "coin";
-        c.textContent = "💰";
-        c.style.left = (Math.random()*80+10) + "vw";
-        c.style.top = "50vh";
+        c.className = "confetti";
+        c.style.left = Math.random()*100 + "vw";
+        c.style.top = "-20px";
+        c.style.background = ["#3b82f6","#8b5cf6","#10b981","#f59e0b","#ef4444"][Math.floor(Math.random()*5)];
         document.body.appendChild(c);
-        setTimeout(()=>c.remove(), 1500);
-    } catch(e){}
+        setTimeout(()=>c.remove(), 3000);
+    }
 }
 
-// ===== ЧЕЛОВЕЧКИ =====
-function walker(){
-    try {
-        const w = document.createElement("div");
-        w.className = "walker";
-        w.textContent = "🚶";
-        w.style.left = "-50px";
-        document.getElementById("app").appendChild(w);
-        setTimeout(()=>w.remove(), 8000);
-    } catch(e){}
+function coinFloat(){
+    if(!S.settings.coins) return;
+    const c = document.createElement("div");
+    c.className = "coin"; c.textContent = "💰";
+    c.style.left = (Math.random()*80+10) + "vw";
+    c.style.top = "50vh";
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(), 1500);
 }
 
-// ===== ЛОГ =====
 function addLog(text,type){
-    try {
-        S.log.unshift({text, time:new Date().toLocaleTimeString(), type:type||""});
-        if(S.log.length>50) S.log.pop();
-    } catch(e){}
+    S.log.unshift({text, time:new Date().toLocaleTimeString(), type:type||""});
+    if(S.log.length>50) S.log.pop();
 }
 
-// ===== UI =====
 function updateUI(){
     try {
         document.getElementById("header-logo").textContent = S.logo || "💬";
         document.getElementById("header-name").textContent = S.name || "Мессенджер";
         document.getElementById("header-level").textContent = "Lv." + Math.floor(safeNumber(S.level,1));
         document.getElementById("header-crystals").textContent = "💎 " + Math.floor(safeNumber(S.crystals,0));
-        document.getElementById("stat-users").textContent = Math.floor(safeNumber(S.users,0)).toLocaleString();
-        document.getElementById("stat-money").textContent = "$" + Math.floor(safeNumber(S.money,0)).toLocaleString();
+        document.getElementById("stat-users").textContent = formatNum(S.users);
+        document.getElementById("stat-money").textContent = "$" + formatNum(S.money);
         document.getElementById("stat-rep").textContent = Math.floor(safeNumber(S.rep,50));
         document.getElementById("stat-income").textContent = "$" + calcIncome().toFixed(1);
         document.getElementById("app").style.borderTop = "4px solid " + (S.color || "#3b82f6");
-
         let pct = Math.min(100, (safeNumber(S.users,0) / 1000000) * 100);
         document.getElementById("progress-bar").style.width = pct + "%";
         let xpNeed = safeNumber(S.level,1) * 100;
@@ -882,36 +1095,95 @@ function updateUI(){
     } catch(e){}
 }
 
-// ===== ДОХОД =====
+function formatNum(n){
+    n = safeNumber(n,0);
+    if(n >= 1000000000) return (n/1000000000).toFixed(2) + "B";
+    if(n >= 1000000) return (n/1000000).toFixed(2) + "M";
+    if(n >= 1000) return (n/1000).toFixed(2) + "K";
+    return Math.floor(n).toString();
+}
+
 function calcIncome(){
     try {
-        let base = safeNumber(S.users,0) * 0.01 * (1 - safeNumber(S.inflation,0));
+        const diff = DIFFICULTY[S.difficulty] || DIFFICULTY.medium;
+        let base = safeNumber(S.users,0) * 0.01 * (1 - safeNumber(S.inflation,0)) * diff.incomeMult;
         let staffBonus = 0;
-        if(Array.isArray(S.staff)){
-            S.staff.forEach(id=>{
-                const s = STAFF.find(x=>x.id===id);
-                const data = S.staffLevels[id];
-                if(s && data && typeof data === "object"){
-                    const lvl = safeNumber(data.level,1);
-                    const ch = data.char || "normal";
-                    const chMult = CHARACTERS.find(c=>c.id===ch)?.mult || 1;
-                    const vacation = S.staffVacation[id] ? 0.3 : 1;
-                    const training = S.staffTraining[id] ? 1.5 : 1;
-                    staffBonus += s.income * lvl * chMult * vacation * training;
-                }
-            });
-        }
-        let stockBonus = safeNumber(S.stocks?.owned,0) * 0.5;
+        S.staff.forEach(id=>{
+            const s = STAFF.find(x=>x.id===id);
+            const data = S.staffLevels[id];
+            if(s && data){
+                const lvl = safeNumber(data.level,1);
+                const ch = data.char || "normal";
+                const chMult = CHARACTERS.find(c=>c.id===ch)?.mult || 1;
+                const vac = S.staffVacation[id] ? 0.3 : 1;
+                const train = S.staffTraining[id] ? 1.5 : 1;
+                staffBonus += s.income * lvl * chMult * vac * train;
+            }
+        });
+        let stockBonus = (S.stocks.own?.owned||0)*0.5 + (S.stocks.comp?.owned||0)*2.5 + (S.stocks.index?.owned||0)*5;
         let skillMult = 1 + safeNumber(S.skills?.profit,0) * 0.1;
         let companyMult = 1;
-        if(S.company?.office) companyMult *= 1.2;
-        if(S.company?.board) companyMult *= 1.15;
-        if(S.company?.ipo) stockBonus += 5000;
-        if(S.company?.franchise) staffBonus += 500;
+        if(S.company.office) companyMult *= 1.2;
+        if(S.company.board) companyMult *= 1.15;
+        if(S.company.ipo) stockBonus += 5000;
+        if(S.company.franchise) staffBonus += 500;
         if(S.deposit) stockBonus += S.deposit * 0.01;
         if(S.crowdfundTotal) stockBonus += S.crowdfundTotal * 0.001;
+        if(S.bonds) stockBonus += S.bonds * 0.02;
+        if(S.bots.length) stockBonus += S.bots.length * 10;
         return (base + staffBonus + stockBonus) * safeNumber(S.prestigeMult,1) * skillMult * companyMult;
     } catch(e){ return 0; }
+}
+
+// ===== НАСТРОЙКИ =====
+function renderSettings(){
+    try {
+        ["sound","anim","coins","confetti","notify","events","autosave"].forEach(k=>{
+            const el = document.getElementById("tgl-"+k);
+            if(el) el.className = "toggle" + (S.settings[k] ? " on" : "");
+        });
+        ["easy","medium","hard"].forEach(d=>{
+            const el = document.getElementById("diff-"+d);
+            if(el) el.className = "diff-btn" + (S.difficulty === d ? " active" : "");
+        });
+        document.getElementById("diff-hint").textContent = DIFFICULTY[S.difficulty].desc;
+    } catch(e){}
+}
+function toggleSetting(key){ S.settings[key] = !S.settings[key]; saveNow(); renderSettings(); }
+function setDifficulty(d){ S.difficulty = d; notify("🎚️ " + DIFFICULTY[d].desc, "#06b6d4"); saveNow(); renderSettings(); }
+
+// ===== ДЕТАЛИЗАЦИЯ =====
+function renderDetails(){
+    try {
+        const el = document.getElementById("details-list");
+        el.innerHTML = "";
+        const details = [
+            {label:"Технологий", value: S.techs.length + "/" + TECHS.length},
+            {label:"Сотрудников", value: S.staff.length + "/" + STAFF.length},
+            {label:"Серверов", value: S.servers.length + "/" + SERVERS.length},
+            {label:"Отделов", value: Object.keys(S.depts).length + "/" + DEPTS.length},
+            {label:"Стран", value: S.countries.filter(c=>c.unlocked).length + "/15"},
+            {label:"Регионов", value: S.regions.filter(r=>r.unlocked).length + "/6"},
+            {label:"Достижений", value: S.achievements.length + "/" + ACHIEVEMENTS.length},
+            {label:"Квестов", value: S.questIndex + "/" + QUESTS.length},
+            {label:"Ботов", value: S.bots.length + "/" + BOTS.length},
+            {label:"Битв", value: S.battlesWon},
+            {label:"Боссов", value: S.bossLevel-1},
+            {label:"Кристаллов", value: Math.floor(S.crystals)},
+            {label:"Престиж", value: S.prestige},
+            {label:"Множитель", value: "×" + safeNumber(S.prestigeMult,1).toFixed(2)},
+            {label:"Сложность", value: DIFFICULTY[S.difficulty].desc.split(":")[0]},
+            {label:"Режим", value: S.mode},
+            {label:"Пасхалок", value: S.easterEggsFound.length + "/30"},
+            {label:"Время", value: Math.floor(S.playtime/60) + " мин"}
+        ];
+        details.forEach(d=>{
+            const div = document.createElement("div");
+            div.className = "detail-row";
+            div.innerHTML = `<span class="label">${d.label}</span><span class="value">${d.value}</span>`;
+            el.appendChild(div);
+        });
+    } catch(e){}
 }
 
 // ===== ТЕХНОЛОГИИ =====
@@ -920,13 +1192,14 @@ function renderTechs(){
         const list = document.getElementById("tech-list");
         list.innerHTML = "";
         const discount = 1 - safeNumber(S.skills?.speed,0) * 0.05;
+        const diff = DIFFICULTY[S.difficulty] || DIFFICULTY.medium;
         TECHS.forEach(t=>{
             const owned = S.techs.includes(t.id);
-            const realCost = Math.floor(t.cost * discount);
+            const realCost = Math.floor(t.cost * discount * diff.costMult);
             const canBuy = S.money >= realCost && !owned;
             const div = document.createElement("div");
             div.className = "item";
-            div.innerHTML = `<div class="item-info"><div class="item-name">${t.name}</div><div class="item-cost">$${realCost.toLocaleString()} • +${t.users} юзеров</div></div>`;
+            div.innerHTML = `<div class="item-info"><div class="item-name">${t.name}</div><div class="item-cost">$${formatNum(realCost)} • +${formatNum(t.users)}</div></div>`;
             const btn = document.createElement("button");
             btn.textContent = owned ? "✓" : "Купить";
             btn.disabled = owned || !canBuy;
@@ -938,14 +1211,8 @@ function renderTechs(){
 }
 function buyTech(t, realCost){
     if(S.money < realCost || S.techs.includes(t.id)) return;
-    S.money -= realCost;
-    S.users += t.users;
-    S.rep = Math.min(100, S.rep + t.rep);
-    S.techs.push(t.id);
-    addXp(20);
-    notify("✅ " + t.name);
-    beep(600, 0.15);
-    coinFloat();
+    S.money -= realCost; S.users += t.users; S.techs.push(t.id);
+    addXp(20); notify("✅ " + t.name); beep(600, 0.15); coinFloat();
     saveNow(); updateUI(); renderTechs();
 }
 
@@ -972,19 +1239,17 @@ function renderStaff(){
             div.style.flexDirection = "column";
             div.style.alignItems = "stretch";
             div.innerHTML = `
-                <div style="display:flex;justify-content:space-between;align-items:center;">
-                    <div class="item-info">
-                        <div class="item-name">${s.name} ${hired?"[Lv."+lvl+"/3]":""} ${hired?'<span class="tag '+chData.tag+'">'+chData.name+'</span>':''} ${onVacation?'<span class="tag tag-lazy">🏖️</span>':''} ${onTraining?'<span class="tag tag-genius">📚</span>':''}</div>
-                        <div class="item-cost">${hired ? "Доход: +" + (s.income*lvl*chData.mult).toFixed(1) + "$/сек" : "$" + s.cost}</div>
-                    </div>
+                <div class="item-info">
+                    <div class="item-name">${s.name} ${hired?"[Lv."+lvl+"/3]":""} ${hired?'<span class="tag '+chData.tag+'">'+chData.name+'</span>':''} ${onVacation?'<span class="tag tag-lazy">🏖️</span>':''} ${onTraining?'<span class="tag tag-genius">📚</span>':''}</div>
+                    <div class="item-cost">${hired ? "+" + (s.income*lvl*chData.mult).toFixed(1) + "$/сек" : "$" + s.cost} ${hired && STAFF_STORIES[s.id] ? "• " + STAFF_STORIES[s.id] : ""}</div>
                 </div>
-                <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">
-                    ${!hired ? `<button style="flex:1;min-width:80px;padding:6px;font-size:12px;" onclick="hireStaff('${s.id}')" ${!canBuy?'disabled':''}>Нанять $${s.cost}</button>` : ''}
-                    ${hired && lvl<3 ? `<button style="flex:1;min-width:80px;padding:6px;font-size:12px;" onclick="upgradeStaff('${s.id}')" ${!canUpgrade?'disabled':''}>↑ Lv.${lvl+1} $${upgradeCost}</button>` : ''}
-                    ${hired && lvl>=3 ? `<button style="flex:1;min-width:80px;padding:6px;font-size:12px;" disabled>MAX</button>` : ''}
-                    ${hired ? `<button style="flex:1;min-width:80px;padding:6px;font-size:12px;background:${onVacation?'#10b981':'#334155'};" onclick="toggleVacation('${s.id}')">${onVacation?'🏖️ Отдых':'🏖️ Отпуск'}</button>` : ''}
-                    ${hired ? `<button style="flex:1;min-width:80px;padding:6px;font-size:12px;background:${onTraining?'#f59e0b':'#334155'};" onclick="toggleTraining('${s.id}')">${onTraining?'📚 Учится':'📚 Обучить'}</button>` : ''}
-                    ${hired ? `<button style="flex:1;min-width:80px;padding:6px;font-size:12px;background:#dc2626;" onclick="fireStaff('${s.id}')">🚪 Уволить</button>` : ''}
+                <div style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap;">
+                    ${!hired ? `<button style="flex:1;min-width:55px;padding:4px;font-size:10px;" onclick="hireStaff('${s.id}')" ${!canBuy?'disabled':''}>Нанять $${s.cost}</button>` : ''}
+                    ${hired && lvl<3 ? `<button style="flex:1;min-width:55px;padding:4px;font-size:10px;" onclick="upgradeStaff('${s.id}')" ${!canUpgrade?'disabled':''}>↑ $${upgradeCost}</button>` : ''}
+                    ${hired && lvl>=3 ? `<button style="flex:1;min-width:55px;padding:4px;font-size:10px;" disabled>MAX</button>` : ''}
+                    ${hired ? `<button style="flex:1;min-width:40px;padding:4px;font-size:10px;background:${onVacation?'#10b981':'#334155'};" onclick="toggleVacation('${s.id}')">🏖️</button>` : ''}
+                    ${hired ? `<button style="flex:1;min-width:40px;padding:4px;font-size:10px;background:${onTraining?'#f59e0b':'#334155'};" onclick="toggleTraining('${s.id}')">📚</button>` : ''}
+                    ${hired ? `<button style="flex:1;min-width:40px;padding:4px;font-size:10px;background:#dc2626;" onclick="fireStaff('${s.id}')">🚪</button>` : ''}
                 </div>
             `;
             list.appendChild(div);
@@ -994,14 +1259,11 @@ function renderStaff(){
 function hireStaff(id){
     const s = STAFF.find(x=>x.id===id);
     if(!s || S.money < s.cost || S.staff.includes(id)) return;
-    S.money -= s.cost;
-    S.staff.push(id);
+    S.money -= s.cost; S.staff.push(id);
     const ch = CHARACTERS[Math.floor(Math.random()*CHARACTERS.length)].id;
     S.staffLevels[id] = {level:1, char:ch};
-    S.users += s.users;
-    addXp(30);
-    notify("👥 " + s.name, "#3b82f6");
-    beep(500, 0.15);
+    S.users += s.users; addXp(30);
+    notify("👥 " + s.name, "#3b82f6"); beep(500, 0.15);
     saveNow(); updateUI(); renderStaff();
 }
 function upgradeStaff(id){
@@ -1010,11 +1272,8 @@ function upgradeStaff(id){
     if(!s || !data || data.level >= 3) return;
     const cost = Math.floor(s.cost * 2 * data.level);
     if(S.money < cost) return;
-    S.money -= cost;
-    data.level++;
-    addXp(20);
-    notify("⬆️ " + s.name + " → Lv." + data.level, "#8b5cf6");
-    beep(700, 0.2);
+    S.money -= cost; data.level++;
+    addXp(20); notify("⬆️ " + s.name + " → Lv." + data.level, "#8b5cf6"); beep(700, 0.2);
     saveNow(); updateUI(); renderStaff();
 }
 function fireStaff(id){
@@ -1024,9 +1283,7 @@ function fireStaff(id){
     const refund = Math.floor(s.cost * 0.5);
     S.money += refund;
     S.staff = S.staff.filter(x=>x!==id);
-    delete S.staffLevels[id];
-    delete S.staffVacation[id];
-    delete S.staffTraining[id];
+    delete S.staffLevels[id]; delete S.staffVacation[id]; delete S.staffTraining[id];
     notify("🚪 Уволен: " + s.name, "#ef4444");
     saveNow(); updateUI(); renderStaff();
 }
@@ -1038,14 +1295,8 @@ function toggleVacation(id){
 function toggleTraining(id){
     const cost = 500;
     if(!S.staffTraining[id] && S.money < cost){ notify("Нужно $500", "#ef4444"); return; }
-    if(!S.staffTraining[id]){
-        S.money -= cost;
-        S.staffTraining[id] = true;
-        notify("📚 Обучается", "#f59e0b");
-    } else {
-        S.staffTraining[id] = false;
-        notify("📚 Закончил", "#10b981");
-    }
+    if(!S.staffTraining[id]){ S.money -= cost; S.staffTraining[id] = true; notify("📚 Обучается", "#f59e0b"); }
+    else { S.staffTraining[id] = false; notify("📚 Закончил", "#10b981"); }
     saveNow(); renderStaff(); updateUI();
 }
 
@@ -1059,7 +1310,7 @@ function renderServers(){
             const canBuy = S.money >= sv.cost && !owned;
             const div = document.createElement("div");
             div.className = "item";
-            div.innerHTML = `<div class="item-info"><div class="item-name">${sv.name}</div><div class="item-cost">$${sv.cost.toLocaleString()} • до ${sv.maxUsers.toLocaleString()}</div></div>`;
+            div.innerHTML = `<div class="item-info"><div class="item-name">${sv.name}</div><div class="item-cost">$${formatNum(sv.cost)} • до ${formatNum(sv.maxUsers)}</div></div>`;
             const btn = document.createElement("button");
             btn.textContent = owned ? "✓" : "Купить";
             btn.disabled = owned || !canBuy;
@@ -1071,11 +1322,8 @@ function renderServers(){
 }
 function buyServer(sv){
     if(S.money < sv.cost || S.servers.includes(sv.id)) return;
-    S.money -= sv.cost;
-    S.servers.push(sv.id);
-    addXp(40);
-    notify("🖥️ " + sv.name, "#8b5cf6");
-    beep(700, 0.2);
+    S.money -= sv.cost; S.servers.push(sv.id); addXp(40);
+    notify("🖥️ " + sv.name, "#8b5cf6"); beep(700, 0.2);
     saveNow(); updateUI(); renderServers();
 }
 
@@ -1089,9 +1337,9 @@ function renderDepts(){
             const canBuy = S.money >= d.cost && !owned;
             const div = document.createElement("div");
             div.className = "dept";
-            div.innerHTML = `<div><b>${d.name}</b><br><span style="color:#94a3b8;font-size:11px;">${d.effect}</span></div>`;
+            div.innerHTML = `<div><b>${d.name}</b><br><span style="color:#94a3b8;font-size:10px;">${d.effect}</span></div>`;
             const btn = document.createElement("button");
-            btn.textContent = owned ? "✓" : "$" + d.cost;
+            btn.textContent = owned ? "✓" : "$" + formatNum(d.cost);
             btn.disabled = owned || !canBuy;
             if(!owned && canBuy) btn.onclick = ()=>buyDept(d);
             div.appendChild(btn);
@@ -1101,11 +1349,8 @@ function renderDepts(){
 }
 function buyDept(d){
     if(S.money < d.cost || S.depts[d.id]) return;
-    S.money -= d.cost;
-    S.depts[d.id] = true;
-    addXp(50);
-    notify("🏢 " + d.name, "#8b5cf6");
-    beep(700, 0.2);
+    S.money -= d.cost; S.depts[d.id] = true; addXp(50);
+    notify("🏢 " + d.name, "#8b5cf6"); beep(700, 0.2);
     saveNow(); updateUI(); renderDepts();
 }
 
@@ -1117,15 +1362,14 @@ function getCompanyLevel(){
     if(v < 500000) return "Средний бизнес";
     if(v < 2000000) return "Крупная компания";
     if(v < 10000000) return "Международная корпорация";
-    return "Империя";
+    if(v < 1000000000) return "Глобальная империя";
+    return "Легенда";
 }
-function getCompanyValue(){
-    return Math.floor(safeNumber(S.users,0) + safeNumber(S.money,0) + S.techs.length * 5000 + S.staff.length * 10000 + S.company.offices * 100000);
-}
+function getCompanyValue(){ return Math.floor(safeNumber(S.users,0) + safeNumber(S.money,0) + S.techs.length * 5000 + S.staff.length * 10000 + S.company.offices * 100000); }
 function renderCompany(){
     try {
         document.getElementById("company-level").textContent = getCompanyLevel();
-        document.getElementById("company-value").textContent = "$" + getCompanyValue().toLocaleString();
+        document.getElementById("company-value").textContent = "$" + formatNum(getCompanyValue());
         document.getElementById("company-offices").textContent = S.company.offices || 0;
         const list = document.getElementById("company-list");
         list.innerHTML = "";
@@ -1134,9 +1378,9 @@ function renderCompany(){
             const canBuy = S.money >= c.cost && !owned;
             const div = document.createElement("div");
             div.className = "dept";
-            div.innerHTML = `<div><b>${c.name}</b><br><span style="color:#94a3b8;font-size:11px;">${c.desc}</span></div>`;
+            div.innerHTML = `<div><b>${c.name}</b><br><span style="color:#94a3b8;font-size:10px;">${c.desc}</span></div>`;
             const btn = document.createElement("button");
-            btn.textContent = owned ? "✓" : "$" + c.cost.toLocaleString();
+            btn.textContent = owned ? "✓" : "$" + formatNum(c.cost);
             btn.disabled = owned || !canBuy;
             if(!owned && canBuy) btn.onclick = ()=>buyCompany(c);
             div.appendChild(btn);
@@ -1147,40 +1391,26 @@ function renderCompany(){
 function buyCompany(c){
     if(S.money < c.cost || S.company[c.id]) return;
     S.money -= c.cost;
-    if(c.id === "office"){
-        S.company.offices = (S.company.offices || 0) + 1;
-        S.company.office = true;
-    } else if(c.id === "absorb"){
-        S.company.absorbed = (S.company.absorbed || 0) + 1;
-        S.users += 50000;
-    } else {
-        S.company[c.id] = true;
-    }
-    addXp(100);
-    notify("💼 " + c.name, "#8b5cf6");
-    confetti(); beep(800, 0.3);
+    if(c.id === "office"){ S.company.offices = (S.company.offices || 0) + 1; S.company.office = true; }
+    else if(c.id === "absorb"){ S.company.absorbed = (S.company.absorbed || 0) + 1; S.users += 50000; }
+    else { S.company[c.id] = true; }
+    addXp(100); notify("💼 " + c.name, "#8b5cf6"); confetti(); beep(800, 0.3);
     saveNow(); updateUI(); renderCompany();
 }
 function absorbMessenger(){
     if(S.money < 100000){ notify("Нужно $100000", "#ef4444"); return; }
-    S.money -= 100000;
-    S.users += 50000;
-    S.company.absorbed = (S.company.absorbed || 0) + 1;
-    notify("🛒 Поглощён мессенджер! +50000 юзеров", "#8b5cf6");
-    confetti(); beep(800, 0.3);
+    S.money -= 100000; S.users += 50000; S.company.absorbed = (S.company.absorbed || 0) + 1;
+    notify("🛒 +50000 юзеров", "#8b5cf6"); confetti(); beep(800, 0.3);
     saveNow(); updateUI(); renderCompany();
 }
 function exportReport(){
     try {
-        const text = `ОТЧЁТ О МЕССЕНДЖЕРЕ "${S.name}"\n\nЮзеры: ${Math.floor(S.users)}\nДеньги: $${Math.floor(S.money)}\nРепутация: ${Math.floor(S.rep)}\nТехнологий: ${S.techs.length}\nСотрудников: ${S.staff.length}\nСерверов: ${S.servers.length}\nУровень: ${S.level}\nПрестиж: ${S.prestige}\nКристаллы: ${S.crystals}\nСтран: ${S.countries.filter(c=>c.unlocked).length}/7\nКлан: ${S.clan.name||"—"}\nVoxCoin: ${S.voxCoin}\nВклад: $${S.deposit}\nКраудфандинг: $${S.crowdfundTotal}`;
+        const text = `ОТЧЁТ: "${S.name}"\nЮзеры: ${Math.floor(S.users)}\nДеньги: $${Math.floor(S.money)}\nРепутация: ${Math.floor(S.rep)}\nТехнологий: ${S.techs.length}/${TECHS.length}\nСотрудников: ${S.staff.length}/${STAFF.length}\nСерверов: ${S.servers.length}/${SERVERS.length}\nУровень: ${S.level}\nПрестиж: ${S.prestige}\nКристаллы: ${S.crystals}\nСтран: ${S.countries.filter(c=>c.unlocked).length}/15\nБотов: ${S.bots.length}\nБитв: ${S.battlesWon}\nБоссов: ${S.bossLevel-1}\nПасхалок: ${S.easterEggsFound.length}/30\nСложность: ${S.difficulty}\nСюжет: глава ${S.storyChapter}`;
         const blob = new Blob([text], {type:"text/plain"});
         const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "messenger-report.txt";
-        a.click();
+        const a = document.createElement("a"); a.href = url; a.download = "messenger-report.txt"; a.click();
         notify("📤 Отчёт скачан", "#10b981");
-    } catch(e){ notify("Ошибка экспорта", "#ef4444"); }
+    } catch(e){ notify("Ошибка", "#ef4444"); }
 }
 
 // ===== НАВЫКИ =====
@@ -1194,9 +1424,9 @@ function renderSkills(){
             const canBuy = S.money >= cost && lvl < sk.maxLevel;
             const div = document.createElement("div");
             div.className = "skill";
-            div.innerHTML = `<div><b>${sk.name}</b> [${lvl}/${sk.maxLevel}]<br><span style="color:#94a3b8;font-size:11px;">${sk.effect}</span></div>`;
+            div.innerHTML = `<div><b>${sk.name}</b> [${lvl}/${sk.maxLevel}]<br><span style="color:#94a3b8;font-size:10px;">${sk.effect}</span></div>`;
             const btn = document.createElement("button");
-            btn.textContent = lvl >= sk.maxLevel ? "MAX" : "$" + cost;
+            btn.textContent = lvl >= sk.maxLevel ? "MAX" : "$" + formatNum(cost);
             btn.disabled = !canBuy || lvl >= sk.maxLevel;
             if(canBuy && lvl < sk.maxLevel) btn.onclick = ()=>buySkill(sk, cost);
             div.appendChild(btn);
@@ -1206,9 +1436,7 @@ function renderSkills(){
 }
 function buySkill(sk, cost){
     if(S.money < cost) return;
-    S.money -= cost;
-    S.skills[sk.id] = (S.skills[sk.id] || 0) + 1;
-    addXp(30);
+    S.money -= cost; S.skills[sk.id] = (S.skills[sk.id] || 0) + 1; addXp(30);
     notify("🌳 " + sk.name + " → Lv." + S.skills[sk.id], "#10b981");
     saveNow(); updateUI(); renderSkills();
 }
@@ -1223,7 +1451,7 @@ function renderQuests(){
             const active = S.questIndex === i;
             const div = document.createElement("div");
             div.className = "quest" + (done ? " done" : "");
-            div.innerHTML = `<b>${done?"✅":active?"⚡":"🔒"} ${q.name}</b><br><span style="color:#94a3b8;font-size:12px;">${q.desc}</span><br><span class="badge">+$${q.reward}</span> <span class="badge badge-crystal">+💎${q.crystals}</span>`;
+            div.innerHTML = `<b>${done?"✅":active?"⚡":"🔒"} ${q.name}</b><br><span style="color:#94a3b8;font-size:10px;">${q.desc}</span><br><span class="badge">+$${formatNum(q.reward)}</span> <span class="badge badge-crystal">+💎${q.crystals}</span>`;
             list.appendChild(div);
         });
     } catch(e){}
@@ -1233,12 +1461,9 @@ function checkQuests(){
         if(S.questIndex >= QUESTS.length) return;
         const q = QUESTS[S.questIndex];
         if(q.check()){
-            S.money += q.reward;
-            S.crystals += q.crystals;
-            S.questIndex++;
-            notify("🎯 " + q.name + " +$" + q.reward + " +💎" + q.crystals, "#ec4899");
-            confetti(); beep(900, 0.3);
-            saveNow();
+            S.money += q.reward; S.crystals += q.crystals; S.questIndex++;
+            notify("🎯 " + q.name + " +$" + formatNum(q.reward), "#ec4899");
+            confetti(); beep(900, 0.3); saveNow();
         }
     } catch(e){}
 }
@@ -1253,10 +1478,9 @@ function renderCrystalShop(){
             const canBuy = S.crystals >= item.cost;
             const div = document.createElement("div");
             div.className = "item";
-            div.innerHTML = `<div class="item-info"><div class="item-name">${item.name}</div><div class="item-cost">Стоит 💎 ${item.cost}</div></div>`;
+            div.innerHTML = `<div class="item-info"><div class="item-name">${item.name}</div><div class="item-cost">💎 ${item.cost}</div></div>`;
             const btn = document.createElement("button");
-            btn.textContent = "Купить";
-            btn.disabled = !canBuy;
+            btn.textContent = "Купить"; btn.disabled = !canBuy;
             if(canBuy) btn.onclick = ()=>buyCrystal(item);
             div.appendChild(btn);
             list.appendChild(div);
@@ -1265,33 +1489,38 @@ function renderCrystalShop(){
 }
 function buyCrystal(item){
     if(S.crystals < item.cost) return;
-    S.crystals -= item.cost;
-    item.action();
-    notify("💎 Куплено: " + item.name, "#06b6d4");
-    confetti();
+    S.crystals -= item.cost; item.action();
+    notify("💎 " + item.name, "#06b6d4"); confetti();
     saveNow(); updateUI(); renderCrystalShop();
 }
 
 // ===== АКЦИИ =====
 function renderStocks(){
     try {
-        document.getElementById("stock-price").textContent = "$" + safeNumber(S.stocks?.price,10).toFixed(2);
-        document.getElementById("stock-owned").textContent = Math.floor(safeNumber(S.stocks?.owned,0));
+        const list = document.getElementById("stocks-list");
+        list.innerHTML = "";
+        [{key:"own",name:"Свои акции"},{key:"comp",name:"Конкуренты"},{key:"index",name:"Индекс"}].forEach(s=>{
+            const data = S.stocks[s.key];
+            const div = document.createElement("div");
+            div.className = "item";
+            div.style.flexDirection = "column";
+            div.style.alignItems = "stretch";
+            div.innerHTML = `<div class="item-info"><div class="item-name">${s.name}</div><div class="item-cost">$${data.price.toFixed(2)} • ${data.owned}</div></div><div style="display:flex;gap:4px;margin-top:4px;"><button style="flex:1;padding:4px;font-size:10px;" onclick="buyStock('${s.key}')">Купить</button><button style="flex:1;padding:4px;font-size:10px;" onclick="sellStock('${s.key}')">Продать</button></div>`;
+            list.appendChild(div);
+        });
     } catch(e){}
 }
-function buyStock(){
-    if(S.money < S.stocks.price) { notify("Не хватает", "#ef4444"); return; }
-    S.money -= S.stocks.price;
-    S.stocks.owned++;
-    notify("📈 Куплено", "#10b981");
-    saveNow(); updateUI(); renderStocks();
+function buyStock(key){
+    const st = S.stocks[key];
+    if(S.money < st.price){ notify("Не хватает", "#ef4444"); return; }
+    S.money -= st.price; st.owned++;
+    notify("📈 Куплено", "#10b981"); saveNow(); updateUI(); renderStocks();
 }
-function sellStock(){
-    if(S.stocks.owned <= 0) { notify("Нет акций", "#ef4444"); return; }
-    S.money += S.stocks.price;
-    S.stocks.owned--;
-    notify("📉 Продано", "#ef4444");
-    saveNow(); updateUI(); renderStocks();
+function sellStock(key){
+    const st = S.stocks[key];
+    if(st.owned <= 0){ notify("Нет акций", "#ef4444"); return; }
+    S.money += st.price; st.owned--;
+    notify("📉 Продано", "#ef4444"); saveNow(); updateUI(); renderStocks();
 }
 
 // ===== КРИПТА =====
@@ -1303,44 +1532,30 @@ function renderCrypto(){
             const c = S.cryptos[sym];
             const div = document.createElement("div");
             div.className = "crypto-item";
-            div.innerHTML = `
-                <div class="crypto-name">${sym}</div>
-                <div class="crypto-price">Курс: $${c.price.toFixed(6)} | У тебя: ${c.owned}</div>
-                <div class="crypto-buttons">
-                    <button onclick="buyCrypto('${sym}')">Купить 1</button>
-                    <button onclick="sellCrypto('${sym}')">Продать всё</button>
-                    <button onclick="mineCrypto('${sym}')">⛏️ Майнить</button>
-                </div>
-            `;
+            div.innerHTML = `<div class="crypto-name">${sym}</div><div class="crypto-price">$${c.price.toFixed(6)} | ${c.owned}</div><div class="crypto-buttons"><button onclick="buyCrypto('${sym}')">+1</button><button onclick="sellCrypto('${sym}')">Продать</button><button onclick="mineCrypto('${sym}')">⛏️</button></div>`;
             list.appendChild(div);
         });
     } catch(e){}
 }
 function buyCrypto(sym){
     const c = S.cryptos[sym];
-    if(S.money < c.price) { notify("Не хватает", "#ef4444"); return; }
-    S.money -= c.price;
-    c.owned += 1;
-    notify("🪙 +1 " + sym, "#10b981");
-    saveNow(); updateUI(); renderCrypto();
+    if(S.money < c.price){ notify("Не хватает", "#ef4444"); return; }
+    S.money -= c.price; c.owned += 1;
+    notify("🪙 +1 " + sym, "#10b981"); saveNow(); updateUI(); renderCrypto();
 }
 function sellCrypto(sym){
     const c = S.cryptos[sym];
-    if(c.owned <= 0) { notify("Нет " + sym, "#ef4444"); return; }
+    if(c.owned <= 0){ notify("Нет " + sym, "#ef4444"); return; }
     const sum = c.owned * c.price;
-    S.money += sum;
-    c.owned = 0;
-    notify("🪙 Продано за $" + sum.toFixed(2), "#10b981");
-    saveNow(); updateUI(); renderCrypto();
+    S.money += sum; c.owned = 0;
+    notify("🪙 Продано за $" + sum.toFixed(2), "#10b981"); saveNow(); updateUI(); renderCrypto();
 }
 function mineCrypto(sym){
     if(Math.random() < 0.4){
         const amount = Math.floor(Math.random() * 3) + 1;
         S.cryptos[sym].owned += amount;
         notify("⛏️ +" + amount + " " + sym, "#10b981");
-    } else {
-        notify("⛏️ Пусто", "#94a3b8");
-    }
+    } else notify("⛏️ Пусто", "#94a3b8");
     saveNow(); renderCrypto();
 }
 
@@ -1350,22 +1565,20 @@ function renderInvestors(){
         const list = document.getElementById("investor-list");
         list.innerHTML = "";
         if(S.investors.length === 0){
-            list.innerHTML = "<p style='font-size:13px;'>Инвесторов нет. Придут при 10000 юзеров.</p>";
+            list.innerHTML = "<p style='font-size:11px;'>Инвесторов нет. Придут при 10000 юзеров.</p>";
         } else {
             S.investors.forEach((inv, i)=>{
                 const div = document.createElement("div");
                 div.className = "item";
-                div.innerHTML = `<div class="item-info"><div class="item-name">${inv.name}</div><div class="item-cost">$${inv.offer.toLocaleString()} за ${(inv.share*100)}%</div></div>`;
+                div.innerHTML = `<div class="item-info"><div class="item-name">${inv.name}</div><div class="item-cost">$${formatNum(inv.offer)} за ${(inv.share*100)}%</div></div>`;
                 const btn = document.createElement("button");
-                btn.textContent = "Взять";
-                btn.onclick = ()=>takeInvestor(i);
+                btn.textContent = "Взять"; btn.onclick = ()=>takeInvestor(i);
                 div.appendChild(btn);
                 list.appendChild(div);
             });
         }
         const takeBtn = document.createElement("button");
-        takeBtn.textContent = "📞 Найти инвестора";
-        takeBtn.onclick = findInvestor;
+        takeBtn.textContent = "📞 Найти инвестора"; takeBtn.onclick = findInvestor;
         list.appendChild(takeBtn);
     } catch(e){}
 }
@@ -1374,15 +1587,13 @@ function findInvestor(){
     const t = INVESTOR_TYPES[Math.floor(Math.random()*INVESTOR_TYPES.length)];
     const offer = t.minOffer + Math.floor(Math.random()*t.minOffer);
     S.investors.push({name:t.name, offer, share:t.share});
-    notify("💼 " + t.name, "#8b5cf6");
-    saveNow(); renderInvestors();
+    notify("💼 " + t.name, "#8b5cf6"); saveNow(); renderInvestors();
 }
 function takeInvestor(i){
     const inv = S.investors[i];
-    S.money += inv.offer;
-    S.prestigeMult *= (1 - inv.share);
+    S.money += inv.offer; S.prestigeMult *= (1 - inv.share);
     S.investors.splice(i, 1);
-    notify("💼 +$" + inv.offer, "#10b981");
+    notify("💼 +$" + formatNum(inv.offer), "#10b981");
     saveNow(); updateUI(); renderInvestors();
 }
 
@@ -1394,12 +1605,12 @@ function renderComp(){
         S.competitors.forEach(c=>{
             const div = document.createElement("div");
             div.className = "comp-bar";
-            div.innerHTML = `<span class="name">${c.name}</span><span class="num">${Math.floor(c.users).toLocaleString()}</span>`;
+            div.innerHTML = `<span class="name">${c.name}</span><span class="num">${formatNum(c.users)}</span>`;
             list.appendChild(div);
         });
         const you = document.createElement("div");
         you.className = "comp-bar you";
-        you.innerHTML = `<span class="name">💬 ${S.name} (ТЫ)</span><span class="num">${Math.floor(S.users).toLocaleString()}</span>`;
+        you.innerHTML = `<span class="name">💬 ${S.name} (ТЫ)</span><span class="num">${formatNum(S.users)}</span>`;
         list.appendChild(you);
     } catch(e){}
 }
@@ -1409,21 +1620,14 @@ function renderRank(){
     try {
         const list = document.getElementById("rank-list");
         list.innerHTML = "";
-        const records = [
-            {name:"🥇 Юзеры", value: Math.floor(safeNumber(S.users,0)), cls:"gold"},
-            {name:"🥈 Деньги", value: Math.floor(safeNumber(S.money,0)), cls:"silver"},
-            {name:"🥉 Доход/сек", value: Math.floor(calcIncome()), cls:"bronze"}
-        ];
-        records.forEach(r=>{
+        [{name:"🥇 Юзеры", value:formatNum(S.users), cls:"gold"},
+         {name:"🥈 Деньги", value:"$"+formatNum(S.money), cls:"silver"},
+         {name:"🥉 Доход/сек", value:"$"+Math.floor(calcIncome()), cls:"bronze"}].forEach(r=>{
             const div = document.createElement("div");
             div.className = "rank " + r.cls;
-            div.innerHTML = `<span>${r.name}</span><span>${r.value.toLocaleString()}</span>`;
+            div.innerHTML = `<span>${r.name}</span><span>${r.value}</span>`;
             list.appendChild(div);
         });
-        const you = document.createElement("div");
-        you.className = "rank you";
-        you.innerHTML = `<span>💬 ${S.name}</span><span>${Math.floor(S.users).toLocaleString()}</span>`;
-        list.appendChild(you);
     } catch(e){}
 }
 
@@ -1440,20 +1644,15 @@ function renderKoll(){
             const div = document.createElement("div");
             div.className = "koll-item" + (owned ? " owned" : " locked");
             div.textContent = ic;
-            if(!owned && S.money >= 1000){
-                div.onclick = ()=>{ S.money -= 1000; S.koll.icons.push(ic); notify("🎨 " + ic, "#10b981"); saveNow(); updateUI(); renderKoll(); };
-            }
+            if(!owned && S.money >= 1000) div.onclick = ()=>{ S.money -= 1000; S.koll.icons.push(ic); saveNow(); updateUI(); renderKoll(); };
             iconsEl.appendChild(div);
         });
         KOLL_THEMES.forEach(t=>{
             const owned = S.koll.themes.includes(t);
             const div = document.createElement("div");
             div.className = "koll-item" + (owned ? " owned" : " locked");
-            div.textContent = t[0];
-            div.title = t;
-            if(!owned && S.money >= 2000){
-                div.onclick = ()=>{ S.money -= 2000; S.koll.themes.push(t); notify("🎨 " + t, "#10b981"); saveNow(); updateUI(); renderKoll(); };
-            }
+            div.textContent = t[0]; div.title = t;
+            if(!owned && S.money >= 2000) div.onclick = ()=>{ S.money -= 2000; S.koll.themes.push(t); saveNow(); updateUI(); renderKoll(); };
             themesEl.appendChild(div);
         });
         ALL_STICKERS.forEach(s=>{
@@ -1461,9 +1660,7 @@ function renderKoll(){
             const div = document.createElement("div");
             div.className = "koll-item" + (owned ? " owned" : " locked");
             div.textContent = s;
-            if(!owned && S.crystals >= 2){
-                div.onclick = ()=>{ S.crystals -= 2; S.koll.stickers.push(s); notify("🎨 Стикер " + s, "#06b6d4"); saveNow(); updateUI(); renderKoll(); };
-            }
+            if(!owned && S.crystals >= 2) div.onclick = ()=>{ S.crystals -= 2; S.koll.stickers.push(s); saveNow(); updateUI(); renderKoll(); };
             stickersEl.appendChild(div);
         });
         ALL_LOGOS.forEach(lg=>{
@@ -1472,11 +1669,8 @@ function renderKoll(){
             div.className = "logo-item" + (S.logo === lg ? " active" : "") + (owned ? "" : " locked");
             div.textContent = lg;
             div.style.opacity = owned ? "1" : "0.3";
-            if(owned){
-                div.onclick = ()=>{ S.logo = lg; notify("🎨 Логотип сменён", "#10b981"); saveNow(); updateUI(); renderKoll(); };
-            } else if(S.crystals >= 3){
-                div.onclick = ()=>{ S.crystals -= 3; S.koll.unlockedLogos.push(lg); notify("🎨 Открыт " + lg, "#06b6d4"); saveNow(); updateUI(); renderKoll(); };
-            }
+            if(owned) div.onclick = ()=>{ S.logo = lg; saveNow(); updateUI(); renderKoll(); };
+            else if(S.crystals >= 3) div.onclick = ()=>{ S.crystals -= 3; S.koll.unlockedLogos.push(lg); saveNow(); updateUI(); renderKoll(); };
             logoEl.appendChild(div);
         });
     } catch(e){}
@@ -1490,16 +1684,32 @@ function renderWorld(){
         S.countries.forEach((c,i)=>{
             const div = document.createElement("div");
             div.className = "country" + (c.unlocked ? "" : " locked");
-            div.innerHTML = `<div>${c.unlocked?"🟢":"🔒"} <b>${c.name}</b><br><span style="color:#94a3b8;font-size:11px;">Юзеров: ${Math.floor(c.users).toLocaleString()}</span></div>`;
+            div.innerHTML = `<div>${c.unlocked?"🟢":"🔒"} <b>${c.name}</b><br><span style="color:#94a3b8;font-size:10px;">${formatNum(c.users)}</span></div>`;
             if(!c.unlocked){
-                const btn = document.createElement("button");
-                btn.textContent = "$" + (50000 * (i+1)).toLocaleString();
                 const cost = 50000 * (i+1);
+                const btn = document.createElement("button");
+                btn.textContent = "$" + formatNum(cost);
                 btn.disabled = S.money < cost;
-                btn.onclick = ()=>{ if(S.money >= cost){ S.money -= cost; c.unlocked = true; notify("🌍 Открыта " + c.name, "#06b6d4"); saveNow(); updateUI(); renderWorld(); }};
+                btn.onclick = ()=>{ if(S.money >= cost){ S.money -= cost; c.unlocked = true; saveNow(); updateUI(); renderWorld(); }};
                 div.appendChild(btn);
             }
             list.appendChild(div);
+        });
+        const regionsList = document.getElementById("region-list");
+        regionsList.innerHTML = "";
+        S.regions.forEach((r,i)=>{
+            const div = document.createElement("div");
+            div.className = "country" + (r.unlocked ? "" : " locked");
+            div.innerHTML = `<div>${r.unlocked?"🟢":"🔒"} <b>${r.name}</b> (бонус ×${r.bonus})</div>`;
+            if(!r.unlocked){
+                const cost = 100000 * (i+1);
+                const btn = document.createElement("button");
+                btn.textContent = "$" + formatNum(cost);
+                btn.disabled = S.money < cost;
+                btn.onclick = ()=>{ if(S.money >= cost){ S.money -= cost; r.unlocked = true; saveNow(); updateUI(); renderWorld(); }};
+                div.appendChild(btn);
+            }
+            regionsList.appendChild(div);
         });
         document.getElementById("current-weather").textContent = S.weather;
     } catch(e){}
@@ -1507,32 +1717,185 @@ function renderWorld(){
 function changeWeather(){
     const w = ["Ясно","Дождь","Снег","Гроза","Туман","Ветер"];
     S.weather = w[Math.floor(Math.random()*w.length)];
-    notify("🌦️ Погода: " + S.weather, "#06b6d4");
-    saveNow(); renderWorld();
+    notify("🌦️ " + S.weather, "#06b6d4"); saveNow(); renderWorld(); renderVisual();
 }
 
-// ===== КЛАНЫ =====
-function renderClans(){
+// ===== БОТЫ =====
+function renderBots(){
     try {
-        document.getElementById("clan-name").textContent = S.clan.name || "—";
-        document.getElementById("clan-members").textContent = S.clan.members.length;
+        const list = document.getElementById("bots-list");
+        list.innerHTML = "";
+        BOTS.forEach(b=>{
+            const owned = S.bots.includes(b.id);
+            const canBuy = S.money >= b.cost && !owned;
+            const div = document.createElement("div");
+            div.className = "item";
+            div.innerHTML = `<div class="item-info"><div class="item-name">${b.name}</div><div class="item-cost">$${formatNum(b.cost)} • ${b.desc}</div></div>`;
+            const btn = document.createElement("button");
+            btn.textContent = owned ? "✓" : "Купить";
+            btn.disabled = owned || !canBuy;
+            if(!owned && canBuy) btn.onclick = ()=>{ S.money -= b.cost; S.bots.push(b.id); notify("🤖 " + b.name, "#3b82f6"); saveNow(); updateUI(); renderBots(); };
+            div.appendChild(btn);
+            list.appendChild(div);
+        });
     } catch(e){}
 }
-function createClan(){
-    const name = prompt("Введи название клана:");
-    if(!name) return;
-    S.clan.name = name;
-    S.clan.members.push("Ты");
-    notify("🛡️ Клан создан: " + name, "#10b981");
-    saveNow(); renderClans();
+
+// ===== БИТВЫ =====
+function renderBattle(){
+    try {
+        const list = document.getElementById("battle-list");
+        list.innerHTML = "";
+        BATTLES.forEach((b,i)=>{
+            const div = document.createElement("div");
+            div.className = "item";
+            div.innerHTML = `<div class="item-info"><div class="item-name">${b.name}</div><div class="item-cost">Награда: $${formatNum(b.reward)}</div></div>`;
+            const btn = document.createElement("button");
+            btn.textContent = "В бой!";
+            btn.disabled = S.users < 10000;
+            btn.onclick = ()=>{ fightBattle(b); };
+            div.appendChild(btn);
+            list.appendChild(div);
+        });
+    } catch(e){}
 }
-function inviteToClan(){
-    if(!S.clan.name){ notify("Сначала создай клан", "#ef4444"); return; }
-    const name = prompt("Имя друга:");
-    if(!name) return;
-    S.clan.members.push(name);
-    notify("📨 " + name + " приглашён", "#10b981");
-    saveNow(); renderClans();
+function fightBattle(b){
+    const power = S.users * (1 + S.techs.length * 0.1) * (1 + S.staff.length * 0.05);
+    if(Math.random() < Math.min(0.9, power / 1000000)){
+        S.money += b.reward;
+        S.battlesWon++;
+        S.users += Math.floor(S.users * 0.05);
+        notify("⚔️ Победа! +$" + formatNum(b.reward), "#10b981");
+        confetti(); beep(900, 0.4);
+    } else {
+        S.users = Math.floor(S.users * 0.95);
+        notify("⚔️ Поражение! -5% юзеров", "#ef4444");
+    }
+    saveNow(); updateUI(); renderBattle();
+}
+
+// ===== БОССЫ =====
+function renderBoss(){
+    try {
+        const el = document.getElementById("boss-content");
+        const hp = Math.max(0, S.bossHP);
+        el.innerHTML = `
+            <div class="boss-card">
+                <div style="font-size:36px;">👹</div>
+                <div style="font-weight:700;">Босс уровня ${S.bossLevel}</div>
+                <div style="font-size:11px;">HP: ${formatNum(hp)} / ${formatNum(S.bossLevel * 1000)}</div>
+                <div class="boss-hp"><div class="boss-hp-bar" style="width:${Math.min(100, hp/(S.bossLevel*1000)*100)}%"></div></div>
+            </div>
+            <button onclick="attackBoss()">⚔️ Атаковать</button>
+            <div style="margin-top:6px;font-size:11px;">Атака = 1% юзеров</div>
+        `;
+    } catch(e){}
+}
+function attackBoss(){
+    const dmg = Math.floor(S.users * 0.01);
+    if(dmg <= 0){ notify("Нужны юзеры", "#ef4444"); return; }
+    S.bossHP -= dmg;
+    if(S.bossHP <= 0){
+        S.bossLevel++;
+        S.bossHP = S.bossLevel * 1000;
+        S.money += S.bossLevel * 100000;
+        S.crystals += 5;
+        notify("👹 Босс побеждён! +$" + formatNum(S.bossLevel*100000) + " +💎5", "#f59e0b");
+        confetti(); beep(900, 0.5);
+    } else {
+        notify("⚔️ Урон: " + formatNum(dmg), "#dc2626");
+    }
+    saveNow(); updateUI(); renderBoss();
+}
+
+// ===== БИРЖА =====
+function renderExchange(){
+    try {
+        const list = document.getElementById("exchange-list");
+        list.innerHTML = "";
+        S.competitors.slice(0, 10).forEach((c,i)=>{
+            const price = c.users / 1000000;
+            const div = document.createElement("div");
+            div.className = "item";
+            div.innerHTML = `<div class="item-info"><div class="item-name">${c.name}</div><div class="item-cost">$${price.toFixed(2)} • ${formatNum(c.users)}</div></div>`;
+            const btn = document.createElement("button");
+            btn.textContent = "Купить";
+            btn.onclick = ()=>{ if(S.money >= price){ S.money -= price; S.stocks.comp.owned++; notify("📊 Куплено", "#10b981"); saveNow(); updateUI(); renderExchange(); }};
+            div.appendChild(btn);
+            list.appendChild(div);
+        });
+    } catch(e){}
+}
+
+// ===== ЛОТЕРЕЯ =====
+function buyLottery(){
+    if(S.money < 100){ notify("Нужно $100", "#ef4444"); return; }
+    S.money -= 100;
+    if(Math.random() < 0.05){
+        const win = 100 + Math.floor(Math.random() * 100000);
+        S.money += win;
+        notify("🎉 Выигрыш: $" + formatNum(win), "#f59e0b");
+        confetti(); beep(900, 0.5);
+    } else {
+        notify("😢 Не повезло", "#94a3b8");
+    }
+    saveNow(); updateUI();
+}
+function casino(){
+    if(S.money < 500){ notify("Нужно $500", "#ef4444"); return; }
+    S.money -= 500;
+    if(Math.random() < 0.45){
+        const win = 1000;
+        S.money += win;
+        notify("🎲 Выигрыш: $" + win, "#10b981");
+        beep(900, 0.3);
+    } else {
+        notify("🎲 Проигрыш", "#ef4444");
+    }
+    saveNow(); updateUI();
+}
+
+// ===== ОФФШОРЫ =====
+function renderOffshore(){
+    try {
+        document.getElementById("offshore-balance").textContent = "$" + formatNum(S.offshore);
+        document.getElementById("bond-balance").textContent = "$" + formatNum(S.bonds);
+    } catch(e){}
+}
+function putOffshore(){
+    if(S.money < 10000){ notify("Нужно $10000", "#ef4444"); return; }
+    S.money -= 10000; S.offshore += 10000;
+    notify("🏝️ +$10000", "#10b981"); saveNow(); updateUI(); renderOffshore();
+}
+function takeOffshore(){
+    if(S.offshore <= 0){ notify("Пусто", "#ef4444"); return; }
+    S.money += S.offshore;
+    notify("💰 +$" + formatNum(S.offshore), "#10b981");
+    S.offshore = 0; saveNow(); updateUI(); renderOffshore();
+}
+function buyBond(){
+    if(S.money < 10000){ notify("Нужно $10000", "#ef4444"); return; }
+    S.money -= 10000; S.bonds += 10000;
+    notify("📜 +$10000 облигаций", "#10b981"); saveNow(); updateUI(); renderOffshore();
+}
+
+// ===== ПРОФСОЮЗЫ =====
+function renderUnions(){
+    try {
+        document.getElementById("union-activity").textContent = Math.floor(S.unionActivity) + "%";
+        document.getElementById("salary-level").textContent = "×" + S.salaryLevel;
+    } catch(e){}
+}
+function negotiateUnion(){
+    S.unionActivity = Math.max(0, S.unionActivity - 30);
+    notify("🤝 Активность -30%", "#10b981");
+    saveNow(); renderUnions();
+}
+function raiseSalaries(){
+    if(S.money < 10000){ notify("Нужно $10000", "#ef4444"); return; }
+    S.money -= 10000; S.salaryLevel += 0.1; S.unionActivity = 0;
+    notify("💵 Зарплаты ×" + S.salaryLevel.toFixed(1), "#10b981");
+    saveNow(); updateUI(); renderUnions();
 }
 
 // ===== СЮЖЕТ =====
@@ -1544,66 +1907,110 @@ function renderStory(){
         const choicesEl = document.getElementById("story-choices");
         choicesEl.innerHTML = "";
         if(S.storyChapter <= STORY_CHAPTERS.length){
-            ch.choices.forEach((c,i)=>{
+            ch.choices.forEach(c=>{
                 const btn = document.createElement("button");
                 btn.textContent = c.text;
-                btn.onclick = ()=>{
-                    c.effect();
-                    S.storyChapter++;
-                    notify("📖 Глава " + S.storyChapter, "#8b5cf6");
-                    saveNow(); updateUI(); renderStory();
-                };
+                btn.onclick = ()=>{ c.effect(); S.storyChapter++; notify("📖 Глава " + S.storyChapter, "#8b5cf6"); saveNow(); updateUI(); renderStory(); };
                 choicesEl.appendChild(btn);
             });
-        } else {
-            choicesEl.innerHTML = "<p style='font-size:13px;'>Сюжет завершён. Спасибо за игру!</p>";
-        }
+        } else choicesEl.innerHTML = "<p style='font-size:11px;'>Сюжет завершён!</p>";
     } catch(e){}
 }
 
-// ===== ЭКОНОМИКА =====
-function renderEconomy(){
+// ===== ПЕРСОНАЖИ =====
+function renderCharacters(){
     try {
-        document.getElementById("voxcoin-balance").textContent = Math.floor(S.voxCoin);
-        document.getElementById("deposit-balance").textContent = "$" + Math.floor(S.deposit).toLocaleString();
-        document.getElementById("crowdfund-total").textContent = "$" + Math.floor(S.crowdfundTotal).toLocaleString();
+        const list = document.getElementById("characters-list");
+        list.innerHTML = "";
+        CHARACTERS_LIST.forEach(c=>{
+            const div = document.createElement("div");
+            div.className = "item";
+            div.innerHTML = `<div class="item-info"><div class="item-name">${c.name} — ${c.role}</div><div class="item-cost">${c.desc}</div></div>`;
+            list.appendChild(div);
+        });
     } catch(e){}
 }
-function mineVoxCoin(){
-    const amount = Math.floor(Math.random() * 10) + 1;
-    S.voxCoin += amount;
-    notify("⛏️ +" + amount + " VoxCoin", "#10b981");
-    saveNow(); renderEconomy();
+
+// ===== ДРУЗЬЯ =====
+function renderFriends(){
+    try {
+        const list = document.getElementById("friends-list");
+        list.innerHTML = "";
+        S.friends.forEach(f=>{
+            const div = document.createElement("div");
+            div.className = "item";
+            div.innerHTML = `<div class="item-info"><div class="item-name">👤 ${f}</div></div>`;
+            list.appendChild(div);
+        });
+    } catch(e){}
 }
-function sellVoxCoin(){
-    if(S.voxCoin <= 0){ notify("Нет VoxCoin", "#ef4444"); return; }
-    const sum = S.voxCoin * 10;
-    S.money += sum;
-    S.voxCoin = 0;
-    notify("💰 Продано за $" + sum, "#10b981");
-    saveNow(); updateUI(); renderEconomy();
+function addFriend(){
+    const input = document.getElementById("friend-input");
+    const name = input.value.trim();
+    if(!name) return;
+    S.friends.push(name);
+    input.value = "";
+    notify("👥 " + name + " добавлен", "#10b981");
+    saveNow(); renderFriends();
 }
-function depositMoney(){
-    if(S.money < 1000){ notify("Нужно $1000", "#ef4444"); return; }
-    S.money -= 1000;
-    S.deposit += 1000;
-    notify("🏦 Вложено $1000", "#10b981");
-    saveNow(); updateUI(); renderEconomy();
+
+// ===== МИНИ-ИГРЫ =====
+function renderMini(){
+    try {
+        document.getElementById("clicker-count").textContent = S.clickerCount;
+    } catch(e){}
 }
-function withdrawMoney(){
-    if(S.deposit <= 0){ notify("Вклад пуст", "#ef4444"); return; }
-    S.money += S.deposit;
-    notify("💸 Забрано $" + S.deposit, "#10b981");
-    S.deposit = 0;
-    saveNow(); updateUI(); renderEconomy();
+function playGuess(){
+    const input = document.getElementById("guess-input");
+    const val = parseInt(input.value);
+    if(!val || val < 1 || val > 10){ notify("Введи 1-10", "#ef4444"); return; }
+    const secret = Math.floor(Math.random() * 10) + 1;
+    if(val === secret){
+        S.money += 1000;
+        notify("🎯 Угадал! +$1000", "#10b981");
+        confetti(); beep(900, 0.4);
+    } else {
+        notify("❌ Не угадал. Было: " + secret, "#ef4444");
+    }
+    input.value = "";
+    saveNow(); updateUI();
 }
-function crowdfund(){
-    if(S.users < 1000){ notify("Нужно 1000 юзеров", "#ef4444"); return; }
-    const raised = Math.floor(S.users * 0.01);
-    S.crowdfundTotal += raised;
-    S.money += raised;
-    notify("📣 Собрано $" + raised, "#10b981");
-    saveNow(); updateUI(); renderEconomy();
+function doClick(){
+    S.clickerCount++;
+    if(S.clickerCount % 10 === 0){
+        S.money += 100;
+        notify("👆 +$100 за 10 кликов", "#10b981");
+    }
+    saveNow(); renderMini(); updateUI();
+}
+
+// ===== МУЛЬТИВСЕЛЕННАЯ =====
+function renderMultiverse(){
+    try {
+        const list = document.getElementById("multiverse-list");
+        list.innerHTML = "";
+        MULTIVERSE_VERSIONS.forEach(v=>{
+            const found = S.multiverse.includes(v.name);
+            const div = document.createElement("div");
+            div.className = "item";
+            div.innerHTML = `<div class="item-info"><div class="item-name">${found?"🌟":"🔒"} ${v.name}</div><div class="item-cost">${v.bonus}</div></div>`;
+            if(!found){
+                const btn = document.createElement("button");
+                btn.textContent = "Найти";
+                btn.onclick = ()=>{
+                    S.multiverse.push(v.name);
+                    if(v.name.includes("миллиардер")) S.money += 1000000;
+                    if(v.name.includes("президент")) S.rep += 50;
+                    if(v.name.includes("робот")) S.techs.push("ai");
+                    notify("🌌 Найдено: " + v.name, "#8b5cf6");
+                    confetti(); beep(900, 0.4);
+                    saveNow(); updateUI(); renderMultiverse();
+                };
+                div.appendChild(btn);
+            }
+            list.appendChild(div);
+        });
+    } catch(e){}
 }
 
 // ===== ВИЗУАЛ =====
@@ -1611,30 +2018,8 @@ function renderVisual(){
     try {
         document.getElementById("time-of-day").textContent = S.timeOfDay;
         document.getElementById("visual-weather").textContent = S.weather;
-        document.getElementById("current-mode").textContent = S.mode === "hardcore" ? "Хардкор" : S.mode === "sandbox" ? "Песочница" : "Обычный";
-        // Логотипы
-        const logoEd = document.getElementById("logo-editor");
-        logoEd.innerHTML = "";
-        ALL_LOGOS.forEach(lg=>{
-            const owned = S.koll.unlockedLogos.includes(lg);
-            const div = document.createElement("div");
-            div.className = "logo-item" + (S.logo === lg ? " active" : "") + (owned ? "" : " locked");
-            div.textContent = lg;
-            div.style.opacity = owned ? "1" : "0.3";
-            if(owned) div.onclick = ()=>{ S.logo = lg; notify("🎨 " + lg, "#10b981"); saveNow(); updateUI(); renderVisual(); };
-            logoEd.appendChild(div);
-        });
-        // Иконки
-        const iconEd = document.getElementById("icon-editor");
-        iconEd.innerHTML = "";
-        KOLL_ICONS.forEach(ic=>{
-            const owned = S.koll.icons.includes(ic);
-            const div = document.createElement("div");
-            div.className = "koll-item" + (owned ? " owned" : " locked");
-            div.textContent = ic;
-            iconEd.appendChild(div);
-        });
-        // Кастомные стикеры
+        document.getElementById("current-mode").textContent = S.mode === "hardcore" ? "Хардкор" : S.mode === "sandbox" ? "Песочница" : S.mode === "survival" ? "Выживание" : "Обычный";
+        document.getElementById("eggs-count").textContent = S.easterEggsFound.length;
         const csEl = document.getElementById("custom-stickers");
         csEl.innerHTML = "";
         S.koll.customStickers.forEach(s=>{
@@ -1651,7 +2036,7 @@ function createSticker(){
     if(!val) return;
     if(!S.koll.customStickers.includes(val)){
         S.koll.customStickers.push(val);
-        notify("🎨 Стикер " + val + " создан", "#10b981");
+        notify("🎨 " + val, "#10b981");
         input.value = "";
         saveNow(); renderVisual();
     }
@@ -1660,38 +2045,88 @@ function changeTimeOfDay(){
     const times = ["Утро","День","Вечер","Ночь"];
     const idx = times.indexOf(S.timeOfDay);
     S.timeOfDay = times[(idx+1) % times.length];
-    notify("🕐 " + S.timeOfDay, "#8b5cf6");
-    saveNow(); renderVisual();
+    notify("🕐 " + S.timeOfDay, "#8b5cf6"); saveNow(); renderVisual();
 }
 function checkEasterEgg(){
-    const eggs = [
-        "🥚 Ты нашёл скрытую надпись: «Тот, кто ищет — найдёт»",
-        "🥚 Секретная команда: нажми F5 три раза подряд",
-        "🥚 Пасхалка: в 2026 году мессенджеры захватят мир",
-        "🥚 Ты нашёл пусто. Или не пусто?",
-        "🥚 Секретный код: VOX-4821"
-    ];
-    const egg = eggs[Math.floor(Math.random()*eggs.length)];
+    const remaining = EASTER_EGGS.filter(e=>!S.easterEggsFound.includes(e));
+    if(remaining.length === 0){ notify("Все пасхалки найдены!", "#f59e0b"); return; }
+    const egg = remaining[Math.floor(Math.random()*remaining.length)];
     document.getElementById("easter-egg-result").textContent = egg;
-    if(!S.easterEggsFound.includes(egg)){
-        S.easterEggsFound.push(egg);
-        S.crystals += 1;
-        notify("🥚 +💎1 за пасхалку", "#f59e0b");
-        saveNow(); updateUI();
-    }
+    S.easterEggsFound.push(egg);
+    S.crystals += 1;
+    notify("🥚 +💎1 (" + S.easterEggsFound.length + "/30)", "#f59e0b");
+    saveNow(); updateUI(); renderVisual();
+}
+function enterCode(){
+    const input = document.getElementById("code-input");
+    const code = input.value.trim().toUpperCase();
+    const codes = { "VOX-4821": ()=>{ S.money += 100000; notify("🔑 +$100000", "#f59e0b"); },
+                    "ROCKET-2026": ()=>{ S.crystals += 10; notify("🔑 +💎10", "#06b6d4"); },
+                    "BACKROOMS": ()=>{ S.users += 1000000; notify("🔑 +1M юзеров", "#10b981"); },
+                    "GODMODE": ()=>{ S.prestigeMult *= 10; notify("🔑 ×10 доход", "#8b5cf6"); },
+                    "FREE": ()=>{ S.money += 10000; notify("🔑 +$10000", "#10b981"); } };
+    if(codes[code]){
+        if(S.codesUsed.includes(code)){ notify("Код уже использован", "#ef4444"); return; }
+        codes[code]();
+        S.codesUsed.push(code);
+        confetti(); beep(900, 0.5);
+    } else notify("❌ Неверный код", "#ef4444");
+    input.value = "";
+    saveNow(); updateUI();
 }
 function changeMode(mode){
     S.mode = mode;
-    if(mode === "hardcore"){
-        S.prestigeMult *= 0.5;
-        notify("💀 Хардкор: доход -50%", "#ef4444");
-    } else if(mode === "sandbox"){
-        S.money += 1000000;
-        notify("🏖️ Песочница: +$1M", "#10b981");
-    } else {
-        notify("⚙️ Обычный режим", "#3b82f6");
-    }
+    if(mode === "hardcore"){ S.prestigeMult *= 0.5; notify("💀 Хардкор", "#ef4444"); }
+    else if(mode === "sandbox"){ S.money += 1000000; notify("🏖️ +$1M", "#10b981"); }
+    else if(mode === "survival"){ notify("💀 Одна жизнь", "#dc2626"); }
+    else { notify("⚙️ Обычный", "#3b82f6"); }
     saveNow(); updateUI(); renderVisual();
+}
+
+// ===== ПРОФИЛЬ =====
+function renderProfile(){
+    try {
+        document.getElementById("profile-avatar").textContent = S.profileAvatar || "👤";
+        document.getElementById("profile-name").value = S.profileName || S.name;
+        document.getElementById("profile-status").value = S.profileStatus || "";
+        const picker = document.getElementById("avatar-picker");
+        picker.innerHTML = "";
+        ALL_AVATARS.forEach(a=>{
+            const div = document.createElement("div");
+            div.className = "koll-item" + (S.profileAvatar === a ? " owned" : "");
+            div.textContent = a;
+            div.onclick = ()=>{ S.profileAvatar = a; saveNow(); renderProfile(); updateUI(); };
+            picker.appendChild(div);
+        });
+        const wallList = document.getElementById("wall-list");
+        wallList.innerHTML = "";
+        S.wall.forEach((w,i)=>{
+            const div = document.createElement("div");
+            div.className = "chat-msg";
+            div.innerHTML = `<b>${w.text}</b><br><span style="font-size:10px;color:#94a3b8;">${w.time} • ❤️ ${w.likes}</span>`;
+            const likeBtn = document.createElement("button");
+            likeBtn.textContent = "❤️";
+            likeBtn.style.width = "auto";
+            likeBtn.style.padding = "2px 6px";
+            likeBtn.style.fontSize = "10px";
+            likeBtn.onclick = ()=>{ w.likes++; saveNow(); renderProfile(); };
+            div.appendChild(likeBtn);
+            wallList.appendChild(div);
+        });
+    } catch(e){}
+}
+function saveProfile(){
+    S.profileName = document.getElementById("profile-name").value;
+    S.profileStatus = document.getElementById("profile-status").value;
+    notify("💾 Профиль сохранён", "#10b981"); saveNow();
+}
+function postWall(){
+    const input = document.getElementById("wall-input");
+    const text = input.value.trim();
+    if(!text) return;
+    S.wall.unshift({text, time:new Date().toLocaleTimeString(), likes:0});
+    input.value = "";
+    notify("📝 Опубликовано", "#10b981"); saveNow(); renderProfile();
 }
 
 // ===== ГРАФИК =====
@@ -1701,7 +2136,7 @@ function drawChart(){
         if(!canvas) return;
         const ctx = canvas.getContext("2d");
         canvas.width = canvas.offsetWidth;
-        canvas.height = 100;
+        canvas.height = 80;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         const data = S.usersHistory.slice(-60);
         if(data.length < 2) return;
@@ -1724,11 +2159,8 @@ function renderForecast(){
         if(data.length < 2){ el.textContent = "Мало данных."; return; }
         const diff = data[data.length-1] - data[0];
         const perSec = diff / data.length;
-        if(perSec > 0){
-            el.innerHTML = `📈 Рост: <b>+${perSec.toFixed(1)} юзеров/сек</b><br>Прогноз через минуту: <b>${Math.floor(S.users + perSec*60).toLocaleString()}</b>`;
-        } else {
-            el.innerHTML = `📉 Падение: <b>${perSec.toFixed(1)} юзеров/сек</b>`;
-        }
+        if(perSec > 0) el.innerHTML = `📈 +${perSec.toFixed(1)} юзеров/сек<br>Через минуту: <b>${formatNum(S.users + perSec*60)}</b>`;
+        else el.innerHTML = `📉 ${perSec.toFixed(1)} юзеров/сек`;
     } catch(e){}
 }
 
@@ -1742,16 +2174,16 @@ function renderPrestige(){
 function doPrestige(){
     if(S.users < 1000000){ notify("Нужно 1 000 000 юзеров", "#ef4444"); return; }
     if(!confirm("Переродиться? Прогресс сбросится, множитель ×2.")) return;
-    S.prestige++;
-    S.prestigeMult = Math.pow(2, S.prestige);
+    S.prestige++; S.prestigeMult = Math.pow(2, S.prestige);
     S.users = 0; S.money = 1000; S.rep = 50;
     S.techs = []; S.staff = []; S.servers = [];
     S.staffLevels = {}; S.staffVacation = {}; S.staffTraining = {};
     S.depts = {}; S.skills = {};
     S.level = 1; S.xp = 0;
-    S.stocks = {owned:0, price:10, history:[10]};
+    S.stocks = {own:{owned:0,price:10}, comp:{owned:0,price:50}, index:{owned:0,price:100}};
     S.usersHistory = [0];
     S.company = {offices:0, absorbed:0, ipo:false, board:false, lawyers:false, franchise:false, partners:0};
+    S.bots = [];
     notify("🌟 Престиж " + S.prestige + "! ×" + S.prestigeMult, "#f59e0b");
     confetti(); beep(900, 0.5);
     saveNow(); updateUI(); show("screen-main");
@@ -1765,16 +2197,33 @@ function generateTasks(){
     const all = [
         {id:"t1", text:"Купи 1 технологию", check:()=>S.techs.length>=1, done:false, reward:200},
         {id:"t2", text:"Найми 1 сотрудника", check:()=>S.staff.length>=1, done:false, reward:300},
-        {id:"t3", text:"Достигни 100 юзеров", check:()=>S.users>=100, done:false, reward:500},
+        {id:"t3", text:"100 юзеров", check:()=>S.users>=100, done:false, reward:500},
         {id:"t4", text:"Купи сервер", check:()=>S.servers.length>=1, done:false, reward:400},
         {id:"t5", text:"Имей 5000$", check:()=>S.money>=5000, done:false, reward:600},
         {id:"t6", text:"Прокачай навык", check:()=>Object.keys(S.skills).length>=1, done:false, reward:500},
-        {id:"t7", text:"Купи акцию", check:()=>S.stocks.owned>=1, done:false, reward:300},
+        {id:"t7", text:"Купи акцию", check:()=>S.stocks.own.owned>=1, done:false, reward:300},
         {id:"t8", text:"Открой отдел", check:()=>Object.keys(S.depts).length>=1, done:false, reward:700},
         {id:"t9", text:"Купи крипту", check:()=>Object.values(S.cryptos).some(c=>c.owned>0), done:false, reward:400},
         {id:"t10", text:"Открой страну", check:()=>S.countries.filter(c=>c.unlocked).length>=2, done:false, reward:800}
     ];
     S.dailyTasks = all.sort(()=>Math.random()-0.5).slice(0,3);
+    // Weekly
+    if(S.weeklyDate !== today.slice(0,7)){
+        S.weeklyDate = today.slice(0,7);
+        S.weeklyTasks = [
+            {id:"w1", text:"Достигни 10000 юзеров", check:()=>S.users>=10000, done:false, reward:5000},
+            {id:"w2", text:"Найми 5 сотрудников", check:()=>S.staff.length>=5, done:false, reward:8000},
+            {id:"w3", text:"Купи 5 технологий", check:()=>S.techs.length>=5, done:false, reward:10000}
+        ];
+    }
+    // Monthly
+    if(S.monthlyDate !== today.slice(0,7)){
+        S.monthlyDate = today.slice(0,7);
+        S.monthlyTasks = [
+            {id:"m1", text:"Достигни 1M юзеров", check:()=>S.users>=1000000, done:false, reward:100000},
+            {id:"m2", text:"Престиж 1", check:()=>S.prestige>=1, done:false, reward:200000}
+        ];
+    }
 }
 function renderTasks(){
     try {
@@ -1783,17 +2232,31 @@ function renderTasks(){
         list.innerHTML = "";
         S.dailyTasks.forEach(t=>{
             const done = t.done || t.check();
-            if(done && !t.done){
-                t.done = true;
-                S.money += t.reward;
-                addXp(50);
-                notify("📅 " + t.text + " (+$" + t.reward + ")", "#10b981");
-                confetti(); saveNow();
-            }
+            if(done && !t.done){ t.done = true; S.money += t.reward; addXp(50); notify("📅 " + t.text, "#10b981"); saveNow(); }
             const div = document.createElement("div");
             div.className = "task" + (t.done ? " done" : "");
             div.innerHTML = `<span>${t.done?"✅":"⬜"} ${t.text}</span><span class="badge">+$${t.reward}</span>`;
             list.appendChild(div);
+        });
+        const weeklyEl = document.getElementById("weekly-tasks");
+        weeklyEl.innerHTML = "";
+        S.weeklyTasks.forEach(t=>{
+            const done = t.done || t.check();
+            if(done && !t.done){ t.done = true; S.money += t.reward; notify("📅 " + t.text, "#10b981"); saveNow(); }
+            const div = document.createElement("div");
+            div.className = "task" + (t.done ? " done" : "");
+            div.innerHTML = `<span>${t.done?"✅":"⬜"} ${t.text}</span><span class="badge">+$${formatNum(t.reward)}</span>`;
+            weeklyEl.appendChild(div);
+        });
+        const monthlyEl = document.getElementById("monthly-tasks");
+        monthlyEl.innerHTML = "";
+        S.monthlyTasks.forEach(t=>{
+            const done = t.done || t.check();
+            if(done && !t.done){ t.done = true; S.money += t.reward; notify("📅 " + t.text, "#10b981"); saveNow(); }
+            const div = document.createElement("div");
+            div.className = "task" + (t.done ? " done" : "");
+            div.innerHTML = `<span>${t.done?"✅":"⬜"} ${t.text}</span><span class="badge">+$${formatNum(t.reward)}</span>`;
+            monthlyEl.appendChild(div);
         });
     } catch(e){}
 }
@@ -1803,10 +2266,7 @@ function renderEvents(){
     try {
         const list = document.getElementById("events-list");
         list.innerHTML = "";
-        if(S.log.length === 0){
-            list.innerHTML = "<div class='event'>Пока событий нет.</div>";
-            return;
-        }
+        if(S.log.length === 0){ list.innerHTML = "<div class='event'>Пока событий нет.</div>"; return; }
         S.log.forEach(e=>{
             const d = document.createElement("div");
             d.className = "event" + (e.type ? " " + e.type : "");
@@ -1834,439 +2294,7 @@ function checkAchievements(){
     try {
         ACHIEVEMENTS.forEach(a=>{
             if(!S.achievements.includes(a.id) && a.check()){
-                S.achievements.push(a.id);
-                S.crystals += 1;
-                notify("🏆 " + a.name + " (+💎1)", "#f59e0b");
-                confetti(); beep(900, 0.3);
-                saveNow();
-            }
-        });
-    } catch(e){}
-}
+                S.achievements.push(
+…
 
-// ===== XP =====
-function addXp(amount){
-    try {
-        S.xp += amount;
-        const need = S.level * 100;
-        if(S.xp >= need){
-            S.xp -= need;
-            S.level++;
-            notify("⬆️ Уровень " + S.level, "#f59e0b");
-            confetti(); beep(800, 0.3);
-            saveNow();
-        }
-    } catch(e){}
-}
-
-// ===== ЕЖЕДНЕВНАЯ НАГРАДА =====
-function claimDaily(){
-    const today = new Date().toDateString();
-    if(S.dailyRewardDate === today){ notify("Уже получено сегодня", "#94a3b8"); return; }
-    S.dailyRewardDate = today;
-    S.dailyStreak = (S.dailyStreak || 0) + 1;
-    const reward = 1000 * S.dailyStreak;
-    const crystals = Math.min(10, S.dailyStreak);
-    S.money += reward;
-    S.crystals += crystals;
-    notify("🎁 День " + S.dailyStreak + ": +$" + reward + " +💎" + crystals, "#f59e0b");
-    confetti(); beep(900, 0.4);
-    saveNow(); updateUI();
-}
-
-// ===== PWA =====
-function installPWA(){
-    notify("📱 Чтобы установить: в браузере нажми «Меню» → «Установить приложение»", "#06b6d4");
-}
-
-// ===== ИГРОВОЙ ЦИКЛ =====
-let taxTimer = 0, storyTimer = 0, stockTimer = 0, historyTimer = 0;
-let cryptoTimer = 0, crisisTimer = 0, investorTimer = 0, seasonTimer = 0;
-let depositTimer = 0, countryTimer = 0, weatherTimer = 0;
-
-function tick(){
-    try {
-        S.playtime++;
-        taxTimer++; storyTimer++; stockTimer++; historyTimer++;
-        cryptoTimer++; crisisTimer++; investorTimer++; seasonTimer++;
-        depositTimer++; countryTimer++; weatherTimer++;
-
-        S.inflation = Math.min(0.5, S.playtime * 0.00001);
-        S.money += calcIncome();
-
-        let upkeep = 0;
-        S.servers.forEach(id=>{
-            const s = SERVERS.find(x=>x.id===id);
-            if(s) upkeep += s.cost * 0.001;
-        });
-        S.money -= upkeep;
-
-        if(taxTimer >= 300){
-            taxTimer = 0;
-            const tax = Math.max(0, S.money * 0.1);
-            S.money -= tax;
-            addLog("🏦 Налог: -$" + Math.floor(tax), "bad");
-            notify("🏦 Налог: -$" + Math.floor(tax), "#ef4444");
-        }
-
-        if(storyTimer >= 180){
-            storyTimer = 0;
-            if(storyIndex < STORY.length){
-                addLog(STORY[storyIndex], "story");
-                notify(STORY[storyIndex], "#8b5cf6");
-                storyIndex++;
-            }
-        }
-
-        if(stockTimer >= 10){
-            stockTimer = 0;
-            const change = (Math.random() - 0.45) * 2;
-            S.stocks.price = Math.max(1, S.stocks.price + change);
-            if(S.stocks.history.length > 50) S.stocks.history.shift();
-            S.stocks.history.push(S.stocks.price);
-        }
-
-        if(cryptoTimer >= 8){
-            cryptoTimer = 0;
-            Object.keys(S.cryptos).forEach(sym=>{
-                const c = S.cryptos[sym];
-                const volatility = sym === "SHIB" ? 0.000001 : sym === "DOGE" ? 0.01 : 1;
-                const change = (Math.random() - 0.5) * c.price * 0.05 * volatility;
-                c.price = Math.max(0.000001, c.price + change);
-            });
-        }
-
-        if(depositTimer >= 300){
-            depositTimer = 0;
-            if(S.deposit > 0){
-                const interest = S.deposit * 0.05;
-                S.deposit += interest;
-                notify("🏦 Вклад +5%: +$" + Math.floor(interest), "#10b981");
-            }
-        }
-
-        if(!S.crisis && crisisTimer >= 600 && Math.random() < 0.1){
-            S.crisis = true;
-            crisisTimer = 0;
-            showCrisisBanner();
-            addLog("🌍 Кризис!", "bad");
-            notify("🌍 КРИЗИС!", "#ef4444");
-        }
-        if(S.crisis){
-            S.crisisTimer = (S.crisisTimer || 0) + 1;
-            if(S.crisisTimer >= 60){
-                S.crisis = false; S.crisisTimer = 0;
-                hideCrisisBanner();
-                notify("🌍 Кризис закончился", "#10b981");
-            }
-        }
-
-        if(S.users >= 10000 && investorTimer >= 300 && S.investors.length < 3){
-            investorTimer = 0;
-            if(Math.random() < 0.5) findInvestor();
-        }
-
-        if(seasonTimer >= 1800){
-            seasonTimer = 0;
-            S.season++;
-            notify("📅 Сезон " + S.season, "#8b5cf6");
-        }
-
-        S.competitors.forEach(c=>{
-            c.users += c.growth * (0.8 + Math.random() * 0.4);
-        });
-
-        // Раздача юзеров по странам
-        if(countryTimer >= 30){
-            countryTimer = 0;
-            const unlockedCountries = S.countries.filter(c=>c.unlocked);
-            unlockedCountries.forEach(c=>{
-                c.users = Math.floor(S.users / unlockedCountries.length);
-            });
-        }
-
-        // Смена погоды
-        if(weatherTimer >= 600){
-            weatherTimer = 0;
-            const w = ["Ясно","Дождь","Снег","Гроза","Туман","Ветер"];
-            S.weather = w[Math.floor(Math.random()*w.length)];
-        }
-
-        let maxUsers = 1000;
-        S.servers.forEach(id=>{
-            const s = SERVERS.find(x=>x.id===id);
-            if(s) maxUsers += s.maxUsers;
-        });
-
-        if(S.users < maxUsers){
-            let growth = 1 + S.techs.length * 0.5 + S.staff.length * 2;
-            growth *= (S.rep / 50);
-            growth *= (1 + (S.level-1) * 0.1);
-            growth *= (1 + (S.skills.growth || 0) * 0.1);
-            if(S.depts.mark) growth *= 1.15;
-            if(S.company.partners) growth *= 1.1;
-            if(S.crisis) growth *= 0.7;
-            if(S.mode === "hardcore") growth *= 0.7;
-            if(S.mode === "sandbox") growth *= 2;
-            S.users += growth;
-        }
-
-        S.rep = Math.max(0, S.rep - 0.02);
-        if(S.depts.supp) S.rep = Math.min(100, S.rep + 0.05);
-
-        addXp(0.5);
-        if(Math.random() < 0.008) randomEvent();
-
-        if(historyTimer >= 5){
-            historyTimer = 0;
-            S.usersHistory.push(S.users);
-            if(S.usersHistory.length > 60) S.usersHistory.shift();
-        }
-
-        checkAchievements();
-        checkQuests();
-        updateUI();
-    } catch(e){ console.log(e); }
-}
-
-function showCrisisBanner(){
-    try {
-        if(document.getElementById("crisisBanner")) return;
-        const b = document.createElement("div");
-        b.id = "crisisBanner";
-        b.className = "crisis-banner";
-        b.textContent = "🌍 МИРОВОЙ КРИЗИС — ДОХОД -30%";
-        document.body.appendChild(b);
-    } catch(e){}
-}
-function hideCrisisBanner(){
-    try {
-        const b = document.getElementById("crisisBanner");
-        if(b) b.remove();
-    } catch(e){}
-}
-
-function randomEvent(){
-    try {
-        const events = [
-            {text:"⚠️ Сервер упал! -5% юзеров", fn:()=>{ S.users *= 0.95; S.rep -= 5; }, type:"bad"},
-            {text:"🎉 Вирусный пост! +500 юзеров", fn:()=>{ S.users += 500; }, type:"good"},
-            {text:"💀 Хакер! -10% денег", fn:()=>{ const dmg=S.money*0.1*(1-(S.skills.defense||0)*0.1); S.money -= S.depts.sec?dmg*0.5:dmg; }, type:"bad"},
-            {text:"📰 Статья! +10 реп", fn:()=>{ S.rep = Math.min(100, S.rep+10); }, type:"good"},
-            {text:"🚨 Утечка! -15 реп", fn:()=>{ S.rep -= 15; }, type:"bad"},
-            {text:"⭐ Инвестор! +$1000", fn:()=>{ S.money += 1000; }, type:"good"},
-            {text:"🐛 Баг! -200 юзеров", fn:()=>{ S.users = Math.max(0, S.users-200); }, type:"bad"},
-            {text:"🔥 Мем! +2000 юзеров", fn:()=>{ S.users += 2000; }, type:"good"},
-            {text:"📈 Вирусный тренд! +5000 юзеров", fn:()=>{ S.users += 5000; }, type:"good"},
-            {text:"📉 Отток! -10% юзеров", fn:()=>{ S.users *= 0.9; }, type:"bad"},
-            {text:"🎁 Спонсор! +$5000", fn:()=>{ S.money += 5000; }, type:"good"},
-            {text:"⚡ DDoS! -20% денег", fn:()=>{ const dmg=S.money*0.2*(1-(S.skills.defense||0)*0.1); S.money -= S.depts.sec?dmg*0.5:dmg; }, type:"bad"},
-            {text:"📺 Реклама! +3000 юзеров", fn:()=>{ S.users += 3000; }, type:"good"},
-            {text:"🤝 Партнёрство! +5000 юзеров", fn:()=>{ S.users += 5000; }, type:"good"},
-            {text:"⚖️ Иск! -$3000", fn:()=>{ if(!S.company.lawyers) S.money -= 3000; }, type:"bad"},
-            {text:"🏆 Награда! +20 реп", fn:()=>{ S.rep = Math.min(100, S.rep+20); }, type:"good"},
-            {text:"🌐 Новая страна! +10000 юзеров", fn:()=>{ S.users += 10000; }, type:"good"},
-            {text:"🚫 Блокировка! -15% юзеров", fn:()=>{ S.users *= 0.85; }, type:"bad"},
-            {text:"💎 Случайный кристалл!", fn:()=>{ S.crystals += 2; }, type:"good"},
-            {text:"🎯 Заказчик! +$10000", fn:()=>{ S.money += 10000; }, type:"good"},
-            {text:"🌍 Пандемия! +20% юзеров", fn:()=>{ S.users *= 1.2; }, type:"world"},
-            {text:"📉 Санкции! -10% денег", fn:()=>{ S.money *= 0.9; }, type:"bad"},
-            {text:"⚔️ Война мессенджеров! -5% юзеров", fn:()=>{ S.users *= 0.95; }, type:"bad"}
-        ];
-        const e = events[Math.floor(Math.random()*events.length)];
-        e.fn();
-        addLog(e.text, e.type);
-        notify(e.text, e.type==="good"?"#10b981":e.type==="world"?"#06b6d4":"#ef4444");
-        beep(e.type==="good"?700:200, 0.3);
-        if(document.getElementById("screen-events").classList.contains("active")) renderEvents();
-        saveNow();
-    } catch(e){}
-}
-
-// ===== СОХРАНЕНИЕ =====
-function saveNow(){
-    try {
-        S.lastPlaytime = Math.floor(Date.now()/1000);
-        localStorage.setItem("messengerSim_v4", JSON.stringify(S));
-        localStorage.setItem("messengerSim_v3", JSON.stringify(S));
-        localStorage.setItem("messengerSim_v2", JSON.stringify(S));
-    } catch(e){}
-}
-
-function load(){
-    try {
-        let d = localStorage.getItem("messengerSim_v4") || localStorage.getItem("messengerSim_v3") || localStorage.getItem("messengerSim_v2");
-        if(!d) return false;
-        const parsed = JSON.parse(d);
-        Object.assign(S, parsed);
-        if(!S.stocks) S.stocks = {owned:0, price:10, history:[10]};
-        if(!S.cryptos){
-            S.cryptos = {
-                VOX:{owned:0,price:1}, BTC:{owned:0,price:60000}, ETH:{owned:0,price:3000},
-                DOGE:{owned:0,price:0.15}, SHIB:{owned:0,price:0.00002}
-            };
-        }
-        if(!S.depts) S.depts = {};
-        if(!S.skills) S.skills = {};
-        if(!S.koll) S.koll = {icons:[], themes:[], stickers:[], customStickers:[], unlockedLogos:["💬"]};
-        if(!S.koll.stickers) S.koll.stickers = [];
-        if(!S.koll.customStickers) S.koll.customStickers = [];
-        if(!S.koll.unlockedLogos) S.koll.unlockedLogos = ["💬"];
-        if(!S.investors) S.investors = [];
-        if(!S.competitors) S.competitors = [
-            {name:"Telegram", users:900000000, growth:100},
-            {name:"WhatsApp", users:2000000000, growth:200},
-            {name:"MAX", users:50000000, growth:50},
-            {name:"Signal", users:40000000, growth:30},
-            {name:"Discord", users:150000000, growth:60},
-            {name:"Viber", users:260000000, growth:20},
-            {name:"WeChat", users:1300000000, growth:150}
-        ];
-        if(!S.usersHistory) S.usersHistory = [S.users];
-        if(S.prestigeMult === undefined) S.prestigeMult = 1;
-        if(S.prestige === undefined) S.prestige = 0;
-        if(S.inflation === undefined) S.inflation = 0;
-        if(S.credit === undefined) S.credit = 0;
-        if(S.season === undefined) S.season = 1;
-        if(!S.staffVacation) S.staffVacation = {};
-        if(!S.staffTraining) S.staffTraining = {};
-        if(!S.company) S.company = {offices:0, absorbed:0, ipo:false, board:false, lawyers:false, franchise:false, partners:0};
-        if(S.crystals === undefined) S.crystals = 0;
-        if(S.dailyRewardDate === undefined) S.dailyRewardDate = "";
-        if(S.dailyStreak === undefined) S.dailyStreak = 0;
-        if(S.questIndex === undefined) S.questIndex = 0;
-        if(S.mode === undefined) S.mode = "normal";
-        if(!S.countries){
-            S.countries = [
-                {name:"Россия", unlocked:true, users:0},
-                {name:"США", unlocked:false, users:0},
-                {name:"Китай", unlocked:false, users:0},
-                {name:"ЕС", unlocked:false, users:0},
-                {name:"Индия", unlocked:false, users:0},
-                {name:"Бразилия", unlocked:false, users:0},
-                {name:"Япония", unlocked:false, users:0}
-            ];
-        }
-        if(!S.weather) S.weather = "Ясно";
-        if(!S.timeOfDay) S.timeOfDay = "День";
-        if(!S.clan) S.clan = {name:"", members:[]};
-        if(!S.storyChapter) S.storyChapter = 1;
-        if(S.voxCoin === undefined) S.voxCoin = 0;
-        if(S.deposit === undefined) S.deposit = 0;
-        if(S.crowdfundTotal === undefined) S.crowdfundTotal = 0;
-        if(!S.easterEggsFound) S.easterEggsFound = [];
-        for(const id in S.staffLevels){
-            if(typeof S.staffLevels[id] === "number"){
-                S.staffLevels[id] = {level: S.staffLevels[id], char:"normal"};
-            }
-        }
-        storyIndex = Math.min(STORY.length, Math.floor(S.playtime / 180));
-        if(S.lastPlaytime){
-            const offlineSec = Math.min(3600, Math.floor(Date.now()/1000) - S.lastPlaytime);
-            if(offlineSec > 60){
-                const offlineIncome = offlineSec * calcIncome();
-                S.money += offlineIncome;
-                setTimeout(()=>notify("💤 Оффлайн: +$" + Math.floor(offlineIncome), "#10b981"), 1000);
-            }
-        }
-        return true;
-    } catch(e){ return false; }
-}
-
-function toggleTheme(){
-    S.light = !S.light;
-    document.body.classList.toggle("light", S.light);
-    saveNow();
-}
-
-function newGame(){ show("screen-create"); }
-
-function continueGame(){
-    if(load()){
-        updateUI();
-        document.body.classList.toggle("light", S.light);
-        show("screen-main");
-        notify("💾 Прогресс загружен", "#10b981");
-    } else {
-        notify("Нет сохранений", "#ef4444");
-    }
-}
-
-function createMessenger(){
-    const name = document.getElementById("input-name").value.trim();
-    if(!name){ notify("Введи название!", "#ef4444"); return; }
-    S = {
-        name, color:document.getElementById("select-color").value, logo:document.getElementById("select-logo").value,
-        mode:document.getElementById("select-mode").value,
-        users:0, money:1000, rep:50, techs:[], staff:[], servers:[],
-        staffLevels:{}, staffVacation:{}, staffTraining:{},
-        depts:{}, skills:{}, log:[], achievements:[], playtime:0,
-        level:1, xp:0, dailyTasks:[], tasksDate:"", lastPlaytime:0, light:false,
-        prestige:0, prestigeMult:1,
-        stocks:{owned:0, price:10, history:[10]},
-        cryptos:{
-            VOX:{owned:0,price:1}, BTC:{owned:0,price:60000}, ETH:{owned:0,price:3000},
-            DOGE:{owned:0,price:0.15}, SHIB:{owned:0,price:0.00002}
-        },
-        competitors:[
-            {name:"Telegram", users:900000000, growth:100},
-            {name:"WhatsApp", users:2000000000, growth:200},
-            {name:"MAX", users:50000000, growth:50},
-            {name:"Signal", users:40000000, growth:30},
-            {name:"Discord", users:150000000, growth:60},
-            {name:"Viber", users:260000000, growth:20},
-            {name:"WeChat", users:1300000000, growth:150}
-        ],
-        usersHistory:[0],
-        crisis:false, crisisTimer:0,
-        investors:[], season:1, seasonTimer:0,
-        koll:{icons:[], themes:[], stickers:[], customStickers:[], unlockedLogos:["💬"]},
-        inflation:0, credit:0,
-        company:{offices:0, absorbed:0, ipo:false, board:false, lawyers:false, franchise:false, partners:0},
-        crystals:0,
-        dailyRewardDate:"",
-        dailyStreak:0,
-        questIndex:0,
-        countries:[
-            {name:"Россия", unlocked:true, users:0},
-            {name:"США", unlocked:false, users:0},
-            {name:"Китай", unlocked:false, users:0},
-            {name:"ЕС", unlocked:false, users:0},
-            {name:"Индия", unlocked:false, users:0},
-            {name:"Бразилия", unlocked:false, users:0},
-            {name:"Япония", unlocked:false, users:0}
-        ],
-        weather:"Ясно",
-        timeOfDay:"День",
-        clan:{name:"", members:[]},
-        storyChapter:1,
-        voxCoin:0,
-        deposit:0,
-        crowdfundTotal:0,
-        easterEggsFound:[]
-    };
-    generateTasks();
-    addLog("Мессенджер создан: " + name, "good");
-    notify("✨ " + name + " запущен!", "#10b981");
-    saveNow(); updateUI();
-    show("screen-main");
-}
-
-function resetGame(){
-    if(confirm("Точно сбросить ВСЁ?")){
-        localStorage.removeItem("messengerSim_v4");
-        localStorage.removeItem("messengerSim_v3");
-        localStorage.removeItem("messengerSim_v2");
-        localStorage.removeItem("messengerSim");
-        location.reload();
-    }
-}
-
-// ===== СТАРТ =====
-updateUI();
-setInterval(tick, 1000);
-window.addEventListener("beforeunload", saveNow);
-setInterval(saveNow, 3000);
-</script>
-</body>
-</html>
+[Message tronqué]  Afficher l'intégralité du message
