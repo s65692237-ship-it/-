@@ -1,7 +1,15 @@
-// ===== СИМУЛЯТОР МЕССЕНДЖЕРА v8.1 =====
-// Все персонажи и события — вымышленные, не связаны с реальными людьми.
+// ===== СИМУЛЯТОР МЕССЕНДЖЕРА v9.0 =====
+// Работает одинаково на ПК и на телефоне.
 
 function safeNumber(n, def){ return (typeof n === "number" && isFinite(n)) ? n : (def || 0); }
+
+// Определение устройства
+function getDeviceType(){
+    const ua = navigator.userAgent || "";
+    const isMobile = /Android|iPhone|iPad|iPod|Mobile|Opera Mini|IEMobile/i.test(ua);
+    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    return isMobile || (isTouch && window.innerWidth < 900) ? "mobile" : "desktop";
+}
 
 let S = {
     name:"", color:"#3b82f6", logo:"💬", mode:"normal", difficulty:"medium",
@@ -33,16 +41,16 @@ let S = {
     company:{offices:0, absorbed:0, ipo:false, board:false, lawyers:false, franchise:false, partners:0},
     crystals:0, dailyRewardDate:"", dailyStreak:0, questIndex:0,
     countries:[
-        {name:"Страна 1",unlocked:true,users:0},{name:"Страна 2",unlocked:false,users:0},
-        {name:"Страна 3",unlocked:false,users:0},{name:"Страна 4",unlocked:false,users:0},
-        {name:"Страна 5",unlocked:false,users:0},{name:"Страна 6",unlocked:false,users:0},
-        {name:"Страна 7",unlocked:false,users:0},{name:"Страна 8",unlocked:false,users:0},
-        {name:"Страна 9",unlocked:false,users:0},{name:"Страна 10",unlocked:false,users:0},
-        {name:"Страна 11",unlocked:false,users:0},{name:"Страна 12",unlocked:false,users:0},
-        {name:"Страна 13",unlocked:false,users:0},{name:"Страна 14",unlocked:false,users:0},
-        {name:"Страна 15",unlocked:false,users:0},{name:"Страна 16",unlocked:false,users:0},
-        {name:"Страна 17",unlocked:false,users:0},{name:"Страна 18",unlocked:false,users:0},
-        {name:"Страна 19",unlocked:false,users:0},{name:"Страна 20",unlocked:false,users:0}
+        {name:"Россия",unlocked:true,users:0},{name:"США",unlocked:false,users:0},
+        {name:"Китай",unlocked:false,users:0},{name:"Германия",unlocked:false,users:0},
+        {name:"Индия",unlocked:false,users:0},{name:"Бразилия",unlocked:false,users:0},
+        {name:"Япония",unlocked:false,users:0},{name:"Корея",unlocked:false,users:0},
+        {name:"Турция",unlocked:false,users:0},{name:"Мексика",unlocked:false,users:0},
+        {name:"Индонезия",unlocked:false,users:0},{name:"Нигерия",unlocked:false,users:0},
+        {name:"Египет",unlocked:false,users:0},{name:"Австралия",unlocked:false,users:0},
+        {name:"Канада",unlocked:false,users:0},{name:"Франция",unlocked:false,users:0},
+        {name:"Италия",unlocked:false,users:0},{name:"Испания",unlocked:false,users:0},
+        {name:"Польша",unlocked:false,users:0},{name:"Аргентина",unlocked:false,users:0}
     ],
     weather:"Ясно", timeOfDay:"День", clan:{name:"", members:[]}, storyChapter:1,
     voxCoin:0, deposit:0, crowdfundTotal:0, offshore:0, bonds:0,
@@ -52,8 +60,8 @@ let S = {
     lastClickTime:0, clickBlocked:false, clickBlockEnd:0, clicksInWindow:0, clickWindowStart:0
 };
 
-// Флаг: создана ли игра (есть ли активное сохранение)
 let gameCreated = false;
+let deviceType = getDeviceType();
 
 const DIFFICULTY = {
     easy:{incomeMult:1.5,costMult:0.7,eventChance:0.005,desc:"Лёгкая: больше дохода"},
@@ -351,18 +359,24 @@ const MULTIVERSE_VERSIONS = [
     {name:"Ты-бог",bonus:"×2 доход",req:"1 миллиард юзеров",check:()=>S.users>=1000000000}
 ];
 
+function updateDeviceInfo(){
+    try {
+        const el = document.getElementById("device-info");
+        if(el) el.textContent = deviceType === "mobile" ? "📱 Телефон" : "🖥️ ПК";
+    } catch(e){}
+}
+
 function show(id){
     try {
-        // Защита: если игра не создана и пытаемся показать не-старт и не-настройки — не пускаем
         if(!gameCreated && id !== "screen-start" && id !== "screen-create" && id !== "screen-settings") {
             document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
             document.getElementById("screen-start").classList.add("active");
             return;
         }
-        
         document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
         const el = document.getElementById(id);
         if(el) el.classList.add("active");
+        window.scrollTo(0,0);
         if(id==="screen-tasks") renderTasks();
         if(id==="screen-events") renderEvents();
         if(id==="screen-tech") renderTechs();
@@ -396,17 +410,13 @@ function show(id){
         if(id==="screen-multiverse") renderMultiverse();
         if(id==="screen-visual") renderVisual();
         if(id==="screen-profile") renderProfile();
-        if(id==="screen-settings") renderSettings();
+        if(id==="screen-settings") { renderSettings(); updateDeviceInfo(); }
     } catch(e){ console.log(e); }
 }
 
-// Возврат из настроек: на старт или на главный
 function backFromSettings(){
-    if(gameCreated){
-        show("screen-main");
-    } else {
-        show("screen-start");
-    }
+    if(gameCreated) show("screen-main");
+    else show("screen-start");
 }
 
 function notify(text,color){
@@ -573,6 +583,7 @@ function renderDetails(){
             {label:"Режим", value: S.mode},
             {label:"Пасхалок", value: S.easterEggsFound.length + "/40"},
             {label:"Мультивселенных", value: S.multiverse.length + "/6"},
+            {label:"Устройство", value: deviceType === "mobile" ? "📱 Телефон" : "🖥️ ПК"},
             {label:"Время", value: Math.floor(S.playtime/60) + " мин"}
         ];
         details.forEach(d=>{
@@ -754,7 +765,7 @@ function absorbMessenger(){
 }
 function exportReport(){
     try {
-        const text = `ОТЧЁТ: "${S.name}"\nЮзеры: ${Math.floor(S.users)}\nДеньги: $${Math.floor(S.money)}\nТехнологий: ${S.techs.length}/${TECHS.length}\nСотрудников: ${S.staff.length}/${STAFF.length}\nУровень: ${S.level}\nПрестиж: ${S.prestige}`;
+        const text = `ОТЧЁТ: "${S.name}"\nЮзеры: ${Math.floor(S.users)}\nДеньги: $${Math.floor(S.money)}\nТехнологий: ${S.techs.length}/${TECHS.length}\nСотрудников: ${S.staff.length}/${STAFF.length}\nУровень: ${S.level}\nПрестиж: ${S.prestige}\nУстройство: ${deviceType === "mobile" ? "Телефон" : "ПК"}`;
         const blob = new Blob([text], {type:"text/plain"});
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a"); a.href = url; a.download = "report.txt"; a.click();
@@ -1225,7 +1236,6 @@ function renderMini(){
 function doClick(event){
     try {
         const now = Date.now();
-        
         if(now - S.lastClickTime < 50 && S.lastClickTime > 0){
             S.clicksInWindow = (S.clicksInWindow || 0) + 1;
             if(S.clicksInWindow > 5){
@@ -1241,7 +1251,6 @@ function doClick(event){
         } else {
             S.clicksInWindow = 0;
         }
-        
         if(!S.clickWindowStart || now - S.clickWindowStart > 2000){
             S.clickWindowStart = now;
             S.clicksInWindow = 0;
@@ -1257,16 +1266,13 @@ function doClick(event){
             renderMini();
             return;
         }
-        
-        if(S.clickBlocked && now < S.clickBlockEnd){
-            return;
-        } else if(S.clickBlocked && now >= S.clickBlockEnd){
+        if(S.clickBlocked && now < S.clickBlockEnd){ return; }
+        else if(S.clickBlocked && now >= S.clickBlockEnd){
             S.clickBlocked = false;
             S.clicksInWindow = 0;
             const msg = document.getElementById("anticheat-message");
             if(msg) msg.innerHTML = '';
         }
-        
         S.lastClickTime = now;
         S.clickerCount++;
         if(S.clickerCount % 10 === 0){ S.money += 100; notify("👆 +$100", "#10b981"); }
@@ -1421,7 +1427,7 @@ function drawChart(){
         if(!canvas) return;
         const ctx = canvas.getContext("2d");
         canvas.width = canvas.offsetWidth;
-        canvas.height = 80;
+        canvas.height = canvas.offsetHeight || 80;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         const data = S.usersHistory.slice(-60);
         if(data.length < 2) return;
@@ -1713,7 +1719,7 @@ function saveNow(){
     try {
         if(!gameCreated) return;
         S.lastPlaytime = Math.floor(Date.now()/1000);
-        ["v8","v7","v6","v5","v4","v3","v2"].forEach(v=>{
+        ["v9","v8","v7","v6","v5","v4","v3","v2"].forEach(v=>{
             try { localStorage.setItem("messengerSim_"+v, JSON.stringify(S)); } catch(e){}
         });
     } catch(e){}
@@ -1722,7 +1728,7 @@ function saveNow(){
 function load(){
     try {
         let d = null;
-        ["v8","v7","v6","v5","v4","v3","v2"].forEach(v=>{ if(!d) d = localStorage.getItem("messengerSim_"+v); });
+        ["v9","v8","v7","v6","v5","v4","v3","v2"].forEach(v=>{ if(!d) d = localStorage.getItem("messengerSim_"+v); });
         if(!d) return false;
         const parsed = JSON.parse(d);
         Object.assign(S, parsed);
@@ -1774,6 +1780,11 @@ function load(){
         if(S.deposit === undefined) S.deposit = 0;
         if(S.crowdfundTotal === undefined) S.crowdfundTotal = 0;
         for(const id in S.staffLevels){ if(typeof S.staffLevels[id] === "number") S.staffLevels[id] = {level: S.staffLevels[id], char:"normal"}; }
+        // Обновление названий стран
+        if(S.countries && S.countries.length >= 20){
+            const newNames = ["Россия","США","Китай","Германия","Индия","Бразилия","Япония","Корея","Турция","Мексика","Индонезия","Нигерия","Египет","Австралия","Канада","Франция","Италия","Испания","Польша","Аргентина"];
+            S.countries.forEach((c,i)=>{ if(newNames[i]) c.name = newNames[i]; });
+        }
         storyIndex = Math.min(STORY.length, Math.floor(S.playtime / 180));
         if(S.lastPlaytime){
             const offlineSec = Math.min(3600, Math.floor(Date.now()/1000) - S.lastPlaytime);
@@ -1788,10 +1799,7 @@ function load(){
 }
 
 function toggleTheme(){ S.light = !S.light; document.body.classList.toggle("light", S.light); saveNow(); }
-function newGame(){ 
-    gameCreated = false;
-    show("screen-create"); 
-}
+function newGame(){ gameCreated = false; show("screen-create"); }
 function continueGame(){
     if(load()){
         gameCreated = true;
@@ -1822,7 +1830,15 @@ function createMessenger(){
         inflation:0,
         company:{offices:0, absorbed:0, ipo:false, board:false, lawyers:false, franchise:false, partners:0},
         crystals:0, dailyRewardDate:"", dailyStreak:0, questIndex:0,
-        countries:[{name:"Страна 1",unlocked:true,users:0},{name:"Страна 2",unlocked:false,users:0},{name:"Страна 3",unlocked:false,users:0},{name:"Страна 4",unlocked:false,users:0},{name:"Страна 5",unlocked:false,users:0},{name:"Страна 6",unlocked:false,users:0},{name:"Страна 7",unlocked:false,users:0},{name:"Страна 8",unlocked:false,users:0},{name:"Страна 9",unlocked:false,users:0},{name:"Страна 10",unlocked:false,users:0},{name:"Страна 11",unlocked:false,users:0},{name:"Страна 12",unlocked:false,users:0},{name:"Страна 13",unlocked:false,users:0},{name:"Страна 14",unlocked:false,users:0},{name:"Страна 15",unlocked:false,users:0},{name:"Страна 16",unlocked:false,users:0},{name:"Страна 17",unlocked:false,users:0},{name:"Страна 18",unlocked:false,users:0},{name:"Страна 19",unlocked:false,users:0},{name:"Страна 20",unlocked:false,users:0}],
+        countries:[
+            {name:"Россия",unlocked:true,users:0},{name:"США",unlocked:false,users:0},{name:"Китай",unlocked:false,users:0},
+            {name:"Германия",unlocked:false,users:0},{name:"Индия",unlocked:false,users:0},{name:"Бразилия",unlocked:false,users:0},
+            {name:"Япония",unlocked:false,users:0},{name:"Корея",unlocked:false,users:0},{name:"Турция",unlocked:false,users:0},
+            {name:"Мексика",unlocked:false,users:0},{name:"Индонезия",unlocked:false,users:0},{name:"Нигерия",unlocked:false,users:0},
+            {name:"Египет",unlocked:false,users:0},{name:"Австралия",unlocked:false,users:0},{name:"Канада",unlocked:false,users:0},
+            {name:"Франция",unlocked:false,users:0},{name:"Италия",unlocked:false,users:0},{name:"Испания",unlocked:false,users:0},
+            {name:"Польша",unlocked:false,users:0},{name:"Аргентина",unlocked:false,users:0}
+        ],
         weather:"Ясно", timeOfDay:"День", clan:{name:"", members:[]}, storyChapter:1,
         voxCoin:0, deposit:0, crowdfundTotal:0, offshore:0, bonds:0,
         easterEggsFound:[], codesUsed:[], bots:[], battlesWon:0, bossHP:1000, bossLevel:1,
@@ -1840,13 +1856,23 @@ function createMessenger(){
 }
 function resetGame(){
     if(confirm("Сбросить ВСЁ?")){
-        ["v8","v7","v6","v5","v4","v3","v2"].forEach(v=>localStorage.removeItem("messengerSim_"+v));
+        ["v9","v8","v7","v6","v5","v4","v3","v2"].forEach(v=>localStorage.removeItem("messengerSim_"+v));
         localStorage.removeItem("messengerSim");
         location.reload();
     }
 }
 
+// Отслеживание изменения размера окна (смена ориентации)
+window.addEventListener("resize", ()=>{
+    const newDevice = getDeviceType();
+    if(newDevice !== deviceType){
+        deviceType = newDevice;
+        updateDeviceInfo();
+    }
+});
+
 updateUI();
+updateDeviceInfo();
 setInterval(tick, 1000);
 window.addEventListener("beforeunload", saveNow);
 setInterval(()=>{ if(S.settings.autosave && gameCreated) saveNow(); }, 3000);
