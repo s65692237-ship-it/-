@@ -1,5 +1,5 @@
-// ===== СИМУЛЯТОР МЕССЕНДЖЕРА v10.0 =====
-// Работает на ПК и телефоне. Все персонажи вымышленные.
+// ===== СИМУЛЯТОР МЕССЕНДЖЕРА v10.2 =====
+// Баланс пересчитан. Математика работает.
 
 function safeNumber(n, def){ return (typeof n === "number" && isFinite(n)) ? n : (def || 0); }
 
@@ -21,7 +21,7 @@ let S = {
     level:1, xp:0,
     dailyTasks:[], tasksDate:"",
     lastPlaytime:0, light:false,
-    prestige:0, prestigeMult:1, prestigePoints:0, prestigeUpgrades:{},
+    prestige:0, prestigeMult:1, prestigePoints:0, prestigeUpgrades:{fastStart:0, cheaperTech:0, moreIncome:0, moreGrowth:0},
     stocks:{own:{owned:0,price:10}, comp:{owned:0,price:50}, index:{owned:0,price:100}},
     cryptos:{VOX:{owned:0,price:1},BTC:{owned:0,price:60000},ETH:{owned:0,price:3000},DOGE:{owned:0,price:0.15},SHIB:{owned:0,price:0.00002},SOL:{owned:0,price:150},XRP:{owned:0,price:0.5},ADA:{owned:0,price:0.4},DOT:{owned:0,price:7},MATIC:{owned:0,price:0.8}},
     competitors:[
@@ -57,7 +57,7 @@ let S = {
     unionActivity:0, salaryLevel:1, friends:[], wall:[], clickerCount:0, multiverse:[],
     profileAvatar:"👤", profileName:"", profileStatus:"",
     lastClickTime:0, clickBlocked:false, clickBlockEnd:0, clicksInWindow:0, clickWindowStart:0,
-    referrals:0, tutorialDone:false, mathGameActive:false, mathAnswer:0, mathTimer:0,
+    referrals:0, tutorialDone:false, mathGameActive:false, mathAnswer:0, mathTimer:0, mathWins:0,
     prestigeUpgrades:{fastStart:0, cheaperTech:0, moreIncome:0, moreGrowth:0}
 };
 
@@ -70,40 +70,42 @@ const DIFFICULTY = {
     hard:{incomeMult:0.6,costMult:1.5,eventChance:0.015,desc:"Сложная: меньше дохода"}
 };
 
+// ===== ТЕХНОЛОГИИ (баланс: users уменьшены в 10 раз) =====
 const TECHS = [
-    {id:"chats",name:"Личные чаты",cost:100,users:50},{id:"groups",name:"Группы",cost:300,users:150},
-    {id:"photo",name:"Фото",cost:500,users:200},{id:"video",name:"Видео",cost:800,users:300},
-    {id:"voice",name:"Голосовые",cost:1200,users:400},{id:"stickers",name:"Стикеры",cost:1800,users:500},
-    {id:"reactions",name:"Реакции",cost:2500,users:700},{id:"calls",name:"Звонки",cost:4000,users:1000},
-    {id:"crypto",name:"Шифрование",cost:7000,users:1500},{id:"bots",name:"Боты",cost:12000,users:2000},
-    {id:"stories",name:"Статусы",cost:18000,users:2500},{id:"channels",name:"Каналы",cost:25000,users:3000},
-    {id:"premium",name:"Подписка",cost:40000,users:5000},{id:"apps",name:"Мини-приложения",cost:70000,users:8000},
-    {id:"ai",name:"AI-ассистент",cost:120000,users:15000},{id:"vr",name:"VR-чаты",cost:200000,users:20000},
-    {id:"ar",name:"AR-маски",cost:300000,users:25000},{id:"nft",name:"NFT-аватары",cost:500000,users:30000},
-    {id:"meta",name:"Метавселенная",cost:800000,users:50000},{id:"quantum",name:"Квантовое шифрование",cost:1500000,users:80000},
-    {id:"neural",name:"Нейроинтерфейс",cost:3000000,users:120000},{id:"hologram",name:"Голограммы",cost:5000000,users:200000},
-    {id:"teleport",name:"Телепортация",cost:10000000,users:400000},{id:"timetravel",name:"Отправка в прошлое",cost:50000000,users:1000000},
-    {id:"parallel",name:"Параллельные миры",cost:100000000,users:2000000},{id:"dimension",name:"Межмерное",cost:500000000,users:5000000},
-    {id:"universe",name:"Связь вселенных",cost:1000000000,users:10000000},{id:"god",name:"Божественный чат",cost:5000000000,users:50000000},
-    {id:"infinity",name:"Бесконечность",cost:10000000000,users:100000000},{id:"eternity",name:"Вечность",cost:50000000000,users:500000000},
-    {id:"dream",name:"Сны",cost:100000000000,users:1000000000},{id:"reality",name:"Управление реальностью",cost:500000000000,users:5000000000},
-    {id:"time",name:"Путешествия во времени",cost:1000000000000,users:10000000000},{id:"void",name:"Связь с пустотой",cost:5000000000000,users:50000000000},
-    {id:"absolute",name:"Абсолютная связь",cost:10000000000000,users:100000000000},{id:"eternal",name:"Вечный чат",cost:50000000000000,users:500000000000},
-    {id:"beyond",name:"За пределами",cost:100000000000000,users:1000000000000},{id:"everything",name:"Всё",cost:500000000000000,users:5000000000000},
-    {id:"nothing",name:"Ничто",cost:1000000000000000,users:10000000000000},{id:"ome",name:"Ом",cost:5000000000000000,users:50000000000000},
-    {id:"zero",name:"Ноль",cost:10000000000000000,users:100000000000000},{id:"alpha",name:"Альфа",cost:50000000000000000,users:500000000000000}
+    {id:"chats",name:"Личные чаты",cost:100,users:5},{id:"groups",name:"Группы",cost:300,users:15},
+    {id:"photo",name:"Фото",cost:500,users:20},{id:"video",name:"Видео",cost:800,users:30},
+    {id:"voice",name:"Голосовые",cost:1200,users:40},{id:"stickers",name:"Стикеры",cost:1800,users:50},
+    {id:"reactions",name:"Реакции",cost:2500,users:70},{id:"calls",name:"Звонки",cost:4000,users:100},
+    {id:"crypto",name:"Шифрование",cost:7000,users:150},{id:"bots",name:"Боты",cost:12000,users:200},
+    {id:"stories",name:"Статусы",cost:18000,users:250},{id:"channels",name:"Каналы",cost:25000,users:300},
+    {id:"premium",name:"Подписка",cost:40000,users:500},{id:"apps",name:"Мини-приложения",cost:70000,users:800},
+    {id:"ai",name:"AI-ассистент",cost:120000,users:1500},{id:"vr",name:"VR-чаты",cost:200000,users:2000},
+    {id:"ar",name:"AR-маски",cost:300000,users:2500},{id:"nft",name:"NFT-аватары",cost:500000,users:3000},
+    {id:"meta",name:"Метавселенная",cost:800000,users:5000},{id:"quantum",name:"Квантовое шифрование",cost:1500000,users:8000},
+    {id:"neural",name:"Нейроинтерфейс",cost:3000000,users:12000},{id:"hologram",name:"Голограммы",cost:5000000,users:20000},
+    {id:"teleport",name:"Телепортация",cost:10000000,users:40000},{id:"timetravel",name:"Отправка в прошлое",cost:50000000,users:100000},
+    {id:"parallel",name:"Параллельные миры",cost:100000000,users:200000},{id:"dimension",name:"Межмерное",cost:500000000,users:500000},
+    {id:"universe",name:"Связь вселенных",cost:1000000000,users:1000000},{id:"god",name:"Божественный чат",cost:5000000000,users:5000000},
+    {id:"infinity",name:"Бесконечность",cost:10000000000,users:10000000},{id:"eternity",name:"Вечность",cost:50000000000,users:50000000},
+    {id:"dream",name:"Сны",cost:100000000000,users:100000000},{id:"reality",name:"Управление реальностью",cost:500000000000,users:500000000},
+    {id:"time",name:"Путешествия во времени",cost:1000000000000,users:1000000000},{id:"void",name:"Связь с пустотой",cost:5000000000000,users:5000000000},
+    {id:"absolute",name:"Абсолютная связь",cost:10000000000000,users:10000000000},{id:"eternal",name:"Вечный чат",cost:50000000000000,users:50000000000},
+    {id:"beyond",name:"За пределами",cost:100000000000000,users:100000000000},{id:"everything",name:"Всё",cost:500000000000000,users:500000000000},
+    {id:"nothing",name:"Ничто",cost:1000000000000000,users:1000000000000},{id:"ome",name:"Ом",cost:5000000000000000,users:5000000000000},
+    {id:"zero",name:"Ноль",cost:10000000000000000,users:10000000000000},{id:"alpha",name:"Альфа",cost:50000000000000000,users:50000000000000}
 ];
 
+// ===== СОТРУДНИКИ (доход уменьшен в 5 раз) =====
 const STAFF = [
-    {id:"dev",name:"Разработчик",cost:500,income:2,users:10},{id:"mod",name:"Модератор",cost:800,income:0,users:20},
-    {id:"design",name:"Дизайнер",cost:1000,income:3,users:15},{id:"market",name:"Маркетолог",cost:1500,income:5,users:50},
-    {id:"sec",name:"Безопасник",cost:2000,income:2,users:5},{id:"intern",name:"Стажёр",cost:100,income:0.5,users:2},
-    {id:"lead",name:"Тимлид",cost:5000,income:10,users:100},{id:"hr",name:"HR",cost:3000,income:1,users:30},
-    {id:"lawyer",name:"Юрист",cost:7000,income:3,users:10},{id:"analyst",name:"Аналитик",cost:6000,income:8,users:40},
-    {id:"cto",name:"Техдир",cost:15000,income:20,users:200},{id:"ceo",name:"Гендир",cost:50000,income:50,users:500},
-    {id:"ai_dev",name:"AI-разработчик",cost:100000,income:100,users:2000},{id:"quantum_dev",name:"Квантовый инженер",cost:500000,income:500,users:10000},
-    {id:"space_dev",name:"Космический инженер",cost:2000000,income:2000,users:50000},{id:"time_dev",name:"Хроно-инженер",cost:10000000,income:10000,users:200000},
-    {id:"god_dev",name:"Божественный архитектор",cost:100000000,income:100000,users:2000000}
+    {id:"dev",name:"Разработчик",cost:500,income:0.4,users:2},{id:"mod",name:"Модератор",cost:800,income:0,users:4},
+    {id:"design",name:"Дизайнер",cost:1000,income:0.6,users:3},{id:"market",name:"Маркетолог",cost:1500,income:1,users:10},
+    {id:"sec",name:"Безопасник",cost:2000,income:0.4,users:1},{id:"intern",name:"Стажёр",cost:100,income:0.1,users:0.4},
+    {id:"lead",name:"Тимлид",cost:5000,income:2,users:20},{id:"hr",name:"HR",cost:3000,income:0.2,users:6},
+    {id:"lawyer",name:"Юрист",cost:7000,income:0.6,users:2},{id:"analyst",name:"Аналитик",cost:6000,income:1.6,users:8},
+    {id:"cto",name:"Техдир",cost:15000,income:4,users:40},{id:"ceo",name:"Гендир",cost:50000,income:10,users:100},
+    {id:"ai_dev",name:"AI-разработчик",cost:100000,income:20,users:400},{id:"quantum_dev",name:"Квантовый инженер",cost:500000,income:100,users:2000},
+    {id:"space_dev",name:"Космический инженер",cost:2000000,income:400,users:10000},{id:"time_dev",name:"Хроно-инженер",cost:10000000,income:2000,users:40000},
+    {id:"god_dev",name:"Божественный архитектор",cost:100000000,income:20000,users:400000}
 ];
 
 const CHARACTERS = [
@@ -285,22 +287,22 @@ const EASTER_EGGS = ["🥚 Тот, кто ищет — найдёт","🥚 КО�
 
 const EVENTS = [
     {text:"⚠️ Сервер упал! -5%",fn:()=>{S.users*=0.95;},type:"bad"},
-    {text:"🎉 Вирусный пост! +500",fn:()=>{S.users+=500;},type:"good"},
+    {text:"🎉 Вирусный пост! +50",fn:()=>{S.users+=50;},type:"good"},
     {text:"💀 Хакер! -10% денег",fn:()=>{S.money*=0.9;},type:"bad"},
     {text:"📰 Статья! +10 реп",fn:()=>{S.rep=Math.min(100,S.rep+10);},type:"good"},
     {text:"🚨 Утечка! -15 реп",fn:()=>{S.rep-=15;},type:"bad"},
     {text:"⭐ Инвестор! +$1000",fn:()=>{S.money+=1000;},type:"good"},
-    {text:"🐛 Баг! -200",fn:()=>{S.users=Math.max(0,S.users-200);},type:"bad"},
-    {text:"🔥 Мем! +2000",fn:()=>{S.users+=2000;},type:"good"},
-    {text:"📈 Тренд! +5000",fn:()=>{S.users+=5000;},type:"good"},
+    {text:"🐛 Баг! -20",fn:()=>{S.users=Math.max(0,S.users-20);},type:"bad"},
+    {text:"🔥 Мем! +200",fn:()=>{S.users+=200;},type:"good"},
+    {text:"📈 Тренд! +500",fn:()=>{S.users+=500;},type:"good"},
     {text:"📉 Отток! -10%",fn:()=>{S.users*=0.9;},type:"bad"},
     {text:"🎁 Спонсор! +$5000",fn:()=>{S.money+=5000;},type:"good"},
     {text:"⚡ DDoS! -20%",fn:()=>{S.money*=0.8;},type:"bad"},
-    {text:"📺 Реклама! +3000",fn:()=>{S.users+=3000;},type:"good"},
-    {text:"🤝 Партнёрство! +5000",fn:()=>{S.users+=5000;},type:"good"},
+    {text:"📺 Реклама! +300",fn:()=>{S.users+=300;},type:"good"},
+    {text:"🤝 Партнёрство! +500",fn:()=>{S.users+=500;},type:"good"},
     {text:"⚖️ Иск! -$3000",fn:()=>{S.money-=3000;},type:"bad"},
     {text:"🏆 Награда! +20 реп",fn:()=>{S.rep=Math.min(100,S.rep+20);},type:"good"},
-    {text:"🌐 Новая страна! +10000",fn:()=>{S.users+=10000;},type:"good"},
+    {text:"🌐 Новая страна! +1000",fn:()=>{S.users+=1000;},type:"good"},
     {text:"🚫 Блокировка! -15%",fn:()=>{S.users*=0.85;},type:"bad"},
     {text:"💎 Кристалл!",fn:()=>{S.crystals+=2;},type:"good"},
     {text:"🎯 Заказчик! +$10000",fn:()=>{S.money+=10000;},type:"good"},
@@ -308,38 +310,38 @@ const EVENTS = [
     {text:"📉 Санкции! -10%",fn:()=>{S.money*=0.9;},type:"bad"},
     {text:"⚔️ Война! -5%",fn:()=>{S.users*=0.95;},type:"bad"},
     {text:"💥 Взлом! -$50000",fn:()=>{S.money-=50000;},type:"bad"},
-    {text:"🌟 Вирусный ролик! +50000",fn:()=>{S.users+=50000;},type:"good"},
-    {text:"🎤 Знаменитость! +100000",fn:()=>{S.users+=100000;},type:"good"},
+    {text:"🌟 Вирусный ролик! +5000",fn:()=>{S.users+=5000;},type:"good"},
+    {text:"🎤 Знаменитость! +10000",fn:()=>{S.users+=10000;},type:"good"},
     {text:"🔥 Пожар! -$20000",fn:()=>{S.money-=20000;},type:"bad"},
     {text:"🎓 Университет! +20 реп",fn:()=>{S.rep=Math.min(100,S.rep+20);},type:"good"},
-    {text:"🚀 Космос! +500000",fn:()=>{S.users+=500000;},type:"good"},
+    {text:"🚀 Космос! +50000",fn:()=>{S.users+=50000;},type:"good"},
     {text:"💎 Алмаз! +5",fn:()=>{S.crystals+=5;},type:"good"},
-    {text:"👽 Контакт! +1000000",fn:()=>{S.users+=1000000;},type:"good"},
+    {text:"👽 Контакт! +100000",fn:()=>{S.users+=100000;},type:"good"},
     {text:"🌈 Чудо! ×2 доход 60с",fn:()=>{S.prestigeMult*=2;setTimeout(()=>{S.prestigeMult/=2;},60000);},type:"good"},
     {text:"🦠 Вирус! -10%",fn:()=>{S.users*=0.9;},type:"bad"},
     {text:"📡 Спутник! +$100000",fn:()=>{S.money+=100000;},type:"good"},
-    {text:"🎬 Фильм! +200000",fn:()=>{S.users+=200000;},type:"good"},
+    {text:"🎬 Фильм! +20000",fn:()=>{S.users+=20000;},type:"good"},
     {text:"⚡ Отключение! -$10000",fn:()=>{S.money-=10000;},type:"bad"},
     {text:"🎁 Миллиардер! +$1000000",fn:()=>{S.money+=1000000;},type:"good"},
     {text:"🌪️ Стихия! -20%",fn:()=>{S.users*=0.8;},type:"bad"},
-    {text:"💫 Квантовый скачок! +5000000",fn:()=>{S.users+=5000000;},type:"good"},
-    {text:"🎆 Праздник! +100000",fn:()=>{S.users+=100000;},type:"good"},
-    {text:"🚀 Ракета! +10000000",fn:()=>{S.users+=10000000;},type:"good"},
-    {text:"🌌 Параллельная вселенная! +100000000",fn:()=>{S.users+=100000000;},type:"good"},
+    {text:"💫 Квантовый скачок! +500000",fn:()=>{S.users+=500000;},type:"good"},
+    {text:"🎆 Праздник! +10000",fn:()=>{S.users+=10000;},type:"good"},
+    {text:"🚀 Ракета! +1000000",fn:()=>{S.users+=1000000;},type:"good"},
+    {text:"🌌 Параллельная вселенная! +10000000",fn:()=>{S.users+=10000000;},type:"good"},
     {text:"⏳ Временной парадокс! +$10000000",fn:()=>{S.money+=10000000;},type:"good"},
     {text:"🕳️ Чёрная дыра! -30%",fn:()=>{S.users*=0.7;},type:"bad"},
-    {text:"🛸 НЛО! +50000000",fn:()=>{S.users+=50000000;},type:"good"},
+    {text:"🛸 НЛО! +5000000",fn:()=>{S.users+=5000000;},type:"good"},
     {text:"🎩 Фокус! +$1000000",fn:()=>{S.money+=1000000;},type:"good"},
     {text:"🌊 Цунами! -25%",fn:()=>{S.users*=0.75;},type:"bad"},
     {text:"🔥 Вулкан! -$500000",fn:()=>{S.money-=500000;},type:"bad"},
-    {text:"⭐ Супернова! +100000000",fn:()=>{S.users+=100000000;},type:"good"},
+    {text:"⭐ Супернова! +10000000",fn:()=>{S.users+=10000000;},type:"good"},
     {text:"💎 Бриллиант! +10 кристаллов",fn:()=>{S.crystals+=10;},type:"good"},
     {text:"🎊 Юбилей! +$5000000",fn:()=>{S.money+=5000000;},type:"good"},
     {text:"🧬 Эволюция! +50% юзеров",fn:()=>{S.users*=1.5;},type:"good"},
     {text:"🌍 Землетрясение! -15%",fn:()=>{S.users*=0.85;},type:"bad"},
     {text:"🎯 Снайпер! +$2000000",fn:()=>{S.money+=2000000;},type:"good"},
     {text:"🎨 Шедевр! +30 реп",fn:()=>{S.rep=Math.min(100,S.rep+30);},type:"good"},
-    {text:"🚀 Космическая гонка! +500000000",fn:()=>{S.users+=500000000;},type:"good"}
+    {text:"🚀 Космическая гонка! +50000000",fn:()=>{S.users+=50000000;},type:"good"}
 ];
 
 const BATTLES = [
@@ -389,6 +391,30 @@ const SEASONS = {
 };
 
 const MONTH_NAMES = ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
+
+function applySettings(){
+    try {
+        document.body.classList.toggle("light", S.light);
+        document.body.classList.toggle("font-big", S.settings.fontbig);
+        if(S.settings.autotheme && window.matchMedia){
+            const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            S.light = !isDark;
+            document.body.classList.toggle("light", S.light);
+        }
+        ["sound","music","coins","confetti","notify","events","autosave","autotheme","fontbig"].forEach(k=>{
+            const el = document.getElementById("tgl-"+k);
+            if(el) el.classList.toggle("on", !!S.settings[k]);
+        });
+        const t = document.getElementById("tgl-theme");
+        if(t) t.classList.toggle("on", S.light);
+        ["easy","medium","hard"].forEach(d=>{
+            const el = document.getElementById("diff-"+d);
+            if(el) el.classList.toggle("active", S.difficulty === d);
+        });
+        const h = document.getElementById("diff-hint");
+        if(h) h.textContent = DIFFICULTY[S.difficulty].desc;
+    } catch(e){ console.log("applySettings:", e); }
+}
 
 function updateDeviceInfo(){
     try {
@@ -441,10 +467,10 @@ function show(id){
         if(id==="screen-multiverse") renderMultiverse();
         if(id==="screen-visual") renderVisual();
         if(id==="screen-profile") renderProfile();
-        if(id==="screen-settings") { renderSettings(); updateDeviceInfo(); }
+        if(id==="screen-settings") { applySettings(); updateDeviceInfo(); }
         if(id==="screen-seasons") renderSeasons();
         if(id==="screen-prestige-upgrades") renderPrestigeUpgrades();
-    } catch(e){ console.log(e); }
+    } catch(e){ console.log("show:", e); }
 }
 
 function backFromSettings(){
@@ -551,12 +577,14 @@ function getSeasonMult(){
     return season ? season.mult : 1;
 }
 
+// ===== ДОХОД (уменьшен, чтобы апгрейды имели смысл) =====
 function calcIncome(){
     try {
         const diff = DIFFICULTY[S.difficulty] || DIFFICULTY.medium;
         const seasonMult = getSeasonMult();
         const prestigeFast = 1 + (S.prestigeUpgrades.moreIncome || 0) * 0.25;
-        let base = safeNumber(S.users,0) * 0.02 * (1 - safeNumber(S.inflation,0)) * diff.incomeMult * seasonMult * prestigeFast;
+        // Доход с юзера: 0.001 в секунду (было 0.02)
+        let base = safeNumber(S.users,0) * 0.001 * (1 - safeNumber(S.inflation,0)) * diff.incomeMult * seasonMult * prestigeFast;
         let staffBonus = 0;
         S.staff.forEach(id=>{
             const s = STAFF.find(x=>x.id===id);
@@ -585,38 +613,28 @@ function calcIncome(){
     } catch(e){ return 0; }
 }
 
-function renderSettings(){
-    try {
-        ["sound","music","coins","confetti","notify","events","autosave","autotheme","fontbig"].forEach(k=>{
-            const el = document.getElementById("tgl-"+k);
-            if(el) el.className = "toggle" + (S.settings[k] ? " on" : "");
-        });
-        ["easy","medium","hard"].forEach(d=>{
-            const el = document.getElementById("diff-"+d);
-            if(el) el.className = "diff-btn" + (S.difficulty === d ? " active" : "");
-        });
-        const h = document.getElementById("diff-hint");
-        if(h) h.textContent = DIFFICULTY[S.difficulty].desc;
-        const t = document.getElementById("tgl-theme");
-        if(t) t.className = "toggle" + (S.light ? " on" : "");
-    } catch(e){}
-}
 function toggleSetting(key){
-    S.settings[key] = !S.settings[key];
-    if(key==="music" && S.settings.music) playMusic();
-    if(key==="autotheme"){
-        if(S.settings.autotheme){
-            const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            S.light = !isDark;
-        }
-        document.body.classList.toggle("light", S.light);
-    }
-    if(key==="fontbig"){
-        document.body.classList.toggle("font-big", S.settings.fontbig);
-    }
-    saveNow(); renderSettings();
+    try {
+        S.settings[key] = !S.settings[key];
+        if(key==="music" && S.settings.music) playMusic();
+        applySettings();
+        saveNow();
+    } catch(e){ console.log("toggleSetting:", e); }
 }
-function setDifficulty(d){ S.difficulty = d; notify("🎚️ " + DIFFICULTY[d].desc, "#06b6d4"); saveNow(); renderSettings(); }
+
+function setDifficulty(d){
+    S.difficulty = d;
+    notify("🎚️ " + DIFFICULTY[d].desc, "#06b6d4");
+    applySettings();
+    saveNow();
+}
+
+function toggleTheme(){
+    S.light = !S.light;
+    if(S.settings.autotheme) S.settings.autotheme = false;
+    applySettings();
+    saveNow();
+}
 
 function renderDetails(){
     try {
@@ -1282,11 +1300,22 @@ function addFriend(){
 }
 function copyReferral(){
     const text = "Играй в Симулятор Мессенджера! " + window.location.origin + window.location.pathname;
+    copyText(text, "📋 Ссылка скопирована");
+}
+
+function copyText(text, successMsg){
     try {
-        navigator.clipboard.writeText(text);
-        notify("📋 Ссылка скопирована", "#10b981");
+        if(navigator.clipboard && navigator.clipboard.writeText){
+            navigator.clipboard.writeText(text).then(()=>{
+                notify(successMsg || "📋 Скопировано", "#10b981");
+            }).catch(()=>{
+                prompt("Скопируй вручную:", text);
+            });
+        } else {
+            prompt("Скопируй вручную:", text);
+        }
     } catch(e){
-        prompt("Скопируй ссылку:", text);
+        prompt("Скопируй вручную:", text);
     }
 }
 
@@ -1348,6 +1377,7 @@ function doClick(event){
     } catch(e){ console.log(e); }
 }
 
+// ===== МАТЕМАТИКА (починено) =====
 function startMathGame(){
     try {
         const a = Math.floor(Math.random() * 20) + 1;
@@ -1360,35 +1390,47 @@ function startMathGame(){
         else answer = a * b;
         S.mathAnswer = answer;
         S.mathGameActive = true;
-        document.getElementById("math-question").textContent = a + " " + op + " " + b + " = ?";
-        document.getElementById("math-answer").value = "";
-        document.getElementById("math-answer").focus();
+        const qEl = document.getElementById("math-question");
+        if(qEl) qEl.textContent = a + " " + op + " " + b + " = ?";
+        const aEl = document.getElementById("math-answer");
+        if(aEl){
+            aEl.value = "";
+            aEl.disabled = false;
+            aEl.focus();
+        }
+        if(S.mathTimer) clearTimeout(S.mathTimer);
         S.mathTimer = setTimeout(()=>{
             if(S.mathGameActive){
                 S.mathGameActive = false;
                 notify("⏰ Время вышло", "#ef4444");
+                const qEl2 = document.getElementById("math-question");
+                if(qEl2) qEl2.textContent = "—";
             }
         }, 10000);
-    } catch(e){}
+    } catch(e){ console.log("startMathGame:", e); }
 }
 
 function checkMathAnswer(){
-    if(!S.mathGameActive) return;
-    const input = document.getElementById("math-answer");
-    const val = parseInt(input.value);
-    if(val === S.mathAnswer){
-        S.money += 500;
-        S.mathWins = (S.mathWins || 0) + 1;
-        notify("✅ +$500", "#10b981");
-        beep(900, 0.3);
-    } else {
-        notify("❌ Неверно", "#ef4444");
-    }
-    S.mathGameActive = false;
-    clearTimeout(S.mathTimer);
-    input.value = "";
-    document.getElementById("math-question").textContent = "—";
-    saveNow(); updateUI();
+    try {
+        if(!S.mathGameActive){ return; }
+        const input = document.getElementById("math-answer");
+        if(!input) return;
+        const val = parseInt(input.value);
+        if(val === S.mathAnswer){
+            S.money += 500;
+            S.mathWins = (S.mathWins || 0) + 1;
+            notify("✅ +$500", "#10b981");
+            beep(900, 0.3);
+        } else {
+            notify("❌ Неверно", "#ef4444");
+        }
+        S.mathGameActive = false;
+        if(S.mathTimer) clearTimeout(S.mathTimer);
+        input.value = "";
+        const qEl = document.getElementById("math-question");
+        if(qEl) qEl.textContent = "—";
+        saveNow(); updateUI();
+    } catch(e){ console.log("checkMathAnswer:", e); }
 }
 
 function renderMultiverse(){
@@ -1726,19 +1768,15 @@ function claimDaily(){
 
 function showShareMenu(){
     const text = `🎮 Играй в Симулятор Мессенджера!\nСоздай свой мессенджер, обгони конкурентов.\n\n🔗 ${window.location.origin}${window.location.pathname}\n📢 t.me/VOXLAB0`;
-    if(navigator.share){
-        navigator.share({title:"Симулятор Мессенджера", text: text}).catch(()=>{});
+    if(navigator.share && deviceType === "mobile"){
+        navigator.share({title:"Симулятор Мессенджера", text: text}).catch(()=>{
+            copyText(text, "📋 Текст скопирован! Вставь в TikTok/VK");
+        });
     } else {
-        try {
-            navigator.clipboard.writeText(text);
-            notify("📋 Текст скопирован! Вставь в TikTok/VK", "#10b981");
-        } catch(e){
-            prompt("Скопируй текст:", text);
-        }
+        copyText(text, "📋 Текст скопирован! Вставь в TikTok/VK");
     }
 }
 
-// ОНБОРДИНГ
 function showTutorial(){
     try {
         if(S.tutorialDone) return;
@@ -1908,7 +1946,7 @@ function tick(){
                 if(bid === "autoTech" && S.money >= 1000){ const t = TECHS.find(x=>!S.techs.includes(x.id)); if(t && S.money >= t.cost){ S.money -= t.cost; S.techs.push(t.id); } }
                 if(bid === "autoStaff" && S.money >= 2000){ const s = STAFF.find(x=>!S.staff.includes(x.id)); if(s && S.money >= s.cost){ S.money -= s.cost; S.staff.push(s.id); S.staffLevels[s.id] = {level:1, char:"genius"}; } }
                 if(bid === "autoCrypto"){ const sym = Object.keys(S.cryptos)[Math.floor(Math.random()*10)]; S.cryptos[sym].owned += 1; }
-                if(bid === "autoAds"){ S.users += 100; }
+                if(bid === "autoAds"){ S.users += 10; }
             });
         }
 
@@ -1920,8 +1958,9 @@ function tick(){
         let maxUsers = 1000;
         S.servers.forEach(id=>{ const s = SERVERS.find(x=>x.id===id); if(s) maxUsers += s.maxUsers; });
 
+        // РОСТ ЮЗЕРОВ: замедлен в 20 раз
         if(S.users < maxUsers){
-            let growth = 1 + S.techs.length * 0.5 + S.staff.length * 2;
+            let growth = 0.05 + S.techs.length * 0.05 + S.staff.length * 0.1;
             growth *= (S.rep / 50);
             growth *= (1 + (S.level-1) * 0.1);
             growth *= (1 + (S.skills.growth || 0) * 0.1);
@@ -2042,21 +2081,13 @@ function load(){
     } catch(e){ return false; }
 }
 
-function toggleTheme(){
-    S.light = !S.light;
-    document.body.classList.toggle("light", S.light);
-    saveNow();
-    renderSettings();
-}
-
 function newGame(){ gameCreated = false; show("screen-create"); }
 
 function continueGame(){
     if(load()){
         gameCreated = true;
         updateUI();
-        document.body.classList.toggle("light", S.light);
-        document.body.classList.toggle("font-big", S.settings.fontbig);
+        applySettings();
         show("screen-main");
         notify("💾 Загружено", "#10b981");
         if(S.settings.music) playMusic();
@@ -2121,7 +2152,6 @@ function resetGame(){
     }
 }
 
-// Проверка ответа на математику
 document.addEventListener("DOMContentLoaded", ()=>{
     const mathInput = document.getElementById("math-answer");
     if(mathInput){
@@ -2129,6 +2159,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
             if(e.key === "Enter") checkMathAnswer();
         });
     }
+    applySettings();
 });
 
 window.addEventListener("resize", ()=>{
@@ -2139,8 +2170,17 @@ window.addEventListener("resize", ()=>{
     }
 });
 
+if(window.matchMedia){
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ()=>{
+        if(S.settings.autotheme){
+            applySettings();
+        }
+    });
+}
+
 updateUI();
 updateDeviceInfo();
+applySettings();
 setInterval(tick, 1000);
 window.addEventListener("beforeunload", saveNow);
 setInterval(()=>{ if(S.settings.autosave && gameCreated) saveNow(); }, 3000);
