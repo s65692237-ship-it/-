@@ -1,5 +1,5 @@
-// ===== СИМУЛЯТОР МЕССЕНДЖЕРА v10.2 =====
-// Баланс пересчитан. Математика работает.
+// ===== СИМУЛЯТОР МЕССЕНДЖЕРА v11.0 =====
+// Сюжет с условиями. Игра сложнее.
 
 function safeNumber(n, def){ return (typeof n === "number" && isFinite(n)) ? n : (def || 0); }
 
@@ -66,46 +66,44 @@ let deviceType = getDeviceType();
 
 const DIFFICULTY = {
     easy:{incomeMult:1.5,costMult:0.7,eventChance:0.005,desc:"Лёгкая: больше дохода"},
-    medium:{incomeMult:1.0,costMult:1.0,eventChance:0.008,desc:"Средняя: баланс"},
-    hard:{incomeMult:0.6,costMult:1.5,eventChance:0.015,desc:"Сложная: меньше дохода"}
+    medium:{incomeMult:1.0,costMult:1.0,eventChance:0.012,desc:"Средняя: баланс"},
+    hard:{incomeMult:0.6,costMult:1.5,eventChance:0.02,desc:"Сложная: меньше дохода"}
 };
 
-// ===== ТЕХНОЛОГИИ (баланс: users уменьшены в 10 раз) =====
 const TECHS = [
-    {id:"chats",name:"Личные чаты",cost:100,users:5},{id:"groups",name:"Группы",cost:300,users:15},
-    {id:"photo",name:"Фото",cost:500,users:20},{id:"video",name:"Видео",cost:800,users:30},
-    {id:"voice",name:"Голосовые",cost:1200,users:40},{id:"stickers",name:"Стикеры",cost:1800,users:50},
-    {id:"reactions",name:"Реакции",cost:2500,users:70},{id:"calls",name:"Звонки",cost:4000,users:100},
-    {id:"crypto",name:"Шифрование",cost:7000,users:150},{id:"bots",name:"Боты",cost:12000,users:200},
-    {id:"stories",name:"Статусы",cost:18000,users:250},{id:"channels",name:"Каналы",cost:25000,users:300},
-    {id:"premium",name:"Подписка",cost:40000,users:500},{id:"apps",name:"Мини-приложения",cost:70000,users:800},
-    {id:"ai",name:"AI-ассистент",cost:120000,users:1500},{id:"vr",name:"VR-чаты",cost:200000,users:2000},
-    {id:"ar",name:"AR-маски",cost:300000,users:2500},{id:"nft",name:"NFT-аватары",cost:500000,users:3000},
-    {id:"meta",name:"Метавселенная",cost:800000,users:5000},{id:"quantum",name:"Квантовое шифрование",cost:1500000,users:8000},
-    {id:"neural",name:"Нейроинтерфейс",cost:3000000,users:12000},{id:"hologram",name:"Голограммы",cost:5000000,users:20000},
-    {id:"teleport",name:"Телепортация",cost:10000000,users:40000},{id:"timetravel",name:"Отправка в прошлое",cost:50000000,users:100000},
-    {id:"parallel",name:"Параллельные миры",cost:100000000,users:200000},{id:"dimension",name:"Межмерное",cost:500000000,users:500000},
-    {id:"universe",name:"Связь вселенных",cost:1000000000,users:1000000},{id:"god",name:"Божественный чат",cost:5000000000,users:5000000},
-    {id:"infinity",name:"Бесконечность",cost:10000000000,users:10000000},{id:"eternity",name:"Вечность",cost:50000000000,users:50000000},
-    {id:"dream",name:"Сны",cost:100000000000,users:100000000},{id:"reality",name:"Управление реальностью",cost:500000000000,users:500000000},
-    {id:"time",name:"Путешествия во времени",cost:1000000000000,users:1000000000},{id:"void",name:"Связь с пустотой",cost:5000000000000,users:5000000000},
-    {id:"absolute",name:"Абсолютная связь",cost:10000000000000,users:10000000000},{id:"eternal",name:"Вечный чат",cost:50000000000000,users:50000000000},
-    {id:"beyond",name:"За пределами",cost:100000000000000,users:100000000000},{id:"everything",name:"Всё",cost:500000000000000,users:500000000000},
-    {id:"nothing",name:"Ничто",cost:1000000000000000,users:1000000000000},{id:"ome",name:"Ом",cost:5000000000000000,users:5000000000000},
-    {id:"zero",name:"Ноль",cost:10000000000000000,users:10000000000000},{id:"alpha",name:"Альфа",cost:50000000000000000,users:50000000000000}
+    {id:"chats",name:"Личные чаты",cost:150,users:5},{id:"groups",name:"Группы",cost:400,users:15},
+    {id:"photo",name:"Фото",cost:700,users:20},{id:"video",name:"Видео",cost:1100,users:30},
+    {id:"voice",name:"Голосовые",cost:1600,users:40},{id:"stickers",name:"Стикеры",cost:2400,users:50},
+    {id:"reactions",name:"Реакции",cost:3300,users:70},{id:"calls",name:"Звонки",cost:5300,users:100},
+    {id:"crypto",name:"Шифрование",cost:9300,users:150},{id:"bots",name:"Боты",cost:16000,users:200},
+    {id:"stories",name:"Статусы",cost:24000,users:250},{id:"channels",name:"Каналы",cost:33000,users:300},
+    {id:"premium",name:"Подписка",cost:53000,users:500},{id:"apps",name:"Мини-приложения",cost:93000,users:800},
+    {id:"ai",name:"AI-ассистент",cost:160000,users:1500},{id:"vr",name:"VR-чаты",cost:260000,users:2000},
+    {id:"ar",name:"AR-маски",cost:400000,users:2500},{id:"nft",name:"NFT-аватары",cost:660000,users:3000},
+    {id:"meta",name:"Метавселенная",cost:1000000,users:5000},{id:"quantum",name:"Квантовое шифрование",cost:2000000,users:8000},
+    {id:"neural",name:"Нейроинтерфейс",cost:4000000,users:12000},{id:"hologram",name:"Голограммы",cost:6600000,users:20000},
+    {id:"teleport",name:"Телепортация",cost:13000000,users:40000},{id:"timetravel",name:"Отправка в прошлое",cost:66000000,users:100000},
+    {id:"parallel",name:"Параллельные миры",cost:130000000,users:200000},{id:"dimension",name:"Межмерное",cost:660000000,users:500000},
+    {id:"universe",name:"Связь вселенных",cost:1300000000,users:1000000},{id:"god",name:"Божественный чат",cost:6600000000,users:5000000},
+    {id:"infinity",name:"Бесконечность",cost:13000000000,users:10000000},{id:"eternity",name:"Вечность",cost:66000000000,users:50000000},
+    {id:"dream",name:"Сны",cost:130000000000,users:100000000},{id:"reality",name:"Управление реальностью",cost:660000000000,users:500000000},
+    {id:"time",name:"Путешествия во времени",cost:1300000000000,users:1000000000},{id:"void",name:"Связь с пустотой",cost:6600000000000,users:5000000000},
+    {id:"absolute",name:"Абсолютная связь",cost:13000000000000,users:10000000000},{id:"eternal",name:"Вечный чат",cost:66000000000000,users:50000000000},
+    {id:"beyond",name:"За пределами",cost:130000000000000,users:100000000000},{id:"everything",name:"Всё",cost:660000000000000,users:500000000000},
+    {id:"nothing",name:"Ничто",cost:1300000000000000,users:1000000000000},{id:"ome",name:"Ом",cost:6600000000000000,users:5000000000000},
+    {id:"zero",name:"Ноль",cost:13000000000000000,users:10000000000000},{id:"alpha",name:"Альфа",cost:66000000000000000,users:50000000000000}
 ];
 
-// ===== СОТРУДНИКИ (доход уменьшен в 5 раз) =====
 const STAFF = [
-    {id:"dev",name:"Разработчик",cost:500,income:0.4,users:2},{id:"mod",name:"Модератор",cost:800,income:0,users:4},
-    {id:"design",name:"Дизайнер",cost:1000,income:0.6,users:3},{id:"market",name:"Маркетолог",cost:1500,income:1,users:10},
-    {id:"sec",name:"Безопасник",cost:2000,income:0.4,users:1},{id:"intern",name:"Стажёр",cost:100,income:0.1,users:0.4},
-    {id:"lead",name:"Тимлид",cost:5000,income:2,users:20},{id:"hr",name:"HR",cost:3000,income:0.2,users:6},
-    {id:"lawyer",name:"Юрист",cost:7000,income:0.6,users:2},{id:"analyst",name:"Аналитик",cost:6000,income:1.6,users:8},
-    {id:"cto",name:"Техдир",cost:15000,income:4,users:40},{id:"ceo",name:"Гендир",cost:50000,income:10,users:100},
-    {id:"ai_dev",name:"AI-разработчик",cost:100000,income:20,users:400},{id:"quantum_dev",name:"Квантовый инженер",cost:500000,income:100,users:2000},
-    {id:"space_dev",name:"Космический инженер",cost:2000000,income:400,users:10000},{id:"time_dev",name:"Хроно-инженер",cost:10000000,income:2000,users:40000},
-    {id:"god_dev",name:"Божественный архитектор",cost:100000000,income:20000,users:400000}
+    {id:"dev",name:"Разработчик",cost:750,income:0.4,users:2},{id:"mod",name:"Модератор",cost:1200,income:0,users:4},
+    {id:"design",name:"Дизайнер",cost:1500,income:0.6,users:3},{id:"market",name:"Маркетолог",cost:2200,income:1,users:10},
+    {id:"sec",name:"Безопасник",cost:3000,income:0.4,users:1},{id:"intern",name:"Стажёр",cost:150,income:0.1,users:0.4},
+    {id:"lead",name:"Тимлид",cost:7500,income:2,users:20},{id:"hr",name:"HR",cost:4500,income:0.2,users:6},
+    {id:"lawyer",name:"Юрист",cost:10000,income:0.6,users:2},{id:"analyst",name:"Аналитик",cost:9000,income:1.6,users:8},
+    {id:"cto",name:"Техдир",cost:22000,income:4,users:40},{id:"ceo",name:"Гендир",cost:75000,income:10,users:100},
+    {id:"ai_dev",name:"AI-разработчик",cost:150000,income:20,users:400},{id:"quantum_dev",name:"Квантовый инженер",cost:750000,income:100,users:2000},
+    {id:"space_dev",name:"Космический инженер",cost:3000000,income:400,users:10000},{id:"time_dev",name:"Хроно-инженер",cost:15000000,income:2000,users:40000},
+    {id:"god_dev",name:"Божественный архитектор",cost:150000000,income:20000,users:400000}
 ];
 
 const CHARACTERS = [
@@ -117,12 +115,12 @@ const CHARACTERS = [
 ];
 
 const SERVERS = [
-    {id:"small",name:"Малый",cost:500,maxUsers:1000},{id:"medium",name:"Средний",cost:2000,maxUsers:5000},
-    {id:"large",name:"Большой",cost:8000,maxUsers:20000},{id:"mega",name:"Мега",cost:30000,maxUsers:100000},
-    {id:"giga",name:"Гига",cost:150000,maxUsers:1000000},{id:"tera",name:"Тера",cost:700000,maxUsers:10000000},
-    {id:"quantum",name:"Квантовый",cost:5000000,maxUsers:100000000},{id:"stellar",name:"Звёздный",cost:50000000,maxUsers:1000000000},
-    {id:"galactic",name:"Галактический",cost:500000000,maxUsers:10000000000},{id:"universal",name:"Вселенский",cost:5000000000,maxUsers:100000000000},
-    {id:"multiversal",name:"Мультивселенский",cost:50000000000,maxUsers:1000000000000},{id:"infinite",name:"Бесконечный",cost:500000000000,maxUsers:10000000000000}
+    {id:"small",name:"Малый",cost:750,maxUsers:1000},{id:"medium",name:"Средний",cost:3000,maxUsers:5000},
+    {id:"large",name:"Большой",cost:12000,maxUsers:20000},{id:"mega",name:"Мега",cost:45000,maxUsers:100000},
+    {id:"giga",name:"Гига",cost:220000,maxUsers:1000000},{id:"tera",name:"Тера",cost:1000000,maxUsers:10000000},
+    {id:"quantum",name:"Квантовый",cost:7500000,maxUsers:100000000},{id:"stellar",name:"Звёздный",cost:75000000,maxUsers:1000000000},
+    {id:"galactic",name:"Галактический",cost:750000000,maxUsers:10000000000},{id:"universal",name:"Вселенский",cost:7500000000,maxUsers:100000000000},
+    {id:"multiversal",name:"Мультивселенский",cost:75000000000,maxUsers:1000000000000},{id:"infinite",name:"Бесконечный",cost:750000000000,maxUsers:10000000000000}
 ];
 
 const DEPTS = [
@@ -269,19 +267,118 @@ const ALL_LOGOS = ["💬","📱","⚡","🌐","🚀","🔥","💎","⭐","🎯",
 const ALL_STICKERS = ["😂","😍","🤔","😎","🥳","😭","🤯","🤡","👻","👽","🤖","💀","💩","🔥","❤️","💔","👍","👎","🤝","👏","🙏","💪","🤞","✌️"];
 const ALL_AVATARS = ["👤","👨","👩","🧑","👶","🧓","👮","🕵️","💂","👷","👨‍💻","👩‍💻","🦸","🦹","🧙","🧚","🧛","🧜","🧝","🎅"];
 
+// ===== СЮЖЕТ С УСЛОВИЯМИ =====
+// Каждая глава требует выполнения условия
 const STORY_CHAPTERS = [
-    {text:"Ты запустил свой мессенджер. Конкуренты заметили.",choices:[{text:"Приватность",effect:()=>{S.rep+=10;}},{text:"Скорость",effect:()=>{S.users+=1000;}}]},
-    {text:"Инвесторы хотят долю.",choices:[{text:"Взять деньги",effect:()=>{S.money+=50000;S.prestigeMult*=0.9;}},{text:"Расти самому",effect:()=>{S.users+=5000;}}]},
-    {text:"Конкурент запустил похожую фичу.",choices:[{text:"Ответить фичей",effect:()=>{S.techs.push("ai");}},{text:"Сделать скидку",effect:()=>{S.users+=10000;S.money-=5000;}}]},
-    {text:"Государство требует лицензию.",choices:[{text:"Получить",effect:()=>{S.money-=20000;S.rep+=20;}},{text:"Игнорировать",effect:()=>{S.rep-=10;S.money+=30000;}}]},
-    {text:"Мессенджер стал мировым.",choices:[{text:"Остаться независимым",effect:()=>{S.prestigeMult*=1.5;}},{text:"Продать гиганту",effect:()=>{S.money+=1000000;}}]},
-    {text:"Крупный конкурент предложил слияние.",choices:[{text:"Принять",effect:()=>{S.users+=100000000;S.prestigeMult*=0.5;}},{text:"Отказаться",effect:()=>{S.rep+=30;}}]},
-    {text:"Появился конкурент из будущего.",choices:[{text:"Изучить",effect:()=>{S.techs.push("quantum");}},{text:"Атаковать",effect:()=>{S.users-=100000;S.money+=500000;}}]},
-    {text:"Учёные предлагают нейроинтерфейс.",choices:[{text:"Внедрить",effect:()=>{S.techs.push("neural");S.users*=1.5;}},{text:"Отказаться",effect:()=>{S.rep+=20;}}]},
-    {text:"Тебе пишет известный предприниматель.",choices:[{text:"Ответить",effect:()=>{S.money+=10000000;S.rep+=50;}},{text:"Игнорировать",effect:()=>{S.users+=5000000;}}]},
-    {text:"Ты стал самым большим мессенджером в истории.",choices:[{text:"Уйти на пенсию",effect:()=>{S.prestige+=1;S.prestigeMult*=5;}},{text:"Продолжать",effect:()=>{S.users*=2;}}]}
+    {text:"Ты запустил свой мессенджер. Первый пользователь зашёл. Нужно решить, на чём сделать упор.",req:{type:"users",value:10,text:"10 юзеров"},choices:[
+        {text:"Приватность (+20 реп)",effect:()=>{S.rep+=20;}},
+        {text:"Скорость (+50 юзеров)",effect:()=>{S.users+=50;}}
+    ]},
+    {text:"Конкуренты заметили тебя. Нужен первый сотрудник, чтобы работать быстрее.",req:{type:"staff",value:1,text:"1 сотрудник"},choices:[
+        {text:"Нанять разработчика",effect:()=>{S.money-=500;S.staff.push("dev");S.staffLevels["dev"]={level:1,char:"genius"};}},
+        {text:"Нанять маркетолога",effect:()=>{S.money-=1500;S.staff.push("market");S.staffLevels["market"]={level:1,char:"genius"};}}
+    ]},
+    {text:"Ты заходишь в новую страну. Нужен сервер, иначе юзеры уйдут.",req:{type:"servers",value:1,text:"1 сервер"},choices:[
+        {text:"Купить малый сервер",effect:()=>{if(!S.servers.includes("small"))S.servers.push("small");}},
+        {text:"Обойтись без сервера (-10% юзеров)",effect:()=>{S.users*=0.9;}}
+    ]},
+    {text:"Пришли инвесторы. Хотят долю. Решай.",req:{type:"users",value:1000,text:"1000 юзеров"},choices:[
+        {text:"Взять деньги (×0.8 доход)",effect:()=>{S.money+=100000;S.prestigeMult*=0.8;}},
+        {text:"Отказаться (+5000 юзеров)",effect:()=>{S.users+=5000;S.rep+=20;}}
+    ]},
+    {text:"Первый конкурент запустил похожую фичу. Ответь.",req:{type:"techs",value:10,text:"10 технологий"},choices:[
+        {text:"Купить AI-ассистента",effect:()=>{if(!S.techs.includes("ai"))S.techs.push("ai");}},
+        {text:"Сделать скидку Premium",effect:()=>{S.users+=10000;S.money-=20000;}}
+    ]},
+    {text:"Государство требует лицензию. Юристы советуют.",req:{type:"money",value:50000,text:"50000$"},choices:[
+        {text:"Получить лицензию (-30к, +30 реп)",effect:()=>{S.money-=30000;S.rep+=30;}},
+        {text:"Игнорировать (риск штрафа)",effect:()=>{S.rep-=15;S.money+=50000;}}
+    ]},
+    {text:"Хакеры атаковали серверы. Нужно защититься.",req:{type:"staff",value:3,text:"3 сотрудника"},choices:[
+        {text:"Нанять безопасника",effect:()=>{if(!S.staff.includes("sec")){S.staff.push("sec");S.staffLevels["sec"]={level:1,char:"genius"};}}},
+        {text:"Заплатить выкуп ($20000)",effect:()=>{S.money-=20000;}}
+    ]},
+    {text:"Вирусный пост в соцсетях. Ты стал популярным.",req:{type:"users",value:10000,text:"10000 юзеров"},choices:[
+        {text:"Усилить рекламу (+50к)",effect:()=>{S.users+=50000;}},
+        {text:"Сохранить репутацию (+50 реп)",effect:()=>{S.rep=Math.min(100,S.rep+50);}}
+    ]},
+    {text:"Крупный холдинг предлагает слияние. Думай.",req:{type:"users",value:100000,text:"100000 юзеров"},choices:[
+        {text:"Принять (+1M юзеров, ×0.5 доход)",effect:()=>{S.users+=1000000;S.prestigeMult*=0.5;}},
+        {text:"Отказаться (+50 реп)",effect:()=>{S.rep=Math.min(100,S.rep+50);}}
+    ]},
+    {text:"Появился конкурент из будущего. Изучаешь?",req:{type:"techs",value:20,text:"20 технологий"},choices:[
+        {text:"Изучить квантовое шифрование",effect:()=>{if(!S.techs.includes("quantum"))S.techs.push("quantum");}},
+        {text:"Атаковать конкурента",effect:()=>{S.users+=500000;S.rep-=20;}}
+    ]},
+    {text:"Учёные предлагают нейроинтерфейс. Рискни.",req:{type:"users",value:500000,text:"500000 юзеров"},choices:[
+        {text:"Внедрить (+100% юзеров)",effect:()=>{S.users*=2;}},
+        {text:"Отказаться (+30 реп)",effect:()=>{S.rep=Math.min(100,S.rep+30);}}
+    ]},
+    {text:"Тебе пишет известный предприниматель.",req:{type:"money",value:500000,text:"500000$"},choices:[
+        {text:"Ответить (+5M денег)",effect:()=>{S.money+=5000000;}},
+        {text:"Игнорировать (+1M юзеров)",effect:()=>{S.users+=1000000;}}
+    ]},
+    {text:"Крипто-бум. Ты можешь заработать.",req:{type:"crypto",value:1,text:"Купить крипту"},choices:[
+        {text:"Инвестировать всё",effect:()=>{S.money+=S.money*0.5;}},
+        {text:"Не рисковать (+20 реп)",effect:()=>{S.rep=Math.min(100,S.rep+20);}}
+    ]},
+    {text:"Второй офис в другой стране. Расширяйся.",req:{type:"money",value:1000000,text:"1M денег"},choices:[
+        {text:"Открыть офис (-500к, +20% доход)",effect:()=>{S.money-=500000;S.company.office=true;S.company.offices=(S.company.offices||0)+1;}},
+        {text:"Подождать (+500к юзеров)",effect:()=>{S.users+=500000;}}
+    ]},
+    {text:"Босс конкурентов вышел на связь. Он хочет бой.",req:{type:"boss",value:2,text:"Убить 1 босса"},choices:[
+        {text:"Принять вызов (+5 кристаллов)",effect:()=>{S.crystals+=5;}},
+        {text:"Уклониться (+50к юзеров)",effect:()=>{S.users+=50000;}}
+    ]},
+    {text:"Ты вошёл в топ-10 мессенджеров мира.",req:{type:"users",value:5000000,text:"5M юзеров"},choices:[
+        {text:"Продолжать рост (+5M юзеров)",effect:()=>{S.users+=5000000;}},
+        {text:"Улучшить качество (+50 реп)",effect:()=>{S.rep=Math.min(100,S.rep+50);}}
+    ]},
+    {text:"Правительство хочет слежку. Откажешь?",req:{type:"money",value:5000000,text:"5M денег"},choices:[
+        {text:"Отказаться (-1M, +50 реп)",effect:()=>{S.money-=1000000;S.rep=Math.min(100,S.rep+50);}},
+        {text:"Согласиться (+5M денег, -30 реп)",effect:()=>{S.money+=5000000;S.rep-=30;}}
+    ]},
+    {text:"Пандемия. Все сидят дома. Твой шанс.",req:{type:"users",value:10000000,text:"10M юзеров"},choices:[
+        {text:"Запустить видеозвонки (+50M юзеров)",effect:()=>{S.users+=50000000;}},
+        {text:"Остаться стабильным (+100 реп)",effect:()=>{S.rep=100;}}
+    ]},
+    {text:"Конкурент обанкротился. Поглотить?",req:{type:"money",value:50000000,text:"50M денег"},choices:[
+        {text:"Поглотить (+100M юзеров)",effect:()=>{S.users+=100000000;}},
+        {text:"Не связываться (+50M денег)",effect:()=>{S.money+=50000000;}}
+    ]},
+    {text:"Тебя хотят купить за триллион. Продашься?",req:{type:"users",value:100000000,text:"100M юзеров"},choices:[
+        {text:"Продать (×10 денег)",effect:()=>{S.money*=10;}},
+        {text:"Остаться независимым (+200 реп)",effect:()=>{S.rep=200;}}
+    ]},
+    {text:"Ракета SpaceX предлагает сотрудничество.",req:{type:"techs",value:30,text:"30 технологий"},choices:[
+        {text:"Согласиться (+500M юзеров)",effect:()=>{S.users+=500000000;}},
+        {text:"Отказаться (+500M денег)",effect:()=>{S.money+=500000000;}}
+    ]},
+    {text:"Квантовый скачок технологий. Ты готов?",req:{type:"users",value:500000000,text:"500M юзеров"},choices:[
+        {text:"Внедрить (×2 юзеров)",effect:()=>{S.users*=2;}},
+        {text:"Осторожно (+200 реп)",effect:()=>{S.rep=Math.min(1000,S.rep+200);}}
+    ]},
+    {text:"Параллельная вселенная. Ты встретил себя.",req:{type:"prestige",value:1,text:"1 престиж"},choices:[
+        {text:"Объединиться (×2 доход)",effect:()=>{S.prestigeMult*=2;}},
+        {text:"Уничтожить (×5 юзеров)",effect:()=>{S.users*=5;}}
+    ]},
+    {text:"Ты стал №1 в мире. Что дальше?",req:{type:"users",value:1000000000,text:"1 миллиард юзеров"},choices:[
+        {text:"Уйти на пенсию (+5 престиж)",effect:()=>{S.prestige+=5;S.prestigeMult*=32;}},
+        {text:"Продолжать (+1T юзеров)",effect:()=>{S.users+=1000000000000;}}
+    ]},
+    {text:"Ом. Ты достиг просветления.",req:{type:"users",value:10000000000,text:"10 миллиардов юзеров"},choices:[
+        {text:"Стать легендой (×10 доход)",effect:()=>{S.prestigeMult*=10;}},
+        {text:"Раствориться (+1000 кристаллов)",effect:()=>{S.crystals+=1000;}}
+    ]},
+    {text:"Вселенная расширяется. Ты — её часть.",req:{type:"users",value:100000000000,text:"100 миллиардов"},choices:[
+        {text:"Стать галактикой (+1000 реп)",effect:()=>{S.rep=1000000;}},
+        {text:"Стать пустотой (+1T денег)",effect:()=>{S.money+=1000000000000;}}
+    ]},
+    {text:"Конец всего. Но это только начало.",req:{type:"prestige",value:3,text:"3 престижа"},choices:[
+        {text:"Начать заново (+10 престиж)",effect:()=>{S.prestige+=10;S.prestigeMult=Math.pow(2,S.prestige);}},
+        {text:"Остаться навсегда (+1Q юзеров)",effect:()=>{S.users+=1000000000000000;}}
+    ]}
 ];
-for(let i=STORY_CHAPTERS.length;i<30;i++) STORY_CHAPTERS.push({text:"Глава "+(i+1)+": Продолжение...",choices:[{text:"Далее",effect:()=>{S.money+=100000;}}]});
 
 const EASTER_EGGS = ["🥚 Тот, кто ищет — найдёт","🥚 КОД-4821","🥚 2026: мессенджеры захватят мир","🥚 Пусто?","🥚 РАКЕТА-2026","🥚 42","🥚 Ещё одна дверь","🥚 Ты — избранный","🥚 Не смотри в бездну","🥚 Всё циклично","🥚 Привет, мир!","🥚 Ты не первый","🥚 Следят за тобой","🥚 Ты видел это","🥚 Данные не исчезают","🥚 Мы видим","🥚 Симуляция","🥚 01001000","🥚 Привет из 3026","🥚 Кот жив","🥚 Красная таблетка","🥚 Синяя таблетка","🥚 Сбой матрицы","🥚 Проснись","🥚 Ты — бот","🥚 Я — ты","🥚 Круг замкнулся","🥚 Конец = начало","🥚 Всё повторится","🥚 Спасибо за игру","🥚 Дверь №7","🥚 Не оборачивайся","🥚 Свет мигает","🥚 Шаги за спиной","🥚 Ты не один","🥚 Они слушают","🥚 Выход есть","🥚 Только вперёд","🥚 Не сдавайся","🥚 Финал близко"];
 
@@ -577,14 +674,13 @@ function getSeasonMult(){
     return season ? season.mult : 1;
 }
 
-// ===== ДОХОД (уменьшен, чтобы апгрейды имели смысл) =====
 function calcIncome(){
     try {
         const diff = DIFFICULTY[S.difficulty] || DIFFICULTY.medium;
         const seasonMult = getSeasonMult();
         const prestigeFast = 1 + (S.prestigeUpgrades.moreIncome || 0) * 0.25;
-        // Доход с юзера: 0.001 в секунду (было 0.02)
-        let base = safeNumber(S.users,0) * 0.001 * (1 - safeNumber(S.inflation,0)) * diff.incomeMult * seasonMult * prestigeFast;
+        // Доход с юзера: 0.0005 (было 0.001)
+        let base = safeNumber(S.users,0) * 0.0005 * (1 - safeNumber(S.inflation,0)) * diff.incomeMult * seasonMult * prestigeFast;
         let staffBonus = 0;
         S.staff.forEach(id=>{
             const s = STAFF.find(x=>x.id===id);
@@ -1244,22 +1340,62 @@ function raiseSalaries(){
     notify("💵 ×" + S.salaryLevel.toFixed(1), "#10b981"); saveNow(); updateUI(); renderUnions();
 }
 
+// ===== СЮЖЕТ (с условиями) =====
 function renderStory(){
     try {
-        document.getElementById("story-chapter").textContent = S.storyChapter;
-        const ch = STORY_CHAPTERS[Math.min(S.storyChapter-1, STORY_CHAPTERS.length-1)];
-        document.getElementById("story-text").textContent = ch.text;
+        const chapterEl = document.getElementById("story-chapter");
+        const textEl = document.getElementById("story-text");
         const choicesEl = document.getElementById("story-choices");
+        if(!chapterEl || !textEl || !choicesEl) return;
+
+        chapterEl.textContent = S.storyChapter + "/" + STORY_CHAPTERS.length;
         choicesEl.innerHTML = "";
-        if(S.storyChapter <= STORY_CHAPTERS.length){
+
+        if(S.storyChapter > STORY_CHAPTERS.length){
+            textEl.textContent = "Сюжет пройден! Ты легенда.";
+            return;
+        }
+
+        const ch = STORY_CHAPTERS[S.storyChapter - 1];
+        if(!ch){ textEl.textContent = "Сюжет завершён."; return; }
+
+        // Проверка условия
+        let conditionMet = true;
+        let conditionText = "";
+        if(ch.req){
+            conditionText = "Требование: " + ch.req.text;
+            if(ch.req.type === "users") conditionMet = S.users >= ch.req.value;
+            else if(ch.req.type === "money") conditionMet = S.money >= ch.req.value;
+            else if(ch.req.type === "techs") conditionMet = S.techs.length >= ch.req.value;
+            else if(ch.req.type === "staff") conditionMet = S.staff.length >= ch.req.value;
+            else if(ch.req.type === "servers") conditionMet = S.servers.length >= ch.req.value;
+            else if(ch.req.type === "boss") conditionMet = S.bossLevel > ch.req.value;
+            else if(ch.req.type === "prestige") conditionMet = S.prestige >= ch.req.value;
+            else if(ch.req.type === "crypto") conditionMet = Object.values(S.cryptos).some(c=>c.owned>0);
+        }
+
+        textEl.innerHTML = ch.text + (conditionText ? `<br><br><b style="color:${conditionMet?"#10b981":"#ef4444"}">${conditionText}</b>` : "");
+
+        if(!conditionMet){
+            const div = document.createElement("div");
+            div.style.cssText = "text-align:center;padding:10px;color:#ef4444;font-weight:700;";
+            div.textContent = "❌ Условие не выполнено";
+            choicesEl.appendChild(div);
+        } else {
             ch.choices.forEach(c=>{
                 const btn = document.createElement("button");
                 btn.textContent = c.text;
-                btn.onclick = ()=>{ c.effect(); S.storyChapter++; notify("📖 Глава " + S.storyChapter, "#8b5cf6"); saveNow(); updateUI(); renderStory(); };
+                btn.onclick = ()=>{
+                    c.effect();
+                    S.storyChapter++;
+                    notify("📖 Глава " + S.storyChapter, "#8b5cf6");
+                    beep(800, 0.2);
+                    saveNow(); updateUI(); renderStory();
+                };
                 choicesEl.appendChild(btn);
             });
-        } else choicesEl.innerHTML = "<p style='font-size:11px;'>Сюжет завершён!</p>";
-    } catch(e){}
+        }
+    } catch(e){ console.log("renderStory:", e); }
 }
 
 function renderCharacters(){
@@ -1377,7 +1513,6 @@ function doClick(event){
     } catch(e){ console.log(e); }
 }
 
-// ===== МАТЕМАТИКА (починено) =====
 function startMathGame(){
     try {
         const a = Math.floor(Math.random() * 20) + 1;
@@ -1670,6 +1805,7 @@ function doPrestige(){
     S.usersHistory = [0];
     S.company = {offices:0, absorbed:0, ipo:false, board:false, lawyers:false, franchise:false, partners:0};
     S.bots = [];
+    S.storyChapter = 1;
     notify("🌟 Престиж " + S.prestige + "! ×" + S.prestigeMult, "#f59e0b");
     confetti(); beep(900, 0.5);
     saveNow(); updateUI(); show("screen-main");
@@ -1865,7 +2001,8 @@ function tick(){
         S.servers.forEach(id=>{ const s = SERVERS.find(x=>x.id===id); if(s) upkeep += s.cost * 0.001 * diff.costMult; });
         S.money -= upkeep;
 
-        if(taxTimer >= 600){
+        // Налоги раз в 5 минут (было 10)
+        if(taxTimer >= 300){
             taxTimer = 0;
             const taxable = Math.max(0, S.money - S.offshore);
             const tax = taxable * 0.1;
@@ -1902,7 +2039,7 @@ function tick(){
             if(S.bonds > 0){ S.bonds += S.bonds * 0.10; }
         }
 
-        if(!S.crisis && crisisTimer >= 600 && Math.random() < 0.1){
+        if(!S.crisis && crisisTimer >= 600 && Math.random() < 0.15){
             S.crisis = true; crisisTimer = 0;
             if(!document.getElementById("crisisBanner")){
                 const b = document.createElement("div");
@@ -1958,9 +2095,9 @@ function tick(){
         let maxUsers = 1000;
         S.servers.forEach(id=>{ const s = SERVERS.find(x=>x.id===id); if(s) maxUsers += s.maxUsers; });
 
-        // РОСТ ЮЗЕРОВ: замедлен в 20 раз
+        // РОСТ: ещё медленнее (в 2 раза)
         if(S.users < maxUsers){
-            let growth = 0.05 + S.techs.length * 0.05 + S.staff.length * 0.1;
+            let growth = 0.025 + S.techs.length * 0.025 + S.staff.length * 0.05;
             growth *= (S.rep / 50);
             growth *= (1 + (S.level-1) * 0.1);
             growth *= (1 + (S.skills.growth || 0) * 0.1);
@@ -1977,7 +2114,8 @@ function tick(){
         if(S.depts.supp) S.rep = Math.min(100, S.rep + 0.05);
 
         addXp(0.5);
-        if(Math.random() < diff.eventChance){
+        // События чаще (шанс ×1.5)
+        if(Math.random() < diff.eventChance * 1.5){
             const e = EVENTS[Math.floor(Math.random()*EVENTS.length)];
             e.fn(); addLog(e.text, e.type);
             notify(e.text, e.type==="good"?"#10b981":"#ef4444");
@@ -2000,7 +2138,7 @@ function saveNow(){
     try {
         if(!gameCreated) return;
         S.lastPlaytime = Math.floor(Date.now()/1000);
-        ["v10","v9","v8","v7","v6","v5","v4","v3","v2"].forEach(v=>{
+        ["v11","v10","v9","v8","v7","v6","v5","v4","v3","v2"].forEach(v=>{
             try { localStorage.setItem("messengerSim_"+v, JSON.stringify(S)); } catch(e){}
         });
     } catch(e){}
@@ -2009,7 +2147,7 @@ function saveNow(){
 function load(){
     try {
         let d = null;
-        ["v10","v9","v8","v7","v6","v5","v4","v3","v2"].forEach(v=>{ if(!d) d = localStorage.getItem("messengerSim_"+v); });
+        ["v11","v10","v9","v8","v7","v6","v5","v4","v3","v2"].forEach(v=>{ if(!d) d = localStorage.getItem("messengerSim_"+v); });
         if(!d) return false;
         const parsed = JSON.parse(d);
         Object.assign(S, parsed);
@@ -2146,7 +2284,7 @@ function createMessenger(){
 
 function resetGame(){
     if(confirm("Сбросить ВСЁ?")){
-        ["v10","v9","v8","v7","v6","v5","v4","v3","v2"].forEach(v=>localStorage.removeItem("messengerSim_"+v));
+        ["v11","v10","v9","v8","v7","v6","v5","v4","v3","v2"].forEach(v=>localStorage.removeItem("messengerSim_"+v));
         localStorage.removeItem("messengerSim");
         location.reload();
     }
