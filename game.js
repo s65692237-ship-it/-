@@ -1,4 +1,4 @@
-// ===== СИМУЛЯТОР МЕССЕНДЖЕРА v8.0 =====
+// ===== СИМУЛЯТОР МЕССЕНДЖЕРА v8.1 =====
 // Все персонажи и события — вымышленные, не связаны с реальными людьми.
 
 function safeNumber(n, def){ return (typeof n === "number" && isFinite(n)) ? n : (def || 0); }
@@ -49,9 +49,11 @@ let S = {
     easterEggsFound:[], codesUsed:[], bots:[], battlesWon:0, bossHP:1000, bossLevel:1,
     unionActivity:0, salaryLevel:1, friends:[], wall:[], clickerCount:0, multiverse:[],
     profileAvatar:"👤", profileName:"", profileStatus:"",
-    // Античит кликера
     lastClickTime:0, clickBlocked:false, clickBlockEnd:0, clicksInWindow:0, clickWindowStart:0
 };
+
+// Флаг: создана ли игра (есть ли активное сохранение)
+let gameCreated = false;
 
 const DIFFICULTY = {
     easy:{incomeMult:1.5,costMult:0.7,eventChance:0.005,desc:"Лёгкая: больше дохода"},
@@ -331,7 +333,6 @@ const BATTLES = [
     {name:"Война с Вэй Ж",reward:100000}
 ];
 
-// Персонажи — вымышленные
 const CHARACTERS_LIST = [
     {name:"Инвестор №1",role:"Инвестор",desc:"Хочет 30% за $500000"},
     {name:"Техдир",role:"Технический директор",desc:"Гений, но вспыльчивый"},
@@ -341,7 +342,6 @@ const CHARACTERS_LIST = [
     {name:"Старый программист",role:"Архитектор",desc:"Знает все баги"}
 ];
 
-// Мультивселенная — открывается за конкретные достижения
 const MULTIVERSE_VERSIONS = [
     {name:"Ты-миллиардер",bonus:"+10% доход",req:"1000000000 денег",check:()=>S.money>=1000000000},
     {name:"Ты-президент",bonus:"+20 репутация",req:"100000 репутации",check:()=>S.rep>=100000},
@@ -353,6 +353,13 @@ const MULTIVERSE_VERSIONS = [
 
 function show(id){
     try {
+        // Защита: если игра не создана и пытаемся показать не-старт и не-настройки — не пускаем
+        if(!gameCreated && id !== "screen-start" && id !== "screen-create" && id !== "screen-settings") {
+            document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+            document.getElementById("screen-start").classList.add("active");
+            return;
+        }
+        
         document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
         const el = document.getElementById(id);
         if(el) el.classList.add("active");
@@ -391,6 +398,15 @@ function show(id){
         if(id==="screen-profile") renderProfile();
         if(id==="screen-settings") renderSettings();
     } catch(e){ console.log(e); }
+}
+
+// Возврат из настроек: на старт или на главный
+function backFromSettings(){
+    if(gameCreated){
+        show("screen-main");
+    } else {
+        show("screen-start");
+    }
 }
 
 function notify(text,color){
@@ -1206,16 +1222,13 @@ function renderMini(){
     } catch(e){}
 }
 
-// АНТИЧИТ КЛИКЕРА
 function doClick(event){
     try {
         const now = Date.now();
         
-        // Проверка 1: слишком быстрые клики (быстрее 50мс = автокликер)
         if(now - S.lastClickTime < 50 && S.lastClickTime > 0){
             S.clicksInWindow = (S.clicksInWindow || 0) + 1;
             if(S.clicksInWindow > 5){
-                // Античит сработал
                 S.clickBlocked = true;
                 S.clickBlockEnd = now + 10000;
                 const msg = document.getElementById("anticheat-message");
@@ -1229,7 +1242,6 @@ function doClick(event){
             S.clicksInWindow = 0;
         }
         
-        // Проверка 2: 100 кликов за 2 секунды
         if(!S.clickWindowStart || now - S.clickWindowStart > 2000){
             S.clickWindowStart = now;
             S.clicksInWindow = 0;
@@ -1246,7 +1258,6 @@ function doClick(event){
             return;
         }
         
-        // Проверка 3: блок активен
         if(S.clickBlocked && now < S.clickBlockEnd){
             return;
         } else if(S.clickBlocked && now >= S.clickBlockEnd){
@@ -1537,6 +1548,7 @@ function addXp(amount){
 }
 
 function claimDaily(){
+    if(!gameCreated){ notify("Сначала создай игру!", "#ef4444"); return; }
     const today = new Date().toDateString();
     if(S.dailyRewardDate === today){ notify("Уже получено", "#94a3b8"); return; }
     S.dailyRewardDate = today;
@@ -1554,6 +1566,7 @@ let depositTimer = 0, countryTimer = 0, weatherTimer = 0, botTimer = 0, unionTim
 
 function tick(){
     try {
+        if(!gameCreated) return;
         S.playtime++;
         taxTimer++; storyTimer++; stockTimer++; historyTimer++;
         cryptoTimer++; crisisTimer++; investorTimer++; seasonTimer++;
@@ -1567,7 +1580,6 @@ function tick(){
         S.servers.forEach(id=>{ const s = SERVERS.find(x=>x.id===id); if(s) upkeep += s.cost * 0.001 * diff.costMult; });
         S.money -= upkeep;
 
-        // Налоги реже — раз в 10 минут
         if(taxTimer >= 600){
             taxTimer = 0;
             const taxable = Math.max(0, S.money - S.offshore);
@@ -1699,6 +1711,7 @@ function tick(){
 
 function saveNow(){
     try {
+        if(!gameCreated) return;
         S.lastPlaytime = Math.floor(Date.now()/1000);
         ["v8","v7","v6","v5","v4","v3","v2"].forEach(v=>{
             try { localStorage.setItem("messengerSim_"+v, JSON.stringify(S)); } catch(e){}
@@ -1775,13 +1788,19 @@ function load(){
 }
 
 function toggleTheme(){ S.light = !S.light; document.body.classList.toggle("light", S.light); saveNow(); }
-function newGame(){ show("screen-create"); }
+function newGame(){ 
+    gameCreated = false;
+    show("screen-create"); 
+}
 function continueGame(){
     if(load()){
+        gameCreated = true;
         updateUI(); document.body.classList.toggle("light", S.light); show("screen-main");
         notify("💾 Загружено", "#10b981");
         if(S.settings.music) playMusic();
-    } else notify("Нет сохранений", "#ef4444");
+    } else {
+        notify("Нет сохранений", "#ef4444");
+    }
 }
 function createMessenger(){
     const name = document.getElementById("input-name").value.trim();
@@ -1811,6 +1830,7 @@ function createMessenger(){
         profileAvatar:"👤", profileName:name, profileStatus:"",
         lastClickTime:0, clickBlocked:false, clickBlockEnd:0, clicksInWindow:0, clickWindowStart:0
     };
+    gameCreated = true;
     generateTasks();
     addLog("Мессенджер создан: " + name, "good");
     notify("✨ " + name + " запущен!", "#10b981");
@@ -1829,4 +1849,4 @@ function resetGame(){
 updateUI();
 setInterval(tick, 1000);
 window.addEventListener("beforeunload", saveNow);
-setInterval(()=>{ if(S.settings.autosave) saveNow(); }, 3000);
+setInterval(()=>{ if(S.settings.autosave && gameCreated) saveNow(); }, 3000);
