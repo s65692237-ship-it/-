@@ -2,8 +2,11 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
 <meta name="theme-color" content="#1e293b">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Симулятор Мессенджера</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; font-family:-apple-system,"Segoe UI",Roboto,sans-serif; -webkit-tap-highlight-color:transparent; }
@@ -23,20 +26,38 @@ body.light label { color:#475569; }
 input,select,textarea { width:100%; padding:7px; margin-top:3px; background:#0f172a; color:#e2e8f0; border:1px solid #334155; border-radius:6px; font-size:13px; transition:border .2s,box-shadow .2s; }
 input:focus, select:focus, textarea:focus { outline:none; border-color:#3b82f6; box-shadow:0 0 0 2px rgba(59,130,246,.2); }
 body.light input, body.light select, body.light textarea { background:#f8fafc; color:#0f172a; border-color:#cbd5e1; }
-button { width:100%; padding:8px; margin-top:4px; background:linear-gradient(135deg,#3b82f6,#2563eb); color:#fff; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; transition:all .2s; box-shadow:0 2px 4px rgba(59,130,246,.3); }
+button { width:100%; padding:8px; margin-top:4px; background:linear-gradient(135deg,#3b82f6,#2563eb); color:#fff; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; transition:all .2s; box-shadow:0 2px 4px rgba(59,130,246,.3); touch-action:manipulation; }
 button:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 3px 8px rgba(59,130,246,.5); }
 button:active:not(:disabled) { transform:scale(0.96); }
 button:disabled { background:#334155; color:#64748b; cursor:not-allowed; opacity:.6; box-shadow:none; }
 .grid-buttons { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; margin-top:4px; }
 .grid-buttons button { margin:0; padding:7px 4px; font-size:11px; border-radius:6px; }
-@media (min-width:520px) { .grid-buttons { grid-template-columns:repeat(4,1fr); gap:5px; } .grid-buttons button { padding:8px 6px; font-size:12px; } }
+/* На ПК — 4 колонки, просторнее */
+@media (min-width:520px) {
+    .grid-buttons { grid-template-columns:repeat(4,1fr); gap:5px; }
+    .grid-buttons button { padding:9px 6px; font-size:12px; }
+}
+@media (min-width:900px) {
+    #app { max-width:720px; padding:14px; }
+    .grid-buttons { grid-template-columns:repeat(5,1fr); }
+    .grid-buttons button { padding:10px 8px; font-size:13px; }
+    h1 { font-size:22px; }
+    h2 { font-size:18px; }
+}
+/* На телефоне в повороте — максимально компактно */
+@media (max-height:500px) and (orientation:landscape) {
+    .grid-buttons { grid-template-columns:repeat(6,1fr); }
+    .grid-buttons button { padding:5px 3px; font-size:10px; }
+    h1 { font-size:14px; margin-bottom:3px; }
+}
 .header { display:flex; align-items:center; gap:5px; margin-bottom:8px; padding:7px; background:linear-gradient(135deg,#0f172a,#1e293b); border-radius:8px; font-size:14px; font-weight:700; flex-wrap:wrap; border:1px solid #334155; }
 body.light .header { background:linear-gradient(135deg,#f1f5f9,#e2e8f0); border-color:#cbd5e1; }
 #header-logo { font-size:18px; animation:pulse 3s infinite; }
-.tg-btn { display:inline-flex; align-items:center; gap:3px; padding:3px 8px; background:linear-gradient(135deg,#229ED9,#1c8cc0); color:#fff !important; text-decoration:none; border-radius:6px; font-size:10px; font-weight:700; box-shadow:0 2px 4px rgba(34,158,217,.4); transition:all .2s; border:none; cursor:pointer; }
+.tg-btn { display:inline-flex; align-items:center; gap:3px; padding:3px 8px; background:linear-gradient(135deg,#229ED9,#1c8cc0); color:#fff !important; text-decoration:none; border-radius:6px; font-size:10px; font-weight:700; box-shadow:0 2px 4px rgba(34,158,217,.4); transition:all .2s; border:none; cursor:pointer; touch-action:manipulation; }
 .tg-btn:hover { transform:translateY(-1px); box-shadow:0 3px 8px rgba(34,158,217,.6); background:linear-gradient(135deg,#1c8cc0,#167099); }
 .tg-btn:active { transform:scale(0.95); }
 .stats { display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-bottom:8px; }
+@media (min-width:520px) { .stats { grid-template-columns:repeat(4,1fr); } }
 .stat { background:#0f172a; padding:6px; border-radius:6px; text-align:center; transition:transform .2s; border:1px solid #1e293b; }
 .stat:hover { transform:scale(1.02); border-color:#3b82f6; }
 body.light .stat { background:#f1f5f9; border-color:#e2e8f0; }
@@ -59,6 +80,12 @@ body.light .item { border-bottom-color:#e2e8f0; }
 .item-name { font-weight:600; font-size:11px; }
 .item-cost { font-size:9px; color:#94a3b8; margin-top:1px; }
 .item button { width:auto; padding:3px 8px; font-size:10px; margin:0; margin-left:4px; }
+@media (min-width:520px) {
+    .item { padding:7px 0; }
+    .item-name { font-size:13px; }
+    .item-cost { font-size:11px; }
+    .item button { padding:5px 12px; font-size:12px; }
+}
 .events-list { max-height:220px; overflow-y:auto; }
 .event { background:#0f172a; padding:5px 7px; border-radius:5px; margin-bottom:3px; font-size:10px; border-left:3px solid #f59e0b; }
 body.light .event { background:#f1f5f9; }
@@ -67,7 +94,7 @@ body.light .event { background:#f1f5f9; }
 .event.bad { border-left-color:#ef4444; }
 .event.quest { border-left-color:#ec4899; }
 .notify { position:fixed; top:10px; right:10px; left:10px; background:linear-gradient(135deg,#1e293b,#334155); padding:8px 10px; border-radius:6px; border-left:3px solid #10b981; font-size:11px; box-shadow:0 8px 20px rgba(0,0,0,.6); z-index:100; animation:slideInRight .3s; color:#e2e8f0; }
-@media (min-width:520px) { .notify { left:auto; max-width:300px; } }
+@media (min-width:520px) { .notify { left:auto; max-width:300px; font-size:13px; padding:10px 14px; } }
 body.light .notify { background:#fff; color:#0f172a; }
 @keyframes slideInRight { from{transform:translateX(400px);opacity:0;} to{transform:translateX(0);opacity:1;} }
 @keyframes fall { 0%{transform:translateY(-20px) rotate(0);opacity:1;} 100%{transform:translateY(100vh) rotate(720deg);opacity:0;} }
@@ -90,13 +117,14 @@ body.light .quest { background:#f1f5f9; }
 .comp-bar:last-child { border-bottom:none; }
 .comp-bar.you { color:#10b981; font-weight:700; }
 canvas { width:100%; height:70px; background:#0f172a; border-radius:5px; margin-bottom:5px; border:1px solid #1e293b; }
+@media (min-width:520px) { canvas { height:120px; } }
 body.light canvas { background:#f8fafc; border-color:#cbd5e1; }
 .koll-item { background:#0f172a; padding:4px; border-radius:4px; text-align:center; font-size:14px; cursor:pointer; transition:.2s; border:1px solid #1e293b; }
 .koll-item:hover { transform:scale(1.1); }
 .koll-item.owned { background:rgba(16,185,129,.2); border-color:#10b981; }
 .koll-item.locked { opacity:.3; }
 .kollekciya { display:grid; grid-template-columns:repeat(6,1fr); gap:3px; }
-@media (min-width:520px) { .kollekciya { grid-template-columns:repeat(8,1fr); } }
+@media (min-width:520px) { .kollekciya { grid-template-columns:repeat(10,1fr); } }
 .skill { display:flex; justify-content:space-between; padding:3px 0; border-bottom:1px solid #1e293b; font-size:10px; align-items:center; }
 .skill:last-child { border-bottom:none; }
 .crisis-banner { position:fixed; top:0; left:0; width:100%; background:linear-gradient(90deg,#dc2626,#ef4444); color:#fff; padding:5px; text-align:center; font-weight:600; z-index:150; font-size:11px; animation:slideInDown .3s; }
@@ -122,6 +150,7 @@ body.light .rank { background:#f1f5f9; }
 .rank.bronze { background:linear-gradient(90deg,#92400e33,#92400e11); border-left:3px solid #92400e; }
 .rank.you { border:1px solid #10b981; }
 .logo-picker { display:grid; grid-template-columns:repeat(6,1fr); gap:3px; }
+@media (min-width:520px) { .logo-picker { grid-template-columns:repeat(10,1fr); } }
 .logo-item { background:#0f172a; padding:4px; border-radius:4px; text-align:center; font-size:14px; cursor:pointer; border:1px solid #1e293b; }
 .logo-item.active { border:2px solid #3b82f6; }
 .logo-item.locked { opacity:.3; }
@@ -301,7 +330,7 @@ body.light .rank { background:#f1f5f9; }
 <div id="screen-visual" class="screen"><h2>🎨 Визуал</h2><div class="section"><div class="section-title">Время суток</div><div style="margin-bottom:4px;">Сейчас: <b id="time-of-day">День</b></div><button onclick="changeTimeOfDay()">🌓 Сменить</button></div><div class="section"><div class="section-title">Погода</div><div style="margin-bottom:4px;">Сейчас: <b id="visual-weather">Ясно</b></div><button onclick="changeWeather()">🌧️ Сменить</button></div><div class="section"><div class="section-title">Конструктор стикеров</div><input type="text" id="sticker-input" maxlength="3" placeholder="Эмодзи"><button onclick="createSticker()">➕ Создать</button><div class="kollekciya" id="custom-stickers" style="margin-top:4px;"></div></div><div class="section"><div class="section-title">Пасхалки (40)</div><button onclick="checkEasterEgg()">🥚 Найти</button><div id="easter-egg-result" style="font-size:10px;margin-top:4px;"></div><div style="font-size:10px;margin-top:4px;">Найдено: <b id="eggs-count">0</b>/40</div></div><div class="section"><div class="section-title">Секретные коды</div><input type="text" id="code-input" placeholder="Введи код"><button onclick="enterCode()">🔑 Активировать</button></div><div class="section"><div class="section-title">Режим</div><div style="font-size:10px;margin-bottom:4px;">Сейчас: <b id="current-mode">Обычный</b></div><button onclick="changeMode('hardcore')">💀 Хардкор</button><button onclick="changeMode('sandbox')">🏖️ Песочница</button><button class="btn-sec" onclick="changeMode('normal')">⚙️ Обычный</button></div><button class="btn-sec" onclick="show('screen-main')">Назад</button></div>
 <div id="screen-profile" class="screen"><h2>👤 Профиль</h2><div class="section"><div style="text-align:center;font-size:36px;" id="profile-avatar">👤</div><label>Имя<input type="text" id="profile-name" maxlength="20"></label><label>Статус<input type="text" id="profile-status" maxlength="50"></label><div class="section-title">Аватар</div><div class="kollekciya" id="avatar-picker"></div><button onclick="saveProfile()">💾 Сохранить</button></div><div class="section"><div class="section-title">Стена</div><textarea id="wall-input" rows="2" placeholder="Что нового?"></textarea><button onclick="postWall()">📝 Опубликовать</button><div id="wall-list" style="margin-top:6px;"></div></div><button class="btn-sec" onclick="show('screen-main')">Назад</button></div>
 
-<div id="screen-settings" class="screen"><h2>⚙️ Настройки</h2><div class="section"><div class="section-title">Звук</div><div class="setting-row"><span>🔊 Звуки</span><div class="toggle on" id="tgl-sound" onclick="toggleSetting('sound')"></div></div><div class="setting-row"><span>🎵 Музыка</span><div class="toggle on" id="tgl-music" onclick="toggleSetting('music')"></div></div><div class="setting-row"><span>💰 Монетки</span><div class="toggle on" id="tgl-coins" onclick="toggleSetting('coins')"></div></div><div class="setting-row"><span>🎉 Конфетти</span><div class="toggle on" id="tgl-confetti" onclick="toggleSetting('confetti')"></div></div></div><div class="section"><div class="section-title">Уведомления</div><div class="setting-row"><span>🔔 Показывать</span><div class="toggle on" id="tgl-notify" onclick="toggleSetting('notify')"></div></div><div class="setting-row"><span>📜 События</span><div class="toggle on" id="tgl-events" onclick="toggleSetting('events')"></div></div></div><div class="section"><div class="section-title">Сохранение</div><div class="setting-row"><span>💾 Автосохранение</span><div class="toggle on" id="tgl-autosave" onclick="toggleSetting('autosave')"></div></div></div><div class="section"><div class="section-title">Сложность</div><div><button class="diff-btn" id="diff-easy" onclick="setDifficulty('easy')">Лёгкая</button><button class="diff-btn active" id="diff-medium" onclick="setDifficulty('medium')">Средняя</button><button class="diff-btn" id="diff-hard" onclick="setDifficulty('hard')">Сложная</button></div><div class="hint" id="diff-hint">Средняя: баланс</div></div><div class="section"><div class="section-title">Интерфейс</div><div class="setting-row"><span>🌓 Тема</span><button class="diff-btn" onclick="toggleTheme()">Сменить</button></div></div><div class="section"><div class="section-title">Наш канал</div><a class="tg-btn" href="https://t.me/VOXLAB0" target="_blank" style="display:block; text-align:center; padding:8px;">📢 VOXLAB0</a></div><div class="section"><div class="section-title">О игре</div><div class="detail-row"><span class="label">Версия</span><span class="value">v8.3</span></div></div><button class="btn-sec" onclick="backFromSettings()">Назад</button></div>
+<div id="screen-settings" class="screen"><h2>⚙️ Настройки</h2><div class="section"><div class="section-title">Звук</div><div class="setting-row"><span>🔊 Звуки</span><div class="toggle on" id="tgl-sound" onclick="toggleSetting('sound')"></div></div><div class="setting-row"><span>🎵 Музыка</span><div class="toggle on" id="tgl-music" onclick="toggleSetting('music')"></div></div><div class="setting-row"><span>💰 Монетки</span><div class="toggle on" id="tgl-coins" onclick="toggleSetting('coins')"></div></div><div class="setting-row"><span>🎉 Конфетти</span><div class="toggle on" id="tgl-confetti" onclick="toggleSetting('confetti')"></div></div></div><div class="section"><div class="section-title">Уведомления</div><div class="setting-row"><span>🔔 Показывать</span><div class="toggle on" id="tgl-notify" onclick="toggleSetting('notify')"></div></div><div class="setting-row"><span>📜 События</span><div class="toggle on" id="tgl-events" onclick="toggleSetting('events')"></div></div></div><div class="section"><div class="section-title">Сохранение</div><div class="setting-row"><span>💾 Автосохранение</span><div class="toggle on" id="tgl-autosave" onclick="toggleSetting('autosave')"></div></div></div><div class="section"><div class="section-title">Сложность</div><div><button class="diff-btn" id="diff-easy" onclick="setDifficulty('easy')">Лёгкая</button><button class="diff-btn active" id="diff-medium" onclick="setDifficulty('medium')">Средняя</button><button class="diff-btn" id="diff-hard" onclick="setDifficulty('hard')">Сложная</button></div><div class="hint" id="diff-hint">Средняя: баланс</div></div><div class="section"><div class="section-title">Интерфейс</div><div class="setting-row"><span>🌓 Тема</span><button class="diff-btn" onclick="toggleTheme()">Сменить</button></div><div class="setting-row"><span>📱 Устройство</span><b id="device-info" style="font-size:11px;">—</b></div></div><div class="section"><div class="section-title">Наш канал</div><a class="tg-btn" href="https://t.me/VOXLAB0" target="_blank" style="display:block; text-align:center; padding:8px;">📢 VOXLAB0</a></div><div class="section"><div class="section-title">О игре</div><div class="detail-row"><span class="label">Версия</span><span class="value">v9.0</span></div></div><button class="btn-sec" onclick="backFromSettings()">Назад</button></div>
 
 <div id="screen-prestige" class="screen"><h2>🌟 Престиж</h2><div class="section"><p>Достигни 1 000 000 юзеров.</p><div style="text-align:center;margin-bottom:5px;">Множитель: <b id="prestige-mult">×1</b></div><div style="text-align:center;margin-bottom:5px;">Уровень: <b id="prestige-level">0</b></div></div><button class="btn-prestige" onclick="doPrestige()">🌟 Переродиться</button><button class="btn-sec" onclick="show('screen-main')">Назад</button></div>
 
